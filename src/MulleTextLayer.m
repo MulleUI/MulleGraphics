@@ -37,11 +37,46 @@
 
 - (void) getFontTextBounds:(CGFloat [4]) bounds
 {
+   assert( _textBounds[ 0] != CGFLOAT_MIN);
+
    bounds[ 0] = _textBounds[ 0];
    bounds[ 1] = _textBounds[ 1];
    bounds[ 2] = _textBounds[ 2];
    bounds[ 3] = _textBounds[ 3];
 }
+
+
+- (void) getFontTextBounds:(CGFloat [4]) bounds
+                   context:(CGContext *) context 
+{
+   if( _textBounds[ 0] == CGFLOAT_MIN)
+      [self updateGeometryWithContext:context];      
+   
+   bounds[ 0] = _textBounds[ 0];
+   bounds[ 1] = _textBounds[ 1];
+   bounds[ 2] = _textBounds[ 2];
+   bounds[ 3] = _textBounds[ 3];
+}
+
+- (CGSize) sizeToFit:(CGSize) max
+             context:(CGContext *) context
+{
+   CGFloat   bounds[ 4];
+
+   assert( max.width == INFINITY && max.height == INFINITY);
+
+   [self getFontTextBounds:bounds
+                   context:context];
+
+   fprintf( stderr, "textBounds: %.2f %.2f %.2f %.2f\n",
+                     bounds[ 0],
+                     bounds[ 1],
+                     bounds[ 2],
+                     bounds[ 3]);
+
+   return( CGSizeMake( bounds[ 2] - bounds[ 0], bounds[ 3] - bounds[ 1]));
+}             
+
 
 - (void) setUTF8Data:(struct mulle_utf8data) data
 {
@@ -54,11 +89,12 @@
 
    allocator = MulleObjCInstanceGetAllocator( self);
    length    = data.length;
+  
+   // don't want two trailing zeroes in incoming data
    if( length)
       if( ! data.characters[ length - 1])
          --length;
 
-   // don't want two trailing zeroes in incoming data
    assert( ! length || data.characters[ length - 1]);
 
    p = mulle_allocator_malloc( allocator, length + 1);
@@ -69,6 +105,12 @@
 
    _data.characters = p;
    _data.length     = length;
+
+   // clear this to be recomputed later
+   _textBounds[ 0] = 
+   _textBounds[ 1] = 
+   _textBounds[ 2] = 
+   _textBounds[ 3] = CGFLOAT_MIN;
 }
 
 
@@ -89,22 +131,12 @@
    if( ! s)
       s = "";
 
-#if 0
-#ifdef NDEBUG
-   struct mulle_utf_information   info;
-   // must be valid UTF8
-   mulle_utf8_information( s, -1, &info);
-   if( ! mulle_utf_information_is_valid( info))
-      abort();
-#endif
-   _newlinesInCString = count_newlines( s);
-#endif
-
-    MulleObjCObjectSetDuplicatedCString( self, (char **) &_data.characters, s);
-   _data.length = strlen( s);
+   // include trailing \0 in data
+   [self setUTF8Data:mulle_utf8data_make( (mulle_utf8_t *) s, strlen( s) + 1)];
 }
 
 
+// fontNameCString ?
 - (void) setFontName:(char *) s
 {
    MulleObjCObjectSetDuplicatedCString( self, &_fontName, s);
@@ -178,13 +210,19 @@ static NSUInteger  count_newlines( mulle_utf8_t *s)
 {
    struct MulleTextLayerRowGlyphs   *p;
    struct MulleTextLayerRowGlyphs   *sentinel;
+   unsigned int                     n;
 
-   p        = _mulle_structarray_get( &_rowGlyphArray, 0);
-   sentinel = &p [ _mulle_structarray_get_count( &_rowGlyphArray)];
-   while( p < sentinel)
+   n = _mulle_structarray_get_count( &_rowGlyphArray);
+   if( n)
    {
-      MulleTextLayerRowGlyphsDone( p);
-      ++p;
+      p        = _mulle_structarray_get( &_rowGlyphArray, 0);
+      sentinel = &p[ n];
+      do
+      {
+         MulleTextLayerRowGlyphsDone( p);
+         ++p;
+      }
+      while( p < sentinel);
    }
 
    _mulle_structarray_done( &_rowGlyphArray);
@@ -196,8 +234,8 @@ static NSUInteger  count_newlines( mulle_utf8_t *s)
    [self _doneRowGlyphs];
    _mulle_structarray_done( &_rowArray);
 
-   MulleObjCObjectDeallocateMemory( self, _fontName);
-   MulleObjCObjectDeallocateMemory( self, _data.characters);
+   MulleObjCInstanceDeallocateMemory( self, _fontName);
+   MulleObjCInstanceDeallocateMemory( self, _data.characters);
 
    [super dealloc];
 }
@@ -244,13 +282,15 @@ static NSUInteger  count_newlines( mulle_utf8_t *s)
    NSUInteger   diff;
    NSUInteger   size;
 
+   assert( max >= 1);
+
    size  = _mulle_structarray_get_size( &_rowArray);
    if( max > size)
    {
       diff = max - size;
       _mulle_structarray_advance( &_rowArray, max);
    }
-   //
+   
    _rows  = _mulle_structarray_get( &_rowArray, 0);
    _nRows = 0;
 }
@@ -262,6 +302,8 @@ static NSUInteger  count_newlines( mulle_utf8_t *s)
    NSUInteger                       diff;
    struct MulleTextLayerRowGlyphs   *p;
    struct MulleTextLayerRowGlyphs   *sentinel;
+
+   assert( max);
 
    //
    // The contents of _rowGlyphArray will be reused, as they contain
@@ -368,42 +410,54 @@ NSUInteger
 }
 
 
-- (void) updateRowsAndGlyphsWithContext:(NVGcontext *) vg
+- (void) updateRowsAndGlyphsWithContext:(CGContext *) context
 {
    NSUInteger   max;
    NSUInteger   i;
    CGFloat      width;
    CGFloat      extent;
+   NVGcontext  *vg;
 
+   vg  = [context nvgContext];
+
+   //
    // calculate max visible rows, which is frame.size.height / _lineh , but
-   // because of partials we add + 2
-
-   max = (NSUInteger) ceil( _frame.size.height / _lineh) + 2;
-
-   // calculate this always, as _textBounds can be useful later on as well
-   extent  = nvgTextMinimalBounds( vg, 0,
-                                       0,
-                                       (void *) _data.characters,
-                                       (void *) &_data.characters[ _data.length],
-                                       _textBounds);
-   // produce row information
-   switch( _lineBreakMode)
+   // because of partially visible rows we add + 2
+   //
+   if( _lineh == 0.0)
    {
-   case NSLineBreakByWordWrapping :
-      // the width can produce more lines, we assume worst case
-      // we have a string of "max" number of linefeeds, followed by
-      // a last line as one large string without linefeed
-      // We will have to divide this by width to get the extra lengths
-      // also when word wrapping how big can the biggest word be ?
+      max = 2;
+      memset( _textBounds, 0, sizeof( _textBounds)); 
+   }
+   else
+   {
+      max = (NSUInteger) ceil( _frame.size.height / _lineh) + 2;
 
-      width   = _frame.size.width;
-      // TODO check this is true, probably need to fuzz it
-      max    += ceil( extent / width) + 1;
-      break;
+      // calculate this always, as _textBounds can be useful later on as well
+      extent  = nvgTextBounds( vg, 0,
+                                   0,
+                                   (void *) _data.characters,
+                                   (void *) &_data.characters[ _data.length],
+                                   _textBounds);
+      // produce row information
+      switch( _lineBreakMode)
+      {
+      case NSLineBreakByWordWrapping :
+         // the width can produce more lines, we assume worst case
+         // we have a string of "max" number of linefeeds, followed by
+         // a last line as one large string without linefeed
+         // We will have to divide this by width to get the extra lengths
+         // also when word wrapping how big can the biggest word be ?
 
-   default :
-      width = INFINITY;
-      break;
+         width   = _frame.size.width;
+         // TODO check this is true, probably need to fuzz it
+         max    += ceil( extent / width) + 1;
+         break;
+
+      default :
+         width = INFINITY;
+         break;
+      }
    }
 
    [self resizeRowsTo:max];
@@ -414,25 +468,25 @@ NSUInteger
    // Here the problem is, that we always calculate from the start though
    // which doesn't work well for middle/bottom...
    //
-   _nRows = nvgTextBreakLines( vg, (void *) _data.characters,
-                                   (void *) &_data.characters[ _data.length],
-                                   width,
-                                   _rows,
-                                   max);
+   if( _lineh == 0.0)
+      _nRows = 0.0;
+   else
+      _nRows = nvgTextBreakLines( vg, (void *) _data.characters,
+                                      (void *) &_data.characters[ _data.length],
+                                      width,
+                                      _rows,
+                                      max);
+
    // produce glyph information for each row
    for( i = 0; i < _nRows; i++)
       [self updateRowGlyphsAtIndex:i
                            context:vg];
 }
 
-
-// textOffset in CGPoint
-//  1.) figure out how
-- (BOOL) drawContentsInContext:(CGContext *) context
+- (BOOL) updateGeometryWithContext:(CGContext *) context
 {
    struct NVGcontext   *vg;
    float               lineh;
-   CGColorRef          textBackgroundColor;
    CGFloat             fontPixelSize;
    CGFloat             rowsHeight;
    CGFloat             baseline;
@@ -442,31 +496,24 @@ NSUInteger
    CGRect              frame;
    char                *name;
    int                 align;
-   NSRange             selectionRange;
-   NSRange             textRange;
-   NSUInteger          i;
-
-   // nothing to draw ? then bail
-   if( ! _data.length)
-      return( NO);
-
+   
    font  = [context fontWithNameCString:_fontName ? _fontName : "sans"];
    name  = [font nameCString];  // get actual name, which could have different address
    frame = [self frame];
    frame = MulleEdgeInsetsInsetRect( _insets, frame);
 
+   vg = [context nvgContext];
+
    fontPixelSize = [self fontPixelSize];
    if( fontPixelSize == 0.0)
       fontPixelSize = (int) frame.size.height;
-
-   vg = [context nvgContext];
 
    nvgFontSize( vg, fontPixelSize);
    nvgFontFace( vg, name);
 
    // I see no difference with different alignment options, for the metrics
    nvgTextMetrics( vg, &_ascender, &_descender, &_lineh);
-   baseline = - _descender;
+
 
    switch( _alignmentMode)
    {
@@ -489,10 +536,8 @@ NSUInteger
    // and also affects the nvg text calculations for the horizontal plane.
    //
    nvgTextAlign( vg, align | NVG_ALIGN_BASELINE);
-   [self updateRowsAndGlyphsWithContext:vg];
-   // now we know the number of rows,
-   // calculate the height of all rows
-   rowsHeight  = _lineh * _nRows;
+
+   [self updateRowsAndGlyphsWithContext:context];
 
    if( _nRows <= 1)
    {
@@ -517,6 +562,10 @@ NSUInteger
    }
    else
    {
+      // now we know the number of rows,
+      // calculate the height of all rows
+      rowsHeight  = _lineh * _nRows;
+
       // this is top aligned as default, other alignments use this as well
       switch( _verticalAlignmentMode)
       {
@@ -554,17 +603,47 @@ NSUInteger
    _origin.x += _textOffset.x;
    _origin.y += _textOffset.y;
 
+   return( _lineh != 0.0);
+}
+
+
+// textOffset in CGPoint
+//  1.) figure out how
+- (BOOL) drawContentsInContext:(CGContext *) context
+{
+   struct NVGcontext   *vg;
+   CGColorRef          textBackgroundColor;
+   CGFloat             fontPixelSize;
+   CGPoint             cursor;
+   CGPoint             offset;
+   CGRect              frame;
+   NSRange             selectionRange;
+   NSRange             textRange;
+   NSUInteger          i;
+
+   // nothing to draw ? then bail
+   if( ! _data.length)
+      return( NO);
+
+   if( ! [self updateGeometryWithContext:context])
+      return( NO);
+
+   frame = [self frame];
+   frame = MulleEdgeInsetsInsetRect( _insets, frame);
+
+   vg = [context nvgContext];
+
    for( i = 0; i < _nRows; i++)
    {
       textRange = NSMakeRange( _rows[ i].start - (char *) _data.characters,
                                _rows[ i].end - _rows[ i].start);
 
-   // Draw the first line only
-   // don't render outside of myself
-   nvgIntersectScissor( vg, frame.origin.x,
-                            frame.origin.y,
-                            frame.size.width,
-                            frame.size.height);
+      // Draw the first line only
+      // don't render outside of myself
+      nvgIntersectScissor( vg, frame.origin.x,
+                               frame.origin.y,
+                               frame.size.width,
+                               frame.size.height);
    //   // nvgFillColor( vg, nvgRGBA(127,127,255,255));
 
       /*
@@ -593,7 +672,7 @@ NSUInteger
          [self drawCursorWithNVGContext:vg
                                     row:i];
    }
-   return( NO);
+   return( YES); // did change scissor
 }
 
 

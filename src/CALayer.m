@@ -67,6 +67,12 @@
 }
 
 
++ (instancetype) layer
+{
+   return( [self object]);
+}
+
+
 - (void) setTransform:(_NVGtransform) transform
               scissor:(NVGscissor *) scissor
 {
@@ -87,11 +93,11 @@
                            color:(CGColorRef) color
                            paint:(MullePaint *) paint
 {
-   NVGcontext     *vg;
-   CGPoint        tl;
-   CGPoint        br;
-   CGRect         frame;
-   CGFloat        borderWidth;
+   NVGcontext        *vg;
+   CGPoint           tl;
+   CGPoint           br;
+   CGRect            frame;
+   CGFloat           borderWidth;
    MulleEdgeInsets   insets;
 
    // if there is a border to be drawn, then we use antialias
@@ -232,6 +238,12 @@ static void   resetTransformAndScissor( CALayer *self, NVGcontext *vg)
    nvgSetScissor( vg, &self->_scissor);
 }
 
+
+- (void) resetTransformAndScissor:(CGContext *) context
+{
+   resetTransformAndScissor( self, [context nvgContext]);
+}
+
 /*
 - (CGPoint) scale
 {
@@ -243,6 +255,27 @@ static void   resetTransformAndScissor( CALayer *self, NVGcontext *vg)
 }
 */
 
+// The caller is expected to have setup the transform and scissor for the
+// layer already!
+//
+//   _NVGtransform   transform;
+//   NVGscissor      scissor;
+//
+//   vg = [context nvgContext];
+//
+//   nvgCurrentTransform( vg, transform);
+//   nvgGetScissor( vg, &scissor);
+//
+//   [layer setTransform:transform
+//                    scissor:&scissor];
+//   if( [layer drawInContext:context])
+//   {
+//      nvgSetScissor( vg, &scissor);
+//      nvgResetTransform( vg);
+//      nvgTransform( vg, transform[ 0], transform[ 1], transform[ 2],
+//                        transform[ 3], transform[ 4], transform[ 5]);
+//   }
+//
 - (BOOL) drawInContext:(CGContext *) context
 {
    CGPoint           scale;
@@ -369,7 +402,6 @@ static void   resetTransformAndScissor( CALayer *self, NVGcontext *vg)
 
    return( YES);
 }
-
 
 
 //

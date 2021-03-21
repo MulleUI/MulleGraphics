@@ -61,6 +61,8 @@
    CGRect       frame;
    CGFloat      alpha;
    CGRect       rect;
+   CGRect       layoutedRect;
+   BOOL         flag;
 
    if( ! _image)
       return( NO);
@@ -75,19 +77,27 @@
    vg        = [context nvgContext];
    frame     = [self frame];
    alpha     = _selected ? 0.5 : 1.0;
-   imgPaint  = nvgImagePattern( vg, frame.origin.x, 
-                                    frame.origin.y, 
-                                    imageSize.width, 
-                                    imageSize.height, 
+
+   nvgBeginPath( vg);
+
+   layoutedRect = MulleSizeApplyContentModeInRect( imageSize, _contentMode, frame);
+   flag = (_contentMode == UIViewContentModeScaleAspectFill);
+   if( flag)
+      nvgScissor( vg, frame.origin.x, frame.origin.y, frame.size.width, frame.size.height);
+
+   imgPaint  = nvgImagePattern( vg, layoutedRect.origin.x, 
+                                    layoutedRect.origin.y, 
+                                    layoutedRect.size.width, 
+                                    layoutedRect.size.height, 
                                     0.0f/180.0f*NVG_PI, 
                                     textureId, 
                                     alpha);
-   nvgBeginPath( vg);
+
    // shouldn't this be the frame ?
-   nvgRoundedRect( vg, frame.origin.x,
-                       frame.origin.y,
-                       imageSize.width,
-                       imageSize.height,
+   nvgRoundedRect( vg, layoutedRect.origin.x,
+                       layoutedRect.origin.y,
+                       layoutedRect.size.width,
+                       layoutedRect.size.height,
                        (int) _cornerRadius);
    nvgFillPaint( vg, imgPaint);
   // nvgFillColor( vg, getNVGColor( 0x402060FF));
@@ -98,19 +108,23 @@
    {
       rect = [_image visibleBounds];
 
+      layoutedRect = MulleSizeApplyContentModeInRect( rect.size, _contentMode, frame);
+      layoutedRect.origin.x += rect.origin.x;
+      layoutedRect.origin.y += rect.origin.y;
+
       // MEMO: wenn man den nvgBeginPath weglaesst, dann klippt das rect gegen
       // den letzten shape, was ev. ganz nuetzlich mal sein kann.
 		nvgBeginPath( vg);
-      nvgRect( vg, rect.origin.x,
-                   rect.origin.y,
-                   rect.size.width,
-                   rect.size.height);
+      nvgRect( vg, layoutedRect.origin.x,
+                   layoutedRect.origin.y,
+                   layoutedRect.size.width,
+                   layoutedRect.size.height);
 
   	   nvgFillColor( vg, _selectionColor);
 	   nvgFill( vg);
    }
 
-   return( NO);
+   return( flag);
 }
 
 

@@ -129,7 +129,7 @@ NSUInteger   MulleNVGglyphPositionSearch( NVGglyphPosition *glyphs,
 // for cleartype it's important to know the color the text is drawn on
 // if the layer backgroundColor is transparent, use this color to supply
 // the correct color to use
-@property CGColorRef                               textBackgroundColor;
+@property( assign) CGColorRef                      textBackgroundColor;
 @property( assign) enum CATextLayerAlignmentMode   alignmentMode;
 @property( assign) NSLineBreakMode                 lineBreakMode;
 
@@ -140,10 +140,20 @@ NSUInteger   MulleNVGglyphPositionSearch( NVGglyphPosition *glyphs,
 // cursor position as row/column
 @property( assign) struct MulleIntegerPoint          cursorPosition;
 
+// only valid during and after render!
 - (CGFloat) fontAscender;
 - (CGFloat) fontDescender;
 - (CGFloat) fontLineHeight;
+
+// TODO: get rid of CGFloat[4], replace with CGrect ? 
 - (void) getFontTextBounds:(CGFloat [4]) bounds;
+
+// this is can be called anytime
+- (void) getFontTextBounds:(CGFloat [4]) bounds
+                   context:(CGContext *) context;
+
+- (CGSize) sizeToFit:(CGSize) bounds
+             context:(CGContext *) context;
 
 - (enum MulleTextLayerVerticalAlignmentMode)  mulleVerticalAlignmentMode;
 - (void) mulleSetVerticalAlignmentMode:(enum MulleTextLayerVerticalAlignmentMode) mode;

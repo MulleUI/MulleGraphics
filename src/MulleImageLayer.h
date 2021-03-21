@@ -2,26 +2,10 @@
 
 #import "MulleCursorProtocol.h"
 
+#include "MulleLayout.h"
+
 
 @class UIImage;
-
-
-typedef enum
-{
-   UIViewContentModeScaleToFill,
-   UIViewContentModeScaleAspectFit,
-   UIViewContentModeScaleAspectFill,
-   UIViewContentModeRedraw,
-   UIViewContentModeCenter,
-   UIViewContentModeTop,
-   UIViewContentModeBottom,
-   UIViewContentModeLeft,
-   UIViewContentModeRight,
-   UIViewContentModeTopLeft,
-   UIViewContentModeTopRight,
-   UIViewContentModeBottomLeft,
-   UIViewContentModeBottomRight
-} UIViewContentMode;
 
 
 @interface MulleImageLayer : CALayer <CAImageLayer, MulleCursor>

@@ -18,8 +18,8 @@
 
 // methods with RGBA are unwrapped, uncompressed binary RGBA data
 - (instancetype) initWithFileCData:(struct mulle_data) data
-                             allocator:(struct mulle_allocator *) allocator
-                         nvgImageFlags:(int) flags;
+                         allocator:(struct mulle_allocator *) allocator
+                     nvgImageFlags:(int) flags;
 
 // Other methods expect PNG or JPG data
                 // const meaning readonly memory
@@ -28,6 +28,11 @@
                      nvgImageFlags:(int) flags;
 - (instancetype) initWithConstRGBA:(const void *) bytes
                         bitmapSize:(mulle_bitmap_size) bitmapSize;
+
+- (instancetype) initWithRGBACData:(struct mulle_data) data
+                        bitmapSize:(mulle_bitmap_size) bitmapSize
+                         allocator:(struct mulle_allocator *) allocator
+                     nvgImageFlags:(int) flags;
 
 - (instancetype) initWithContentsOfFileWithFileRepresentationString:(char *) s
                                                       nvgImageFlags:(int) flags;

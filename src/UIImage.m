@@ -7,7 +7,7 @@
 
 
 - (instancetype) initWithFileCData:(struct mulle_data) data
-                             allocator:(struct mulle_allocator *) allocator
+                         allocator:(struct mulle_allocator *) allocator
 {
    _fileData          = data;
    _fileDataAllocator = allocator;
@@ -17,8 +17,16 @@
 }
 
 
+- (instancetype) initWithConstantBytes:(const void *) bytes
+                                length:(NSUInteger) length
+{
+   return( [self initWithFileCData:mulle_data_make( bytes, length) 
+                         allocator:NULL]);
+}                                
+
+
 - (instancetype) initWithFileCData:(struct mulle_data) data
-                         sharingObject:(id) sharingObject
+                     sharingObject:(id) sharingObject
 {
    _fileDataSharingObject = [sharingObject retain];
    return( [self initWithFileCData:data

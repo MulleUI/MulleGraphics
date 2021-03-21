@@ -36,7 +36,7 @@
 
 
 - (instancetype) initWithFileCData:(struct mulle_data) data
-                            allocator:(struct mulle_allocator *) allocator
+                         allocator:(struct mulle_allocator *) allocator
 {
    NSVGimage   *image;
    BOOL        hasZero;

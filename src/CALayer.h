@@ -57,7 +57,7 @@ struct CAAnimationOptions;
 
 
 + (instancetype) layerWithFrame:(CGRect) frame;
-
++ (instancetype) layer;
 
 - (instancetype) init; // designated
 - (instancetype) initWithFrame:(CGRect) frame;
@@ -73,12 +73,15 @@ struct CAAnimationOptions;
 // scissors in return YES, otherwise NO.
 //
 - (BOOL) drawBackgroundInContext:(CGContext *) context;
-- (BOOL) drawContentsInContext:(CGContext *) ctx;
+- (BOOL) drawContentsInContext:(CGContext *) contextcontext;
 - (BOOL) drawBorderInContext:(CGContext *) context;
 
 
 - (void) setTransform:(_NVGtransform) transform
               scissor:(NVGscissor *) scissor;
+
+// use after draw...InContext: calls if return value is YES             
+- (void) resetTransformAndScissor:(CGContext *) context;
 
 
 - (void) fillBackgroundInContext:(CGContext *) context

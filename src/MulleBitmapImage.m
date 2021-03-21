@@ -53,9 +53,9 @@ struct mulle_allocator    stbi_allocator;  // no contents
 
 
 - (instancetype) initWithRGBACData:(struct mulle_data) data
-                            bitmapSize:(mulle_bitmap_size) bitmapSize
-                             allocator:(struct mulle_allocator *) allocator
-                         nvgImageFlags:(int) flags
+                        bitmapSize:(mulle_bitmap_size) bitmapSize
+                         allocator:(struct mulle_allocator *) allocator
+                     nvgImageFlags:(int) flags
 {
    self = [self initWithConstRGBA:(const void *) data.bytes
                        bitmapSize:bitmapSize
