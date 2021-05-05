@@ -26,48 +26,52 @@
 }
 
 // needs to restore context if changed
-- (BOOL) drawContentsInContext:(CGContext *) context
+- (void) drawInContext:(CGContext *) context
 {
-   NVGcontext   *nvg;
+   NVGcontext   *vg;
    BOOL          fill;
    BOOL          stroke;
    CGRect        frame;
-   CGRect        bounds;
+   CGRect        canvas;
 
    fill   = ! MulleColorIsTransparent( _fillColor);
    stroke = ! MulleColorIsTransparent( _strokeColor);
 
    if( ! fill && ! stroke)
-      return( NO);
+      return;
 
-   nvg    = [context nvgContext];
+   vg    = [context nvgContext];
    frame  = [self frame];
 
    // scale untested
-   bounds = [self bounds];
-   nvgTranslate( nvg, frame.origin.x, frame.origin.y);
-   {   
-      if( ! CGSizeEqualToSize( frame.size, bounds.size))
-      {
-         nvgScale( nvg, bounds.size.width / frame.size.width, 
-                        bounds.size.height / frame.size.height);
-      }
+   canvas = [self canvas];
 
-      nvgBeginPath( nvg);
-      nvgAddCGPath( nvg, _path);
+   nvgSave( vg);
+   {
+      nvgTranslate( vg, frame.origin.x, frame.origin.y);
+      {   
+         if( ! CGSizeEqualToSize( frame.size, canvas.size))
+         {
+            nvgScale( vg, canvas.size.width / frame.size.width, 
+                           canvas.size.height / frame.size.height);
+         }
 
-      if( fill)
-      {
-         nvgFillColor( nvg, _fillColor);
-         nvgFill( nvg);
-      }
+         nvgBeginPath( vg);
+         nvgAddCGPath( vg, _path);
 
-      if( stroke)
-      {
-         nvgStrokeColor( nvg, _strokeColor);
-         nvgStroke( nvg);
-      }
-   }   
-   return( YES);
+         if( fill)
+         {
+            nvgFillColor( vg, _fillColor);
+            nvgFill( vg);
+         }
+
+         if( stroke)
+         {
+            nvgStrokeColor( vg, _strokeColor);
+            nvgStroke( vg);
+         }
+      }   
+   }
+   nvgRestore( vg);
 }
 @end

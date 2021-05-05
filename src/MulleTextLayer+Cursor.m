@@ -26,7 +26,7 @@
 - (void) drawCursorWithNVGContext:(NVGcontext *) vg
                               row:(NSUInteger) i
 {
-   CGRect                           frame;
+   CGRect                           canvas;
    struct MulleTextLayerRowGlyphs   *p;
    NSUInteger                       x;
    CGPoint                          offset;
@@ -36,7 +36,7 @@
    if( MulleIntegerPointGetRow( _cursorPosition) != i)
       return;
 
-   frame = [self frame];
+   canvas = [self canvas];
          
    // get glyphs
    p = &_rowGlyphs[ i];
@@ -56,8 +56,8 @@
       nvgBeginPath( vg);
       nvgFillColor( vg, nvgRGBA(255,0,0,255));
       nvgRect( vg, 
-               frame.origin.x + _origin.x + offset.x - 0.5, 
-               frame.origin.y + _origin.y - _ascender + y, 
+               canvas.origin.x + _origin.x + offset.x - 0.5, 
+               canvas.origin.y + _origin.y - _ascender + y, 
                1, 
                h);
       nvgFill( vg);
@@ -67,7 +67,7 @@
 - (CGFloat) offsetNeededToMakeCursorVisible
 {
    CGPoint                          offset;
-   CGRect                           bounds;
+   CGRect                           canvas;
    CGFloat                          min;
    CGFloat                          diff;
    NVGglyphPosition                 *glyph;
@@ -84,13 +84,13 @@
    glyph    = &p->glyphs[ _cursorPosition.x];
 
    offset.x = _origin.x + glyph->x - 0.5;
-   bounds   = [self bounds];
-   min      = bounds.size.width * 10.0 / 100.0;
+   canvas   = [self canvas];
+   min      = canvas.size.width * 10.0 / 100.0;
 
-   diff = (CGRectGetMinX( bounds) + min) - offset.x;
+   diff = (CGRectGetMinX( canvas) + min) - offset.x;
    if( diff > 0)
       return( diff);
-   diff = offset.x - (CGRectGetMaxX( bounds) - min);
+   diff = offset.x - (CGRectGetMaxX( canvas) - min);
    if( diff > 0)
       return( -diff);
    return( 0.0);

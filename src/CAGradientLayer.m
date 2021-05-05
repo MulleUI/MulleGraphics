@@ -9,12 +9,11 @@
 
 @implementation CAGradientLayer
 
-- (BOOL) drawBackgroundInContext:(CGContext *) context
+- (void) drawBackgroundInContext:(CGContext *) context
 {
    [self fillBackgroundInContext:context
                            color:_backgroundColor
                            paint:_paint];
-   return( NO);
 }
 
 @end

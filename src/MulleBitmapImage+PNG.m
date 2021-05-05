@@ -40,7 +40,7 @@ static unsigned char  *compress_for_stbiw( unsigned char *data,
 
 - (id) initWithPNGData:(NSData *) data
 {
-   return( [self initWithCData:mulle_data_make( [data bytes], [data length])
+   return( [self initWithFileCData:mulle_data_make( [data bytes], [data length])
                          allocator:NULL
                      nvgImageFlags:0]);
 }

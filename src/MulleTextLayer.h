@@ -152,8 +152,7 @@ NSUInteger   MulleNVGglyphPositionSearch( NVGglyphPosition *glyphs,
 - (void) getFontTextBounds:(CGFloat [4]) bounds
                    context:(CGContext *) context;
 
-- (CGSize) sizeToFit:(CGSize) bounds
-             context:(CGContext *) context;
+- (CGSize) sizeThatFits:(CGSize) bounds;
 
 - (enum MulleTextLayerVerticalAlignmentMode)  mulleVerticalAlignmentMode;
 - (void) mulleSetVerticalAlignmentMode:(enum MulleTextLayerVerticalAlignmentMode) mode;

@@ -362,8 +362,9 @@ static mulle_objc_walkcommand_t
    ctxt.infra             = infra;
    ctxt.self              = self;
 
+
 	_mulle_objc_infraclass_walk_properties( infra,
-                                           -1,  // inherit nothing
+                                           _mulle_objc_infraclass_get_inheritance( infra),
                                            walkproperties_callback,
                                            &ctxt);
 }
@@ -375,7 +376,7 @@ static mulle_objc_walkcommand_t
    assert( animation);
 
    assert( _mulle_pointerarray_find( &_animations, animation) == mulle_not_found_e);
-   _mulle_pointerarray_add( &_animations, animation);
+   _mulle_pointerarray_add( &_animations, [animation retain]);
 }
 
 
@@ -400,11 +401,6 @@ static mulle_objc_walkcommand_t
 }
 
 
-- (void) willAnimateWithAbsoluteTime:(CAAbsoluteTime) time;
-{
-}
-
-
 - (void) animateWithAbsoluteTime:(CAAbsoluteTime) renderTime
 {
    struct mulle_pointerarrayenumerator   rover;
@@ -416,7 +412,7 @@ static mulle_objc_walkcommand_t
 
    rover = mulle_pointerarray_enumerate( &_animations);
    while( _mulle_pointerarrayenumerator_next( &rover, (void **) &animation))
-      [animation animateLayer:self
+      [animation animateObject:self
                  absoluteTime:renderTime];
    mulle_pointerarrayenumerator_done( &rover);
 }

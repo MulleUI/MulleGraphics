@@ -16,7 +16,7 @@
 {
    NSInteger                        x;
    float                            xyxy[ 4];
-   CGRect                           frame;
+   CGRect                           canvas;
    struct MulleTextLayerRowGlyphs   *p;
    NSRange                          selectionRange;
    CGRect                           rect;
@@ -25,7 +25,7 @@
    if( ! selectionRange.length)
       return;
 
-   frame = [self frame];
+   canvas = [self canvas];
 
    // draw background for selection, compute area by removing
    // unselected characters
@@ -36,8 +36,8 @@
    if( x + selectionRange.length > p->nGlyphs)
       abort();  // can't happen or ?
 
-   rect.origin.x    = frame.origin.x + _origin.x + p->glyphs[ x].x;
-   rect.origin.y    = frame.origin.y + _origin.y + (i * _lineh) - _lineh / 2.0;
+   rect.origin.x    = canvas.origin.x + _origin.x + p->glyphs[ x].x;
+   rect.origin.y    = canvas.origin.y + _origin.y + (i * _lineh) - _lineh / 2.0;
    rect.size.width  = p->glyphs[ x + selectionRange.length].x - p->glyphs[ x].x;
    rect.size.height = _lineh;
 

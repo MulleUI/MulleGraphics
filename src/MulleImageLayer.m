@@ -21,24 +21,20 @@
 
 - (instancetype) initWithImage:(UIImage *) image
 {
-   CGRect   bounds;
-
 	assert( ! image || [image isKindOfClass:[UIImage class]]);
 
    if( ! (self = [super init]))
       return( self);
 
-   _image = [image retain];  // ownership transfer
-   if( image)
-   {
-      // TODO: useful, bounds are just there for subviews or ?
-      bounds.origin = CGPointMake( 0.0, 0.0);
-      bounds.size   = [_image size];
+   _image        = [image retain];  // ownership transfer
 
-      [self setBounds:bounds];
-   }
+   _canvas.origin = CGPointZero;
+   _canvas.size   = [image size];
 
-   _selectionColor = MulleColorCreate( 0x7FFF7F7F);
+   // set as well for convenience
+   _frame          = _canvas;
+
+   _selectionColor = MulleColorMake( 0x7FFF7F7F);
 
    return( self);
 }
@@ -47,50 +43,50 @@
 - (void) dealloc
 {
    [_image release];
+
    [super dealloc];
 }
 
 
-// rename to drawWithContext: ?
-- (BOOL) drawContentsInContext:(CGContext *) context
+- (void) drawInContext:(CGContext *) context
 {
    int          textureId;
    NVGpaint     imgPaint;
    NVGcontext   *vg;
    CGSize       imageSize;
-   CGRect       frame;
+   CGRect       canvas;
    CGFloat      alpha;
    CGRect       rect;
    CGRect       layoutedRect;
    BOOL         flag;
 
    if( ! _image)
-      return( NO);
-     
+      return;
+
    textureId = [_image textureIDWithContext:context];
    if( textureId == -1)
-      return( NO);
+      return;
 
    // TODO: check contentMode and translate/scale accordingly
 
    imageSize = [_image size];
-   vg        = [context nvgContext];
-   frame     = [self frame];
+   canvas    = [self canvas];
    alpha     = _selected ? 0.5 : 1.0;
 
+   vg        = MulleContextGetNVGContext( context);
    nvgBeginPath( vg);
 
-   layoutedRect = MulleSizeApplyContentModeInRect( imageSize, _contentMode, frame);
-   flag = (_contentMode == UIViewContentModeScaleAspectFill);
-   if( flag)
-      nvgScissor( vg, frame.origin.x, frame.origin.y, frame.size.width, frame.size.height);
+   layoutedRect = MulleSizeApplyContentModeInRect( imageSize, _contentMode, canvas);
+//   flag = (_contentMode == UIViewContentModeScaleAspectFill);
+//   if( flag)
+   nvgIntersectScissor( vg, canvas.origin.x, canvas.origin.y, canvas.size.width, canvas.size.height);
 
-   imgPaint  = nvgImagePattern( vg, layoutedRect.origin.x, 
-                                    layoutedRect.origin.y, 
-                                    layoutedRect.size.width, 
-                                    layoutedRect.size.height, 
-                                    0.0f/180.0f*NVG_PI, 
-                                    textureId, 
+   imgPaint  = nvgImagePattern( vg, layoutedRect.origin.x,
+                                    layoutedRect.origin.y,
+                                    layoutedRect.size.width,
+                                    layoutedRect.size.height,
+                                    0.0f/180.0f*NVG_PI,
+                                    textureId,
                                     alpha);
 
    // shouldn't this be the frame ?
@@ -108,7 +104,7 @@
    {
       rect = [_image visibleBounds];
 
-      layoutedRect = MulleSizeApplyContentModeInRect( rect.size, _contentMode, frame);
+      layoutedRect = MulleSizeApplyContentModeInRect( rect.size, _contentMode, canvas);
       layoutedRect.origin.x += rect.origin.x;
       layoutedRect.origin.y += rect.origin.y;
 
@@ -123,8 +119,6 @@
   	   nvgFillColor( vg, _selectionColor);
 	   nvgFill( vg);
    }
-
-   return( flag);
 }
 
 
