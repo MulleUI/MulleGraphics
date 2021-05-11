@@ -105,14 +105,16 @@ NSUInteger   MulleNVGglyphPositionSearch( NVGglyphPosition *glyphs,
    enum MulleTextLayerVerticalAlignmentMode   _verticalAlignmentMode;
 }
 
-@property( assign) char             *fontName;
-@property( assign) CGFloat          fontPixelSize;
-@property( assign) MulleEdgeInsets  insets;
+@property( assign) char                        *fontName;
+@property( observable, assign) CGFloat          fontPixelSize;
+@property( observable, assign) MulleEdgeInsets  insets;
 
 // incoming data need not be zero terminated
+// resets textBounds and textRange
 - (void) setUTF8Data:(struct mulle_utf8data) data;
 // returned data is zero terminated but does not show it in length
 - (struct mulle_utf8data) UTF8Data;
+- (struct mulle_utf8data) UTF8DataInTextRange;
 
 - (char *) cString;
 - (void) setCString:(char *) s;
@@ -121,10 +123,19 @@ NSUInteger   MulleNVGglyphPositionSearch( NVGglyphPosition *glyphs,
 // The selection of the UTF8 characters: the selection must not
 // split graphemes and combined emoji. But MulleTextLayer won't check that.
 //
-@property( assign) NSRange          selection;
-@property( observable) CGColorRef   selectionColor;
-@property( observable) CGColorRef   textColor;
-@property( observable) CGPoint      textOffset; // in pixels
+@property( observable, assign) NSRange   selection;
+
+//
+// if range.location is != NSNotFound (default), this will be used to "cut"
+// the data. This will observe UTF8 encoding, so textRange.length is
+// often < UTF8Data.length.
+// If you read this property, when location is actually NSNotFound, it will
+// give the proper textRange back. Sometimes useful for animation
+//
+@property( observable, assign) NSRange   textRange;
+@property( observable) CGColorRef        selectionColor;
+@property( observable) CGColorRef        textColor;
+@property( observable) CGPoint           textOffset; // in pixels
 
 // for cleartype it's important to know the color the text is drawn on
 // if the layer backgroundColor is transparent, use this color to supply
@@ -145,14 +156,11 @@ NSUInteger   MulleNVGglyphPositionSearch( NVGglyphPosition *glyphs,
 - (CGFloat) fontDescender;
 - (CGFloat) fontLineHeight;
 
-// TODO: get rid of CGFloat[4], replace with CGrect ? 
-- (void) getFontTextBounds:(CGFloat [4]) bounds;
+// don't call this unless you're sure textBounds have been calculated ?
+- (CGRect) textBounds;
 
 // this is can be called anytime
-- (void) getFontTextBounds:(CGFloat [4]) bounds
-                   context:(CGContext *) context;
-
-- (CGSize) sizeThatFits:(CGSize) bounds;
+- (CGRect) textBoundsWithContext:(CGContext *) context;
 
 - (enum MulleTextLayerVerticalAlignmentMode)  mulleVerticalAlignmentMode;
 - (void) mulleSetVerticalAlignmentMode:(enum MulleTextLayerVerticalAlignmentMode) mode;

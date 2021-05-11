@@ -10,13 +10,13 @@
 
 @implementation MulleTextLayer ( Cursor)
 
-- (void) getCursorPosition:(struct MulleIntegerPoint *) p_cursor 
+- (void) getCursorPosition:(struct MulleIntegerPoint *) p_cursor
 {
    *p_cursor = _cursorPosition;
 }
 
 // ------------------------------
-// 
+//
 //
 //
 // -------------------------------
@@ -37,7 +37,7 @@
       return;
 
    canvas = [self canvas];
-         
+
    // get glyphs
    p = &_rowGlyphs[ i];
    x = MulleIntegerPointGetColumn( _cursorPosition);
@@ -52,13 +52,13 @@
          y  = 1;
       }
       offset.y = -(_lineh / 2); // depends on alignment, really, use middle here
-         
+
       nvgBeginPath( vg);
       nvgFillColor( vg, nvgRGBA(255,0,0,255));
-      nvgRect( vg, 
-               canvas.origin.x + _origin.x + offset.x - 0.5, 
-               canvas.origin.y + _origin.y - _ascender + y, 
-               1, 
+      nvgRect( vg,
+               canvas.origin.x + _origin.x + offset.x - 0.5,
+               canvas.origin.y + _origin.y - _ascender + y,
+               1,
                h);
       nvgFill( vg);
    }
@@ -78,7 +78,7 @@
 
    p = &_rowGlyphs[ _cursorPosition.y];
    if( _cursorPosition.x > p->nGlyphs)
-      return( 0.0);   
+      return( 0.0);
 
    // get glyphs
    glyph    = &p->glyphs[ _cursorPosition.x];
@@ -97,19 +97,23 @@
 }
 
 
-- (NSUInteger) characterIndexForCursor:(struct MulleIntegerPoint) cursor 
+- (NSUInteger) characterIndexForCursor:(struct MulleIntegerPoint) cursor
 {
    struct MulleTextLayerRowGlyphs   *p;
    NVGglyphPosition                 *glyph;
+   struct mulle_utf8data            data;
 
    if( cursor.y >= _nRows)
       return( NSNotFound);
 
    p = &_rowGlyphs[ cursor.y];
    if( cursor.x > p->nGlyphs)
-      return( NSNotFound);   
+      return( NSNotFound);
    glyph = &p->glyphs[ cursor.x];
-   return( glyph->str - (char *) _data.characters);
+
+   // nothing to draw ? then bail
+   data = [self UTF8DataInTextRange];
+   return( glyph->str - (char *) data.characters);
 }
 
 
@@ -124,7 +128,7 @@
    if( cursor.x < 0 || cursor.x > p->nGlyphs)
       return( CGPointMake( -1, -1));
 
-   return( CGPointMake( _origin.x + p->glyphs[ cursor.x].x, 
+   return( CGPointMake( _origin.x + p->glyphs[ cursor.x].x,
                         _origin.y - 1.0));
 }
 
@@ -141,7 +145,7 @@
    if( cursor.x < 0 || cursor.x > p->nGlyphs)
       return( CGPointMake( -1, -1));
 
-   return( CGPointMake( _origin.x + p->glyphs[ cursor.x].x, 
+   return( CGPointMake( _origin.x + p->glyphs[ cursor.x].x,
                         _origin.y + 0.0));
 }
 
@@ -156,7 +160,7 @@
    struct MulleIntegerPoint         cursor;
    struct MulleTextLayerRowGlyphs   *p;
 
-   // figure out the row that was hit, a row is _lineh and 
+   // figure out the row that was hit, a row is _lineh and
    // drawn at frame.origin.y + _origin.y  + i *_lineh
    y = (NSInteger) round( (point.y -_origin.y) / _lineh);
    if( y < 0 || y >= _nRows)
@@ -177,7 +181,7 @@
          // check if hitting left or right side
          if( search >= p->glyphs[ x].x + (p->glyphs[ x + 1].x - p->glyphs[ x].x) / 2)
             x++;
-         cursor.x = x;           
+         cursor.x = x;
          cursor.y = y;
          return( cursor);
       }
@@ -187,7 +191,7 @@
 
 
 // point is within bounds
-- (void) setCursorPositionToPoint:(CGPoint) point 
+- (void) setCursorPositionToPoint:(CGPoint) point
 {
    NSUInteger                 i;
    struct MulleIntegerPoint   cursor;
@@ -236,10 +240,10 @@
       return;
 
    s = [self cString];
-   s = MulleObjC_asprintf( "%.*s%C%s", 
-               (int) pos, 
-               s, 
-               c, 
+   s = MulleObjC_asprintf( "%.*s%C%s",
+               (int) pos,
+               s,
+               c,
                &s[ pos]);
    [self setCString:s];
 
@@ -248,7 +252,7 @@
    [self setCursorPosition:cursorPosition];
 }
 
-- (void) enterOrReturn 
+- (void) enterOrReturn
 {
    // don't talk to a delegate, you are a layer!
 }
@@ -281,12 +285,14 @@
    struct MulleCursorUTF8Data  info;
    NSUInteger                  offset;
    struct MulleIntegerPoint    cursorPosition;
+   struct mulle_utf8data       data;
 
    [self getCursorPosition:&cursorPosition];
-   offset = [self characterIndexForCursor:cursorPosition]; 
+   offset = [self characterIndexForCursor:cursorPosition];
 
-   info.dataUpToCursor  = mulle_utf8data_make( _data.characters, offset);
-   info.dataAfterCursor = mulle_utf8data_make( &_data.characters[ offset], _data.length);
+   data = [self UTF8DataInTextRange];
+   info.dataUpToCursor  = mulle_utf8data_make( data.characters, offset);
+   info.dataAfterCursor = mulle_utf8data_make( &data.characters[ offset], data.length);
    return( info);
 }
 

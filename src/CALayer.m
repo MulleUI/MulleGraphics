@@ -84,24 +84,6 @@
 }
 
 
-//
-// This is called very often during animation, it would be good if the
-// animation code could use a different setter that does not call
-// will change..
-//
-- (void) willChange
-{
-   // this is called frequently so use C
-   if( ! UIViewAreAnimationsEnabled())
-      return;
-   if( _snapshot)
-      return;
-
-   [UIView addAnimatedLayer:self];
-   _snapshot = [self copy];
-}
-
-
 - (id) copy
 {
    CALayer   *copy;
@@ -139,7 +121,7 @@ static inline CGRect   getBounds( CALayer *self)
 - (void) setBounds:(CGRect) bounds
 {
    _bounds.origin = bounds.origin;
-   if( (_frameTracking & CALayerBoundsSizeTracksFrameSize) && 
+   if( (_frameTracking & CALayerBoundsSizeTracksFrameSize) &&
          CGSizeEqualToSize( _frame.size, bounds.size))
       _bounds.size.width = INFINITY;
    else
@@ -168,7 +150,7 @@ static inline CGRect   getCanvas( CALayer *self)
 - (void) setCanvas:(CGRect) canvas
 {
    _canvas.origin = canvas.origin;
-   if( (_frameTracking & CALayerCanvasSizeTracksFrameSize) && 
+   if( (_frameTracking & CALayerCanvasSizeTracksFrameSize) &&
          CGSizeEqualToSize( _frame.size, canvas.size))
       _canvas.size.width = INFINITY;
    else
@@ -358,15 +340,19 @@ static inline CGRect   getCanvas( CALayer *self)
       bounds        = [self bounds];
       localClipRect = CGRectApplyAffineTransform( bounds, *localTransform);
 
-      nvgIntersectScissor( vg, localClipRect.origin.x, 
-                               localClipRect.origin.y, 
-                               localClipRect.size.width, 
+      nvgIntersectScissor( vg, localClipRect.origin.x,
+                               localClipRect.origin.y,
+                               localClipRect.size.width,
                                localClipRect.size.height);
    }
    nvgGlobalAlpha( vg, alpha);
    return( vg);
 }
 
+- (BOOL) hasAnimations
+{
+   return( _mulle_pointerarray_get_count( &_animations) != 0);
+}
 
 - (void) renderInContext:(CGContext *) context
 {
@@ -422,9 +408,9 @@ static inline CGRect   getCanvas( CALayer *self)
       // Now we have the transform set up for the draw into "global" space
       // we don't have a scissor yet though
       // if( _masksToBounds)
-      //    nvgIntersectScissor( vg, bounds.origin.x, 
-      //                             bounds.origin.y, 
-      //                             bounds.size.width, 
+      //    nvgIntersectScissor( vg, bounds.origin.x,
+      //                             bounds.origin.y,
+      //                             bounds.size.width,
       //                             bounds.size.height);
 
       // implementers should restore scissor/transform changes themselves

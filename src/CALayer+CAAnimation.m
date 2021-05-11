@@ -82,6 +82,37 @@ static void   animate_integer_property( struct _mulle_objc_property *property,
    MulleObjectSetNSInteger( ctx->self, setter, startValue);
 }
 
+static void   animate_range_property( struct _mulle_objc_property *property,
+                                     struct property_animation_context *ctx)
+{
+   CAAnimation  *animation;
+   NSRange      startRange;
+   NSRange      endRange;
+   SEL          getter;
+   SEL          setter;
+
+   getter     = mulle_objc_property_get_getter( property);
+   startRange = MulleObjectGetNSRange( ctx->snapshot, getter);
+   endRange   = MulleObjectGetNSRange( ctx->self, getter);
+   if( ! NSEqualRanges( startRange, endRange))
+   {
+      setter    = mulle_objc_property_get_setter( property);
+      animation = [[[CAAnimation alloc] initWithPropertySetter:setter
+                                                    startRange:startRange
+                                                      endRange:endRange
+                                                       options:ctx->animationOptions] autorelease];
+      [animation setAnimationDelegate:ctx->animationDelegate];
+      [ctx->self addAnimation:animation];
+
+      // reset to start position
+      // this should work and not trigger another willChange action, as willChange
+      // will see the existing snapshot in the layer and do nothing
+      // STILL it would be nicer to do this more stealthily by setting the ivar
+      // directly
+      MulleObjectSetNSRange( ctx->self, setter, startRange);
+   }
+}
+
 
 static void   animate_float_property( struct _mulle_objc_property *property,
                                        struct property_animation_context  *ctx)
@@ -247,7 +278,7 @@ static void   animate_color_property( struct _mulle_objc_property *property,
    SEL           getter;
    SEL           setter;
 
-   getter      = mulle_objc_property_get_getter( property);
+   getter     = mulle_objc_property_get_getter( property);
    startColor = MulleObjectGetCGColorRef( ctx->snapshot, getter);
    endColor   = MulleObjectGetCGColorRef( ctx->self, getter);
 
@@ -268,6 +299,24 @@ static void   animate_color_property( struct _mulle_objc_property *property,
 
 
 @implementation CALayer( CAAnimation)
+
+//
+// This is called very often during animation, it would be good if the
+// animation code could use a different setter that does not call
+// will change..
+//
+- (void) willChange
+{
+   id   manager;
+   // this is called frequently so use C
+   manager = CATransactionGetCurrentTransactionManager();
+   if( ! manager)
+      return;
+   if( _snapshot)
+      return;
+   _snapshot = [self copy];
+   [manager addAnimatableObject:self];
+}
 
 
 static mulle_objc_walkcommand_t
@@ -320,27 +369,40 @@ static mulle_objc_walkcommand_t
    assert( name_e && strchr( name_b, ',') > name_e);
    name_len = name_e - name_b;
 
-   // CGRect, NVGColor, CGSize, CGPoint, MulleEdgeInsets
+   // Mulle[E]dgeInsets
+   // CGSiz[e]
+   // NSRan[g]e is actually mulle_range though
+   // NVGCo[l]or
+   // CGPoi[n]t
+   // mulle[_]range
+   // CGRec[t]
+
    if( name_len < 6)
       return( mulle_objc_walk_ok);
 
-   switch( name_b[ 2])
+   switch( name_b[ 5])
    {
-   case 'G' : if( ! string_matcher( "NVGcolor", name_b, name_len))
-                  animate_color_property( property, ctx);
-              return( mulle_objc_walk_ok);
-   case 'P' : if( ! string_matcher( "CGPoint", name_b, name_len))
-                  animate_point_property( property, ctx);
-              return( mulle_objc_walk_ok);
-   case 'S' : if( ! string_matcher( "CGSize", name_b, name_len))
-                  animate_size_property( property, ctx);
-              return( mulle_objc_walk_ok);
-   case 'l' : if( ! string_matcher( "MulleEdgeInsets", name_b, name_len))
+   case 'E' : if( ! string_matcher( "MulleEdgeInsets", name_b, name_len))
                   animate_insets_property( property, ctx);
               return( mulle_objc_walk_ok);
-   case 'R' : if( ! string_matcher( "CGRect", name_b, name_len))
+   case 'e' : if( ! string_matcher( "CGSize", name_b, name_len))
+                  animate_size_property( property, ctx);
+              return( mulle_objc_walk_ok);
+   case 'g' : if( ! string_matcher( "NSRange", name_b, name_len))
+                 animate_range_property( property, ctx);
+              return( mulle_objc_walk_ok);
+   case 'l' : if( ! string_matcher( "NVGcolor", name_b, name_len))
+                  animate_color_property( property, ctx);
+              return( mulle_objc_walk_ok);
+   case 'n' : if( ! string_matcher( "CGPoint", name_b, name_len))
+                  animate_point_property( property, ctx);
+              return( mulle_objc_walk_ok);
+   case '_' : if( ! string_matcher( "mulle_range", name_b, name_len))
+                  animate_range_property( property, ctx);
+              return( mulle_objc_walk_ok);
+   case 't' : if( ! string_matcher( "CGRect", name_b, name_len))
                   animate_rect_property( property, ctx);
-             return( mulle_objc_walk_ok);
+              return( mulle_objc_walk_ok);
    }
 
    return( mulle_objc_walk_ok);
@@ -368,7 +430,6 @@ static mulle_objc_walkcommand_t
                                            walkproperties_callback,
                                            &ctxt);
 }
-
 
 
 - (void) addAnimation:(CAAnimation *) animation
@@ -418,35 +479,10 @@ static mulle_objc_walkcommand_t
 }
 
 
-MulleQuadratic   CALayerQuadraticForCurveType( NSUInteger curvetype)
-{
-   MulleQuadratic   quadratic;
 
-   switch( [UIView animationCurve])
-   {
-   case UIViewAnimationCurveEaseInOut:
-      MulleQuadraticInit( &quadratic, 0.0, 0.025, 1.0 - 0.025, 1.0);
-      break;
-
-   case UIViewAnimationCurveEaseOut:
-      MulleQuadraticInit( &quadratic, 0.0, 0.9, 0.9, 1.0);
-      break;
-
-   case UIViewAnimationCurveEaseIn:
-      MulleQuadraticInit( &quadratic, 0.0, 0.0, 0.1, 1.0);
-      break;
-
-   default :
-      MulleQuadraticInit( &quadratic, 0.0, 0.333, 0.666, 1.0);
-      break;
-   }
-
-   return( quadratic);
-}
-
-
-- (void) commitImplicitAnimationsWithAnimationID:(char *) animationsID
-                               animationDelegate:(MulleAnimationDelegate *) animationDelegate
+- (void) commitImplicitAnimationsWithID:(char *) animationsID
+                               delegate:(MulleAnimationDelegate *) animationDelegate
+                             parameters:(struct CAAnimationParameters *) info
 {
    CAAnimation                  *animation;
    CGColorRef                   endColor;
@@ -462,10 +498,10 @@ MulleQuadratic   CALayerQuadraticForCurveType( NSUInteger curvetype)
 
    [self removeAllAnimations];
 
-   options.timeRange   = CARelativeTimeRangeMake( [UIView animationDelay], [UIView animationDuration]);
-   options.repeatCount = [UIView animationRepeatCount];
-   options.bits        = [UIView animationRepeatAutoreverses] ? CAAnimationReverses : 0;
-   options.curve       = CALayerQuadraticForCurveType( [UIView animationCurve]);
+   options.timeRange   = CARelativeTimeRangeMake( info->animationDelay, info->animationDuration);
+   options.repeatCount = info->animationRepeatCount;
+   options.bits        = info->animationAutoreverses ? CAAnimationReverses : 0;
+   options.curve       = MulleQuadraticForAnimationCurve( info->animationCurve);
 
    /** Our animatable properties
        subclasses might want to add more

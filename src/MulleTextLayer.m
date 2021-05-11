@@ -7,6 +7,7 @@
 #import "CGContext+CGFont.h"
 #import "CGGeometry+CString.h"
 #import "CGFont.h"
+#import "UIEdgeInsets.h"
 
 #include <ctype.h>
 
@@ -35,6 +36,7 @@
    _textColor           = MulleColorMake( 0x000000FF);
    _textBackgroundColor = MulleColorMake( 0xFFFFFFFF);
    _selectionColor      = MulleColorMake( 0x7FFF7F7F);
+   _textRange           = NSMakeRange( NSNotFound, 0);
 
    [self _init];
 
@@ -122,38 +124,45 @@
 }
 
 
-- (void) getFontTextBounds:(CGFloat [4]) bounds
+- (CGRect) textBounds
 {
+   CGRect   bounds;
+
    assert( _textBounds[ 0] != CGFLOAT_MIN);
 
-   bounds[ 0] = _textBounds[ 0];
-   bounds[ 1] = _textBounds[ 1];
-   bounds[ 2] = _textBounds[ 2];
-   bounds[ 3] = _textBounds[ 3];
+   bounds.origin.x    = _textBounds[ 0];
+   bounds.origin.y    = _textBounds[ 1];
+   bounds.size.width  = _textBounds[ 2] - _textBounds[ 0];
+   bounds.size.height = _textBounds[ 3] - _textBounds[ 1];
+
+   return( bounds);
 }
 
 
-- (void) getFontTextBounds:(CGFloat [4]) bounds
-                   context:(CGContext *) context
+- (CGRect) textBoundsWithContext:(CGContext *) context
 {
+   CGRect   bounds;
+
    if( _textBounds[ 0] == CGFLOAT_MIN)
       [self updateGeometryWithContext:context];
 
-   bounds[ 0] = _textBounds[ 0];
-   bounds[ 1] = _textBounds[ 1];
-   bounds[ 2] = _textBounds[ 2];
-   bounds[ 3] = _textBounds[ 3];
+   bounds.origin.x    = _textBounds[ 0];
+   bounds.origin.y    = _textBounds[ 1];
+   bounds.size.width  = _textBounds[ 2] - _textBounds[ 0];
+   bounds.size.height = _textBounds[ 3] - _textBounds[ 1];
+
+   return( bounds);
 }
+
 
 - (CGSize) sizeThatFits:(CGSize) max
                 context:(CGContext *) context
 {
-   CGFloat   bounds[ 4];
+   CGRect   bounds;
 
    assert( max.width == INFINITY && max.height == INFINITY);
 
-   [self getFontTextBounds:bounds
-                   context:context];
+   bounds = [self textBoundsWithContext:context];
 
 #if 0
    fprintf( stderr, "textBounds: %.2f %.2f %.2f %.2f\n",
@@ -162,12 +171,8 @@
                      bounds[ 2],
                      bounds[ 3]);
 #endif
-   bounds[ 0] -= _insets.left;
-   bounds[ 1] -= _insets.top;
-   bounds[ 2] += _insets.right;
-   bounds[ 3] += _insets.bottom;
-
-   return( CGSizeMake( bounds[ 2] - bounds[ 0], bounds[ 3] - bounds[ 1]));
+   bounds = UIEdgeInsetsExtrudeRect( bounds, _insets);
+   return( bounds.size);
 }
 
 
@@ -204,6 +209,9 @@
    _textBounds[ 1] =
    _textBounds[ 2] =
    _textBounds[ 3] = CGFLOAT_MIN;
+
+   // reset
+   _textRange      = NSMakeRange( NSNotFound, 0);
 }
 
 
@@ -249,14 +257,42 @@ static void   assert_sane_font_name( char *s)
    MulleObjCObjectSetDuplicatedCString( self, &_fontName, s);
 }
 
+
 - (enum MulleTextLayerVerticalAlignmentMode)  mulleVerticalAlignmentMode
 {
    return( _verticalAlignmentMode);
 }
 
+
 - (void) mulleSetVerticalAlignmentMode:(enum MulleTextLayerVerticalAlignmentMode) mode
 {
    _verticalAlignmentMode = mode;
+}
+
+
+- (NSRange) textRange
+{
+   NSRange                        range;
+   struct mulle_utf_information   info;
+
+   if( _textRange.location != NSNotFound)
+      return( _textRange);
+
+   if( mulle_utf8_information( _data.characters, _data.length, &info))
+      return(  NSMakeRange( NSNotFound, 0));
+
+   _textRange = NSMakeRange( 0, info.utf32len);
+   return( _textRange);
+}
+
+//
+// use above tzextRange to get the to be displayed data
+//
+- (struct mulle_utf8data) UTF8DataInTextRange
+{
+   if( _textRange.location == NSNotFound)
+      return( _data);
+   return( mulle_utf8data_range_of_utf32_range( _data, _textRange));
 }
 
 
@@ -465,13 +501,16 @@ NSUInteger
 
 - (void) updateRowsAndGlyphsWithContext:(CGContext *) context
 {
-   NSUInteger   max;
-   NSUInteger   i;
-   CGFloat      width;
-   CGFloat      extent;
-   NVGcontext  *vg;
+   NSUInteger               max;
+   NSUInteger               i;
+   CGFloat                  width;
+   CGFloat                  extent;
+   NVGcontext               *vg;
+   struct mulle_utf8data    data;
 
-   vg  = [context nvgContext];
+   data = [self UTF8DataInTextRange];
+   vg   = [context nvgContext];
+
 
    //
    // calculate max visible rows, which is frame.size.height / _lineh , but
@@ -489,8 +528,8 @@ NSUInteger
       // calculate this always, as _textBounds can be useful later on as well
       extent  = nvgTextBounds( vg, 0,
                                    0,
-                                   (void *) _data.characters,
-                                   (void *) &_data.characters[ _data.length],
+                                   (void *) data.characters,
+                                   (void *) &data.characters[ data.length],
                                    _textBounds);
       // produce row information
       switch( _lineBreakMode)
@@ -524,8 +563,8 @@ NSUInteger
    if( _lineh == 0.0)
       _nRows = 0.0;
    else
-      _nRows = nvgTextBreakLines( vg, (void *) _data.characters,
-                                      (void *) &_data.characters[ _data.length],
+      _nRows = nvgTextBreakLines( vg, (void *) data.characters,
+                                      (void *) &data.characters[ data.length],
                                       width,
                                       _rows,
                                       max);
@@ -682,18 +721,20 @@ NSUInteger
 //  1.) figure out how
 - (void) drawInContext:(CGContext *) context
 {
-   struct NVGcontext   *vg;
-   CGColorRef          textBackgroundColor;
-   CGFloat             fontPixelSize;
-   CGPoint             cursor;
-   CGPoint             offset;
-   CGRect              canvas;
-   NSRange             selectionRange;
-   NSRange             textRange;
-   NSUInteger          i;
+   struct NVGcontext       *vg;
+   CGColorRef              textBackgroundColor;
+   CGFloat                 fontPixelSize;
+   CGPoint                 cursor;
+   CGPoint                 offset;
+   CGRect                  canvas;
+   NSRange                 selectionRange;
+   NSRange                 textRange;
+   NSUInteger              i;
+   struct mulle_utf8data   data;
 
    // nothing to draw ? then bail
-   if( ! _data.length)
+   data = [self UTF8DataInTextRange];
+   if( ! data.length)
       return;
 
    if( ! [self updateGeometryWithContext:context])
@@ -706,7 +747,7 @@ NSUInteger
 
    for( i = 0; i < _nRows; i++)
    {
-      textRange = NSMakeRange( _rows[ i].start - (char *) _data.characters,
+      textRange = NSMakeRange( _rows[ i].start - (char *) data.characters,
                                _rows[ i].end - _rows[ i].start);
 
       // Draw the first line only
@@ -776,6 +817,7 @@ static size_t   mulle_utf8_utf32length( mulle_utf8_t *s, size_t len)
    NSUInteger                       x;
    CGFloat                          search;
    struct MulleTextLayerRowGlyphs   *p;
+   struct mulle_utf8data            data;
 
    if( ! _nRows)
       return( NSNotFound);
@@ -810,7 +852,9 @@ static size_t   mulle_utf8_utf32length( mulle_utf8_t *s, size_t len)
       if( search >= p->glyphs[ x].minx + (p->glyphs[ x].maxx - p->glyphs[ x].minx) / 3.0)
          x++;
    }
-   return( p->glyphs[ x].str - (char *) _data.characters);
+
+   data = [self UTF8DataInTextRange];
+   return( p->glyphs[ x].str - (char *) data.characters);
 }
 
 

@@ -28,6 +28,25 @@ static inline NSInteger   MulleObjectGetNSInteger( id obj, SEL sel)
 }
 
 
+static inline void   MulleObjectSetNSRange( id obj, SEL sel, NSRange range)
+{
+   mulle_metaabi_struct_voidptr_return( struct { NSRange range; })  param;
+
+   param.p.range = range;
+
+   mulle_objc_object_call( obj, (mulle_objc_methodid_t) sel, &param);
+}
+
+
+static inline NSRange   MulleObjectGetNSRange( id obj, SEL sel)
+{
+   mulle_metaabi_struct_voidptr_parameter( struct { NSRange range; })  param;
+
+   mulle_objc_object_call( obj, (mulle_objc_methodid_t) sel, &param);
+   return( param.r.range);
+}
+
+
 static inline void   MulleObjectSetCGFloat( id obj, SEL sel, CGFloat value)
 {
    mulle_metaabi_struct_voidptr_return( struct { CGFloat value; })  param;
@@ -53,7 +72,7 @@ static inline void   MulleObjectSetCGRect( id obj, SEL sel, CGRect rect)
 
    param.p.rect = rect;
 
-  mulle_objc_object_call( obj, (mulle_objc_methodid_t) sel, &param);
+   mulle_objc_object_call( obj, (mulle_objc_methodid_t) sel, &param);
 }
 
 

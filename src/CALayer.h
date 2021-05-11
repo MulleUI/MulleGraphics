@@ -1,17 +1,13 @@
 #import "import.h"
 
 #import "CGColor.h"
-#import "CATime.h"
 #import "CGAffineTransform.h"
-
+#import "CGContext+Render.h"
 
 @class CGContext;
 @class CAAnimation;
-@class MulleAnimationDelegate;
 @class MullePaint;
 
-struct MulleFrameInfo;
-struct CAAnimationOptions;
 
 //
 // Drawing in a layer.
@@ -65,8 +61,8 @@ enum
    CALayerBoundsSizeTracksFrameSize = 0x2
 };
 
-
-@interface CALayer : NSObject < NSCopying>
+//
+@interface CALayer : NSObject < NSCopying, CGRenderObject>
 {
    CALayer                     *_snapshot;
    struct mulle_pointerarray   _animations;
@@ -175,6 +171,8 @@ enum
 // and return it. Used for layouting by UIView
 - (CGSize) sizeThatFits:(CGSize) size
                 context:(CGContext *) context;
+
+- (BOOL) hasAnimations;
 
 @end
 

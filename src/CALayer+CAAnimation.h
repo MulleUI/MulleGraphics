@@ -1,8 +1,17 @@
 #import "CALayer.h"
 
+#import "CAAnimation.h"
+#import "CATime.h"
+#import "CATransaction.h"
 
-@interface CALayer( CAAnimation)
 
+@interface CALayer( CAAnimation) <CAAnimatableObject, CAImplicitlyAnimatableObject>
+
+//
+// Animations should not be shared with other layers as they have state.
+// If you did, one or many of the other layers would sometimes fail to do the
+// last animation step
+//
 - (void) addAnimation:(CAAnimation *) animation;
 - (void) removeAllAnimations;
 - (NSUInteger) numberOfAnimations;
@@ -17,8 +26,9 @@
 // the snapshot will be gone afterwards. Also cancels all other
 // animations. (?)
 //
-- (void) commitImplicitAnimationsWithAnimationID:(char *) animationsID
-                               animationDelegate:(MulleAnimationDelegate *) animationDelegate;
+- (void) commitImplicitAnimationsWithID:(char *) animationsID
+                               delegate:(MulleAnimationDelegate *) animationDelegate
+                             parameters:(struct CAAnimationParameters *) info; // either UIView class or CATransaction
 
 @end
 
