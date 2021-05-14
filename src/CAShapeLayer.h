@@ -9,8 +9,6 @@
 
 #import "import.h"
 
-#include "CGPath.h"
-
 
 @interface CAShapeLayer : CALayer
 
@@ -18,8 +16,8 @@
 @property( observable) CGColorRef   fillColor;
 
 //
-// Ownership of CGPath is transferred to CALayer and CALayer will call 
-// CGPathDestroy on 
+// Ownership of CGPath is transferred to CALayer and CALayer will call
+// CGPathDestroy on
 // it!
 //
 @property( assign) struct CGPath  *path;

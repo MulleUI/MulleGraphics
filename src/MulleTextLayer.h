@@ -1,6 +1,5 @@
 #import "CALayer.h"
 
-#import "MulleEdgeInsets.h"
 #import "MulleCursorProtocol.h"
 
 // not a string in MulleUI

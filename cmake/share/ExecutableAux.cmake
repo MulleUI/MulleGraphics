@@ -12,8 +12,18 @@ include( AllLoadC)
 include( ExecutableAuxC OPTIONAL)
 
 CreateForceAllLoadList( ALL_LOAD_DEPENDENCY_LIBRARIES FORCE_ALL_LOAD_DEPENDENCY_LIBRARIES)
-CreateForceAllLoadList( ALL_LOAD_DEPENDENCY_FRAMEWORKS FORCE_ALL_LOAD_DEPENDENCY_FRAMEWORKS)
 CreateForceAllLoadList( STARTUP_ALL_LOAD_DEPENDENCY_LIBRARIES FORCE_STARTUP_ALL_LOAD_DEPENDENCY_LIBRARIES)
+
+#
+# Currently we have no distinction for static and dynamic frameworks 
+# all frameworks are dynamic, so we don't really force load them.
+# But we keep the code as is otherwise, because static frameworks are likely
+# to arrive sooner or later.
+#
+if( APPLE)
+   unset( FORCE_LOAD_PREFIX)
+endif()
+CreateForceAllLoadList( ALL_LOAD_DEPENDENCY_FRAMEWORKS FORCE_ALL_LOAD_DEPENDENCY_FRAMEWORKS)
 CreateForceAllLoadList( STARTUP_ALL_LOAD_DEPENDENCY_FRAMEWORKS FORCE_STARTUP_ALL_LOAD_DEPENDENCY_FRAMEWORKS)
 
 if( NOT DEFINED EXECUTABLE_LIBRARY_LIST)

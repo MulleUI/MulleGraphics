@@ -3,12 +3,6 @@
 #import "MulleTextLayer+Cursor.h"
 #import "MulleTextLayer+Selection.h"
 
-#import "CGContext.h"
-#import "CGContext+CGFont.h"
-#import "CGGeometry+CString.h"
-#import "CGFont.h"
-#import "UIEdgeInsets.h"
-
 #include <ctype.h>
 
 
@@ -28,6 +22,7 @@
    _rows  = NULL;
    _nRows = 0;
 }
+
 
 - (id) init
 {
@@ -171,7 +166,7 @@
                      bounds[ 2],
                      bounds[ 3]);
 #endif
-   bounds = UIEdgeInsetsExtrudeRect( bounds, _insets);
+   bounds = MulleEdgeInsetsExtrudeRect( _insets, bounds);
    return( bounds.size);
 }
 

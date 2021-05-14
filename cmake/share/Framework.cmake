@@ -61,12 +61,11 @@ target_link_libraries( "${FRAMEWORK_NAME}"
    ${SHARED_LIBRARY_LIST} # use SHARED_LIBRARY_LIST because of PostSharedLibrary
 )
 
+
 set_target_properties( "${FRAMEWORK_NAME}" PROPERTIES
   FRAMEWORK TRUE
   # FRAMEWORK_VERSION A
-  # MACOSX_FRAMEWORK_IDENTIFIER <|PUBLISHER_REVERSE_DOMAIN|>.${LIBRARY_NAME}
-  MACOSX_FRAMEWORK_INFO_PLIST ${PROJECT_SOURCE_DIR}/cmake/share/MacOSXFrameworkInfo.plist.in
-  # headers must be part of LIBRARY_NAME target else it don't work
+  # headers must be part of ${FRAMEWORK_NAME} target else it don't work
   PUBLIC_HEADER "${INSTALL_PUBLIC_HEADERS}"
   PRIVATE_HEADER "${INSTALL_PRIVATE_HEADERS}"
   RESOURCE "${INSTALL_RESOURCES}"

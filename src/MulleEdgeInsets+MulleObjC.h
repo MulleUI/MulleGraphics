@@ -1,10 +1,7 @@
 //
 // Copyright (c) 2020 Nat!, Mulle kybernetiK
 //
-#ifndef mulle_edge_insets_mulleobjc_h__
-#define mulle_edge_insets_mulleobjc_h__
-
-#include "MulleEdgeInsets.h"
+#include "import.h"
 
 
 static inline void   MulleObjectSetEdgeInsets( id obj, SEL sel, MulleEdgeInsets insets)
@@ -25,4 +22,3 @@ static inline MulleEdgeInsets   MulleObjectGetEdgeInsets( id obj, SEL sel)
    return( param.r.insets);
 }
 
-#endif

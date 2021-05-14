@@ -3,8 +3,6 @@
 //
 #import "import.h"
 
-#import "CGGeometry.h"
-
 
 struct MulleIntegerPoint
 {
@@ -12,7 +10,7 @@ struct MulleIntegerPoint
 	NSUInteger    y;
 };
 
-static inline 
+static inline
    struct MulleIntegerPoint   MulleIntegerPointMake( NSUInteger x, NSUInteger y)
 {
    struct MulleIntegerPoint   point;
@@ -45,8 +43,8 @@ static inline NSUInteger   MulleIntegerPointGetRow( struct MulleIntegerPoint poi
 
 
 //
-// if editable and in focus, will draw a caret/cursor    
-// cursor position as row/column                         
+// if editable and in focus, will draw a caret/cursor
+// cursor position as row/column
 //
 #define MULLE_CURSOR_PROPERTIES \
    @property( assign, getter=isEditable) BOOL   editable;   \
@@ -64,4 +62,4 @@ MULLE_CURSOR_PROPERTIES;
 - (CGFloat) offsetNeededToMakeCursorVisible;
 - (struct MulleIntegerPoint) maxCursorPosition;
 
-@end 
+@end

@@ -2,16 +2,6 @@
 
 #import "CALayer.h"
 
-#import "CGAffineTransform.h"
-#import "CGAffineTransform+CString.h"
-#import "CGGeometry.h"
-#import "CGGeometry+CString.h"
-#import "CGContext.h"
-#import "nanovg+CString.h"
-#import "UIView+CAAnimation.h"
-#import "MulleEdgeInsets.h"
-#import "MullePaint.h"
-
 
 #pragma clang diagnostic ignored "-Wparentheses"
 // #define RENDER_DEBUG
@@ -459,7 +449,7 @@ static inline CGRect   getCanvas( CALayer *self)
    size_t      len;
    char        *format;
 
-   s = class_getName( object_getClass( self));
+   s = MulleObjCClassGetNameCString( NSClassFromObject( self));
    sprintf( buf, "%p",  self);
 
    format = "<%s %s>";

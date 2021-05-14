@@ -5,7 +5,6 @@
 
 #import "import-private.h"
 
-#import "CGGeometry.h"
 
 
 @implementation MulleTextLayer ( Cursor)
@@ -206,7 +205,7 @@
 
 - (void) setCursorPosition:(struct MulleIntegerPoint) point
 {
-   NSLog( @"cursor: %lu/%lu", (long) point.x, (long) point.y);
+   // NSLog( @"cursor: %lu/%lu", (long) point.x, (long) point.y);
    _cursorPosition = point;
 }
 
@@ -228,7 +227,8 @@
 }
 
 
-- (void) insertCharacter:(unichar) c
+// typed like mulle_utf32_t
+- (void) insertUTF32Character:(int32_t) c
 {
    char                       *s;
    struct MulleIntegerPoint   cursorPosition;
@@ -240,11 +240,11 @@
       return;
 
    s = [self cString];
-   s = MulleObjC_asprintf( "%.*s%C%s",
-               (int) pos,
-               s,
-               c,
-               &s[ pos]);
+   s = MulleCG_asprintf( "%.*s%C%s",
+                            (int) pos,
+                            s,
+                            (int) c,
+                            &s[ pos]);
    [self setCString:s];
 
    // naive!! need to consider line breaks
@@ -274,7 +274,7 @@
    pos1           = [self characterIndexForCursor:cursorPosition];
 
    s              = [self cString];
-   s = MulleObjC_asprintf( "%.*s%s", (int) pos1, s, &s[ pos2]);
+   s = MulleCG_asprintf( "%.*s%s", (int) pos1, s, &s[ pos2]);
    [self setCString:s];
    [self setCursorPosition:cursorPosition];
 }

@@ -1,9 +1,5 @@
 #import "CALayer.h"
 
-#import "CAAnimation.h"
-#import "CATime.h"
-#import "CATransaction.h"
-
 
 @interface CALayer( CAAnimation) <CAAnimatableObject, CAImplicitlyAnimatableObject>
 
@@ -20,7 +16,7 @@
 
 - (void) animatePropertiesWithSnapshotlayer:(CALayer *) snapshot
                           animationDelegate:(MulleAnimationDelegate *) animationDelegate
-                           animationOptions:(struct CAAnimationOptions *) animationOptions;
+                           animationOptions:(struct CABasicAnimationOptions *) animationOptions;
 //
 // called by UIView to create implicit animations from snapshotted values
 // the snapshot will be gone afterwards. Also cancels all other

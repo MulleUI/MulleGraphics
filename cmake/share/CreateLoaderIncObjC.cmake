@@ -49,10 +49,10 @@ if( CREATE_OBJC_LOADER_INC)
 
    # The preferred way:
    #
-   # _1_MulleUI is an object library (a collection of files).
-   # _2_MulleUI is the loader with OBJC_LOADER_INC.
+   # _1_MulleGraphics is an object library (a collection of files).
+   # _2_MulleGraphics is the loader with OBJC_LOADER_INC.
    #
-   # Produce a static library _3_MulleUI from _1_MulleUI
+   # Produce a static library _3_MulleGraphics from _1_MulleGraphics
    # to feed into MULLE_OBJC_LOADER_TOOL.
    #
    # The static library is, so that the commandline doesn't overflow for
@@ -72,7 +72,9 @@ if( CREATE_OBJC_LOADER_INC)
       )
    else()
       if( TARGET "_1_${LIBRARY_NAME}")
-         message( FATAL_ERROR "_1_${LIBRARY_NAME} is defined, but _2_${LIBRARY_NAME} is missing. Is MulleObjCLoader+${LIBRARY_NAME} not part of STAGE2_SOURCES ?")
+         message( FATAL_ERROR "_1_${LIBRARY_NAME} is defined, but _2_${LIBRARY_NAME} is missing.
+   Maybe MulleObjCLoader+${LIBRARY_NAME}.h not part of STAGE2_SOURCES ?
+   Tip: Check if \"$ENV{PROJECT_SOURCE_DIR}/MulleObjCLoader+${LIBRARY_NAME}.m\" (sic) exists")
       endif()
       set( OBJC_LOADER_LIBRARY "$<TARGET_FILE:${LIBRARY_NAME}>")
    endif()

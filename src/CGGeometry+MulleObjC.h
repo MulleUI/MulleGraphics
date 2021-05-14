@@ -1,6 +1,4 @@
-#include "CGGeometry.h"
-
-#include "include-private.h"
+#import "import.h"
 
 
 // TODO: move this stuff to CGBase+MulleObjC.h until CGRect
@@ -53,7 +51,7 @@ static inline void   MulleObjectSetCGFloat( id obj, SEL sel, CGFloat value)
 
    param.p.value = value;
 
-  mulle_objc_object_call( obj, (mulle_objc_methodid_t) sel, &param);
+   mulle_objc_object_call( obj, (mulle_objc_methodid_t) sel, &param);
 }
 
 
@@ -91,7 +89,7 @@ static inline void   MulleObjectSetCGSize( id obj, SEL sel, CGSize size)
 
    param.p.size = size;
 
-  mulle_objc_object_call( obj, (mulle_objc_methodid_t) sel, &param);
+   mulle_objc_object_call( obj, (mulle_objc_methodid_t) sel, &param);
 }
 
 
@@ -110,7 +108,7 @@ static inline void   MulleObjectSetCGPoint( id obj, SEL sel, CGPoint point)
 
    param.p.point = point;
 
-  mulle_objc_object_call( obj, (mulle_objc_methodid_t) sel, &param);
+   mulle_objc_object_call( obj, (mulle_objc_methodid_t) sel, &param);
 }
 
 

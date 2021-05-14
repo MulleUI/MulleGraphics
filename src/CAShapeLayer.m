@@ -5,14 +5,10 @@
 
 #import "import-private.h"
 
-#import "CGContext.h"
-
-#include "CGPath+nanovg.h"
-
 
 @implementation CAShapeLayer
 
-- (void) setCGPath:(CGPath *) path 
+- (void) setCGPath:(CGPath *) path
 {
    CGPathDestroy( _path);
    _path = path;
@@ -40,7 +36,7 @@
    if( ! fill && ! stroke)
       return;
 
-   vg    = [context nvgContext];
+   vg     = [context nvgContext];
    frame  = [self frame];
 
    // scale untested
@@ -49,10 +45,10 @@
    nvgSave( vg);
    {
       nvgTranslate( vg, frame.origin.x, frame.origin.y);
-      {   
+      {
          if( ! CGSizeEqualToSize( frame.size, canvas.size))
          {
-            nvgScale( vg, canvas.size.width / frame.size.width, 
+            nvgScale( vg, canvas.size.width / frame.size.width,
                            canvas.size.height / frame.size.height);
          }
 
@@ -70,7 +66,7 @@
             nvgStrokeColor( vg, _strokeColor);
             nvgStroke( vg);
          }
-      }   
+      }
    }
    nvgRestore( vg);
 }

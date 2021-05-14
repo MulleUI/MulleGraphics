@@ -12,7 +12,7 @@
 #import "import.h"
 
 /*
- * The cursor is moving along the row information in 
+ * The cursor is moving along the row information in
  * and _rowGlyphs[ y].glyphs[ x]. Each _rowGlyphs has a sentinel glyph,
  * for the end of line.
  */
@@ -45,7 +45,7 @@ struct MulleCursorUTF8Data
 /*
  * keyboard support here for now
  */
-- (void) insertCharacter:(unichar) c;
+- (void) insertUTF32Character:(int32_t) c;
 - (void) backspaceCharacter;
 
 - (struct MulleCursorUTF8Data) cursorUTF8Data;

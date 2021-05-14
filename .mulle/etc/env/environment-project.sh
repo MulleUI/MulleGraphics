@@ -1,43 +1,20 @@
+# Edit with: mulle-env environment --scope project set <key> <value>
 #
 #
 #
-export PROJECT_NAME="MulleUI"
-
-
-#
-#
-#
-export PROJECT_C_NAME="MulleUI"
-
-
-#
-#
-#
-export PROJECT_IDENTIFIER="MulleUI"
-
-
-#
-#
-#
-export PROJECT_DOWNCASE_IDENTIFIER="mulle_ui"
-
-
-#
-#
-#
-export PROJECT_UPCASE_IDENTIFIER="MULLE_UI"
-
-
-#
-#
-#
-export PROJECT_TYPE="executable"
+export PROJECT_TYPE="library"
 
 
 #
 #
 #
 export PROJECT_SOURCE_DIR="src"
+
+
+#
+#
+#
+export PROJECT_NAME="MulleGraphics"
 
 
 #

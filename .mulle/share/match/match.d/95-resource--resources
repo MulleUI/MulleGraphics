@@ -1,0 +1,6 @@
+# Copy .plist and related to resources
+
+*.plist
+*.strings
+*.eomodeld
+*.nib

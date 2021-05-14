@@ -1,0 +1,40 @@
+{
+	"folders":
+	[
+		{
+			"path": "/home/src/srcO/mulle-layout"
+		},
+		{
+			"path": "/home/src/srcO/MulleCG"
+		},
+		{
+			"path": "/home/src/srcO/MulleCA"
+		},
+		{
+			"file_exclude_patterns":
+			[
+				"*~",
+				"*~.*",
+				"*.chk",
+				".DS_Store",
+				"._.DS_Store",
+				"*.sublime-workspace",
+				"tmp.*"
+			],
+			"folder_exclude_patterns":
+			[
+				".git",
+				".mulle/var",
+				".unison*",
+				"addiction",
+				"build",
+				"Build",
+				"kitchen",
+				"dependency",
+				"stash",
+				"var"
+			],
+			"path": "."
+		}
+	]
+}
