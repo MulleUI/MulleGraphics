@@ -46,11 +46,14 @@ static void   animate_bool_property( struct _mulle_objc_property *property,
                                                startIntegerValue:startValue
                                                  endIntegerValue:endValue
                                                          options:ctx->animationOptions] autorelease];
-   [animation setAnimationDelegate:ctx->animationDelegate];
-   [ctx->self addAnimation:animation];
+   if( animation)
+   {
+      [animation setAnimationDelegate:ctx->animationDelegate];
+      [ctx->self addAnimation:animation];
 
-   // reset to start position
-   MulleObjectSetBOOL( ctx->self, setter, startValue);
+      // reset to start position
+      MulleObjectSetBOOL( ctx->self, setter, startValue);
+   }
 }
 
 
@@ -74,11 +77,14 @@ static void   animate_integer_property( struct _mulle_objc_property *property,
                                                startIntegerValue:startValue
                                                  endIntegerValue:endValue
                                                          options:ctx->animationOptions] autorelease];
-   [animation setAnimationDelegate:ctx->animationDelegate];
-   [ctx->self addAnimation:animation];
+   if( animation)
+   {
+      [animation setAnimationDelegate:ctx->animationDelegate];
+      [ctx->self addAnimation:animation];
 
-   // reset to start position
-   MulleObjectSetNSInteger( ctx->self, setter, startValue);
+      // reset to start position
+      MulleObjectSetNSInteger( ctx->self, setter, startValue);
+   }
 }
 
 static void   animate_range_property( struct _mulle_objc_property *property,
@@ -93,13 +99,16 @@ static void   animate_range_property( struct _mulle_objc_property *property,
    getter     = mulle_objc_property_get_getter( property);
    startRange = MulleObjectGetNSRange( ctx->snapshot, getter);
    endRange   = MulleObjectGetNSRange( ctx->self, getter);
-   if( ! NSEqualRanges( startRange, endRange))
+   if( NSEqualRanges( startRange, endRange))
+      return;
+
+   setter    = mulle_objc_property_get_setter( property);
+   animation = [[[CABasicAnimation alloc] initWithPropertySetter:setter
+                                                      startRange:startRange
+                                                        endRange:endRange
+                                                         options:ctx->animationOptions] autorelease];
+   if( animation)
    {
-      setter    = mulle_objc_property_get_setter( property);
-      animation = [[[CABasicAnimation alloc] initWithPropertySetter:setter
-                                                         startRange:startRange
-                                                           endRange:endRange
-                                                            options:ctx->animationOptions] autorelease];
       [animation setAnimationDelegate:ctx->animationDelegate];
       [ctx->self addAnimation:animation];
 
@@ -133,11 +142,14 @@ static void   animate_float_property( struct _mulle_objc_property *property,
                                                  startFloatValue:startValue
                                                    endFloatValue:endValue
                                                          options:ctx->animationOptions] autorelease];
-   [animation setAnimationDelegate:ctx->animationDelegate];
-   [ctx->self addAnimation:animation];
+   if( animation)
+   {
+      [animation setAnimationDelegate:ctx->animationDelegate];
+      [ctx->self addAnimation:animation];
 
-   // reset to start position
-   MulleObjectSetCGFloat( ctx->self, setter, startValue);
+      // reset to start position
+      MulleObjectSetCGFloat( ctx->self, setter, startValue);
+   }
 }
 
 static void   animate_point_property( struct _mulle_objc_property *property,
@@ -152,13 +164,16 @@ static void   animate_point_property( struct _mulle_objc_property *property,
    getter     = mulle_objc_property_get_getter( property);
    startPoint = MulleObjectGetCGPoint( ctx->snapshot, getter);
    endPoint   = MulleObjectGetCGPoint( ctx->self, getter);
-   if( ! CGPointEqualToPoint( startPoint, endPoint))
+   if( CGPointEqualToPoint( startPoint, endPoint))
+      return;
+
+   setter    = mulle_objc_property_get_setter( property);
+   animation = [[[CABasicAnimation alloc] initWithPropertySetter:setter
+                                                      startPoint:startPoint
+                                                        endPoint:endPoint
+                                                         options:ctx->animationOptions] autorelease];
+   if( animation)
    {
-      setter    = mulle_objc_property_get_setter( property);
-      animation = [[[CABasicAnimation alloc] initWithPropertySetter:setter
-                                                         startPoint:startPoint
-                                                           endPoint:endPoint
-                                                            options:ctx->animationOptions] autorelease];
       [animation setAnimationDelegate:ctx->animationDelegate];
       [ctx->self addAnimation:animation];
 
@@ -184,13 +199,16 @@ static void   animate_size_property( struct _mulle_objc_property *property,
    getter    = mulle_objc_property_get_getter( property);
    startSize = MulleObjectGetCGSize( ctx->snapshot, getter);
    endSize   = MulleObjectGetCGSize( ctx->self, getter);
-   if( ! CGSizeEqualToSize( startSize, endSize))
+   if( CGSizeEqualToSize( startSize, endSize))
+      return;
+
+   setter    = mulle_objc_property_get_setter( property);
+   animation = [[[CABasicAnimation alloc] initWithPropertySetter:setter
+                                                       startSize:startSize
+                                                         endSize:endSize
+                                                         options:ctx->animationOptions] autorelease];
+   if( animation)
    {
-      setter    = mulle_objc_property_get_setter( property);
-      animation = [[[CABasicAnimation alloc] initWithPropertySetter:setter
-                                                          startSize:startSize
-                                                            endSize:endSize
-                                                            options:ctx->animationOptions] autorelease];
       [animation setAnimationDelegate:ctx->animationDelegate];
       [ctx->self addAnimation:animation];
 
@@ -216,13 +234,16 @@ static void   animate_rect_property( struct _mulle_objc_property *property,
    getter    = mulle_objc_property_get_getter( property);
    startRect = MulleObjectGetCGRect( ctx->snapshot, getter);
    endRect   = MulleObjectGetCGRect( ctx->self, getter);
-   if( ! CGRectEqualToRect( startRect, endRect))
+   if( CGRectEqualToRect( startRect, endRect))
+      return;
+
+   setter    = mulle_objc_property_get_setter( property);
+   animation = [[[CABasicAnimation alloc] initWithPropertySetter:setter
+                                                       startRect:startRect
+                                                         endRect:endRect
+                                                         options:ctx->animationOptions] autorelease];
+   if( animation)
    {
-      setter    = mulle_objc_property_get_setter( property);
-      animation = [[[CABasicAnimation alloc] initWithPropertySetter:setter
-                                                          startRect:startRect
-                                                            endRect:endRect
-                                                            options:ctx->animationOptions] autorelease];
       [animation setAnimationDelegate:ctx->animationDelegate];
       [ctx->self addAnimation:animation];
 
@@ -248,13 +269,16 @@ static void   animate_insets_property( struct _mulle_objc_property *property,
    getter     = mulle_objc_property_get_getter( property);
    startInsets = MulleObjectGetEdgeInsets( ctx->snapshot, getter);
    endInsets   = MulleObjectGetEdgeInsets( ctx->self, getter);
-   if( ! MulleEdgeInsetsEqualToEdgeInsets( startInsets, endInsets))
+   if( MulleEdgeInsetsEqualToEdgeInsets( startInsets, endInsets))
+      return;
+
+   setter    = mulle_objc_property_get_setter( property);
+   animation = [[[CABasicAnimation alloc] initWithPropertySetter:setter
+                                                 startEdgeInsets:startInsets
+                                                   endEdgeInsets:endInsets
+                                                         options:ctx->animationOptions] autorelease];
+   if( animation)
    {
-      setter    = mulle_objc_property_get_setter( property);
-      animation = [[[CABasicAnimation alloc] initWithPropertySetter:setter
-                                                    startEdgeInsets:startInsets
-                                                      endEdgeInsets:endInsets
-                                                            options:ctx->animationOptions] autorelease];
       [animation setAnimationDelegate:ctx->animationDelegate];
       [ctx->self addAnimation:animation];
 
@@ -266,6 +290,7 @@ static void   animate_insets_property( struct _mulle_objc_property *property,
       MulleObjectSetEdgeInsets( ctx->self, setter, startInsets);
    }
 }
+
 
 
 static void   animate_color_property( struct _mulle_objc_property *property,
@@ -289,15 +314,19 @@ static void   animate_color_property( struct _mulle_objc_property *property,
                                                       startColor:startColor
                                                         endColor:endColor
                                                          options:ctx->animationOptions] autorelease];
-   [animation setAnimationDelegate:ctx->animationDelegate];
-   [ctx->self addAnimation:animation];
+   if( animation)
+   {
+      [animation setAnimationDelegate:ctx->animationDelegate];
+      [ctx->self addAnimation:animation];
 
-   // reset to start position
-   MulleObjectSetCGColorRef( ctx->self, setter, startColor);
+      // reset to start position
+      MulleObjectSetCGColorRef( ctx->self, setter, startColor);
+   }
 }
 
 
 @implementation CALayer( CAAnimation)
+
 
 //
 // This is called very often during animation, it would be good if the
@@ -308,14 +337,16 @@ static void   animate_color_property( struct _mulle_objc_property *property,
 {
    id   manager;
    // this is called frequently so use C
-   manager = CATransactionGetCurrentTransactionManager();
+   manager = CATransactionGetCurrentTransaction();
    if( ! manager)
       return;
    if( _snapshot)
       return;
+
    _snapshot = [self copy];
    [manager addAnimatableObject:self];
 }
+
 
 
 static mulle_objc_walkcommand_t
@@ -423,11 +454,41 @@ static mulle_objc_walkcommand_t
    ctxt.infra             = infra;
    ctxt.self              = self;
 
-
 	_mulle_objc_infraclass_walk_properties( infra,
                                            _mulle_objc_infraclass_get_inheritance( infra),
                                            walkproperties_callback,
                                            &ctxt);
+}
+
+
+- (BOOL) hasAnimations
+{
+   return( _numberOfAnimations != 0);
+}
+
+
+- (NSUInteger) numberOfAnimations
+{
+   return( _numberOfAnimations);
+}
+
+
+- (BOOL) hasRunningAnimations
+{
+   struct mulle_pointerarrayenumerator  rover;
+   CAAnimation                          *animation;
+   BOOL                                 flag;
+
+   flag = NO;
+
+   rover = mulle_pointerarray_enumerate( &_animations);
+   while( _mulle_pointerarrayenumerator_next( &rover, (void **) &animation))
+      if( animation && ! [animation hasEnded])
+      {
+         flag = YES;
+      }
+   mulle_pointerarrayenumerator_done( &rover);
+   return( flag);
 }
 
 
@@ -437,6 +498,26 @@ static mulle_objc_walkcommand_t
 
    assert( _mulle_pointerarray_find( &_animations, animation) == mulle_not_found_e);
    _mulle_pointerarray_add( &_animations, [animation retain]);
+   _numberOfAnimations++;
+}
+
+
+- (void) removeAnimation:(CAAnimation *) animation
+{
+   struct mulle_pointerarray   tmp;
+   uintptr_t                   index;
+
+   index = _mulle_pointerarray_find( &_animations, animation);
+   if( index == mulle_not_found_e)
+      return;
+
+   if( ! --_numberOfAnimations)
+      [self removeAllAnimations];
+   else
+   {
+      [animation autorelease];
+      mulle_pointerarray_set( &_animations, (unsigned int) index, NULL);
+   }
 }
 
 
@@ -452,12 +533,8 @@ static mulle_objc_walkcommand_t
 
    _mulle_pointerarray_done( &_animations);
    _mulle_pointerarray_init( &_animations, 16, NULL);
-}
 
-
-- (NSUInteger) numberOfAnimations
-{
-   return( mulle_pointerarray_get_count( &_animations));
+   _numberOfAnimations = 0;
 }
 
 
@@ -490,10 +567,14 @@ static mulle_objc_walkcommand_t
 
    [self removeAllAnimations];
 
+   memset( &options, 0, sizeof( options));
+
    options.base.timeRange   = CARelativeTimeRangeMake( info->animationDelay, info->animationDuration);
    options.base.repeatCount = info->animationRepeatCount;
    options.base.bits        = info->animationAutoreverses ? CAAnimationReverses : 0;
-   options.curve            = MulleQuadraticForAnimationCurve( info->animationCurve);
+   options.tween            = info->animationTweenFunction;
+   if( ! options.tween)
+      options.curve         = info->animationCurve;
 
    /** Our animatable properties
        subclasses might want to add more

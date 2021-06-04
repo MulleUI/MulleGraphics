@@ -1,1 +1,0 @@
-Foundation;${FOUNDATION_NODETYPE:-tar};no-singlephase;BC4F11F5-A1C5-490E-9011-907BEF9DE44D;${FOUNDATION_URL:-https://github.com/MulleFoundation/Foundation/archive/${MULLE_TAG}.tar.gz};${FOUNDATION_BRANCH};${FOUNDATION_TAG:-latest};;

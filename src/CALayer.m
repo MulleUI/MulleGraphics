@@ -147,7 +147,6 @@ static inline CGRect   getCanvas( CALayer *self)
       _canvas.size = canvas.size;
 }
 
-
 - (void) fillBackgroundInContext:(CGContext *) context
                            color:(CGColorRef) color
                            paint:(MullePaint *) paint
@@ -178,7 +177,7 @@ static inline CGRect   getCanvas( CALayer *self)
    if( tl.x > br.x && tl.y > br.y)
       return;
 
-   vg = MulleContextGetNVGContext( context);
+   vg = CGContextGetNVGContext( context);
 
    // calc border out from fill, but don't draw
    borderWidth = [self borderWidth];
@@ -255,7 +254,7 @@ static inline CGRect   getCanvas( CALayer *self)
    if( ! (tl.x <= br.x || tl.y <= br.y))
       return;
 
-   vg = MulleContextGetNVGContext( context);
+   vg = CGContextGetNVGContext( context);
 
    //
    // the _cornerRadius is computed for a stroke of width 1 (or 0 ?)
@@ -300,7 +299,7 @@ static inline CGRect   getCanvas( CALayer *self)
    if( _frame.size.width == 0.0 || _frame.size.height == 0.0)
       return( NULL);
 
-   vg = MulleContextGetNVGContext( context);
+   vg = CGContextGetNVGContext( context);
 
    //
    // as we reset here and set alpha global, we don't need to save state
@@ -339,10 +338,6 @@ static inline CGRect   getCanvas( CALayer *self)
    return( vg);
 }
 
-- (BOOL) hasAnimations
-{
-   return( _mulle_pointerarray_get_count( &_animations) != 0);
-}
 
 - (void) renderInContext:(CGContext *) context
 {
@@ -369,7 +364,7 @@ static inline CGRect   getCanvas( CALayer *self)
    //
    // if any dimension is zero size, nothing gets painted anyway...
    //
-   localTransform = MulleAffineTransformMakeProjection( _frame, bounds);
+   localTransform = CGAffineTransformMakeProjection( _frame, bounds);
    alpha           = _opacity * _alpha;
    vg              = [self setupContext:context
                          localTransform:&localTransform

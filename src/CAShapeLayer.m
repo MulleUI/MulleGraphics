@@ -30,13 +30,15 @@
    CGRect        frame;
    CGRect        canvas;
 
+   [super drawInContext:context];
+
    fill   = ! MulleColorIsTransparent( _fillColor);
    stroke = ! MulleColorIsTransparent( _strokeColor);
 
    if( ! fill && ! stroke)
       return;
 
-   vg     = [context nvgContext];
+   vg     = CGContextGetNVGContext( context);
    frame  = [self frame];
 
    // scale untested

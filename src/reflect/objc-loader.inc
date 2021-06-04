@@ -2,10 +2,11 @@
       { @selector( MulleObjCLoader), @selector( MulleCG) },      // 47a9beb6;MulleObjCLoader;d422218a;MulleCG
       { @selector( CABasicAnimation), @selector( CGColor) },      // 1462ac1b;CABasicAnimation;94e785ef;CGColor
       { @selector( CAGradientLayer), MULLE_OBJC_NO_CATEGORYID },      // cf9da5a2;CAGradientLayer;;
+      { @selector( CAImageLayer), @selector( Cursor) },      // 2a9d3438;CAImageLayer;58a502f5;Cursor
+      { @selector( CAImageLayer), MULLE_OBJC_NO_CATEGORYID },      // 2a9d3438;CAImageLayer;;
       { @selector( CALayer), @selector( CAAnimation) },      // 55df8726;CALayer;c85bd814;CAAnimation
       { @selector( CALayer), MULLE_OBJC_NO_CATEGORYID },      // 55df8726;CALayer;;
       { @selector( CAShapeLayer), MULLE_OBJC_NO_CATEGORYID },      // 1effb374;CAShapeLayer;;
-      { @selector( MulleImageLayer), MULLE_OBJC_NO_CATEGORYID },      // 80047541;MulleImageLayer;;
-      { @selector( MulleTextLayer), @selector( Cursor) },      // b9415768;MulleTextLayer;58a502f5;Cursor
-      { @selector( MulleTextLayer), @selector( Selection) },      // b9415768;MulleTextLayer;dea34b5b;Selection
-      { @selector( MulleTextLayer), MULLE_OBJC_NO_CATEGORYID },      // b9415768;MulleTextLayer;;
+      { @selector( CATextLayer), @selector( Cursor) },      // de65b073;CATextLayer;58a502f5;Cursor
+      { @selector( CATextLayer), @selector( Selection) },      // de65b073;CATextLayer;dea34b5b;Selection
+      { @selector( CATextLayer), MULLE_OBJC_NO_CATEGORYID },      // de65b073;CATextLayer;;

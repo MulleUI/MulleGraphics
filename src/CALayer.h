@@ -11,10 +11,9 @@
 //
 // A layer draws content in its "canvas". A part or all
 // of this drawing is displayed in the "frame". The piece of the "canvas" that
-// is drawn in the "frame" is specified by the "bounds". As the geometries can
-// be different, there can be scaling. The content is provided by subclasses
-// or the drawCallback function. There is no default way to draw an image or
-// a text, like in the Apple CALayer.
+// is drawn in the "frame" is specified by the "bounds". The content is
+// provided by subclasses or the drawCallback function. There is no default
+// way to draw an image or a text, like in the Apple CALayer.
 //
 // canvas.origin (0,0)
 //       .----------------------.
@@ -54,6 +53,10 @@
 //
 // See example: main-layout-bounds.m
 //
+// This is simple as long as there is no scaling involved. If there is scaling
+// then bounds can't track frame, as bounds are in canvas space. So everytime
+// frame.size is changed, the bounds may need to be adjusted manually.
+//
 enum
 {
    CALayerCanvasSizeTracksFrameSize = 0x1,
@@ -64,7 +67,8 @@ enum
 @interface CALayer : NSObject < NSCopying, CGRenderObject>
 {
    CALayer                     *_snapshot;
-   struct mulle_pointerarray   _animations;
+   struct mulle_pointerarray   _animations; // can have holes!
+   NSUInteger                  _numberOfAnimations;
 }
 
 // animatable properties
@@ -172,17 +176,7 @@ enum
 - (CGSize) sizeThatFits:(CGSize) size
                 context:(CGContext *) context;
 
-- (BOOL) hasAnimations;
 
 @end
 
-
-@protocol CGImage;
-
-
-@protocol CAImageLayer
-
-@property( retain) NSObject <CGImage>   *image;
-
-@end
 

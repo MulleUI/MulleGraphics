@@ -4,13 +4,16 @@
 @interface CALayer( CAAnimation) <CAAnimatableObject, CAImplicitlyAnimatableObject>
 
 //
+- (NSUInteger) numberOfAnimations;
+- (BOOL) hasRunningAnimations;
+- (BOOL) hasAnimations;
+
 // Animations should not be shared with other layers as they have state.
 // If you did, one or many of the other layers would sometimes fail to do the
 // last animation step
 //
 - (void) addAnimation:(CAAnimation *) animation;
 - (void) removeAllAnimations;
-- (NSUInteger) numberOfAnimations;
 
 - (void) animateWithAbsoluteTime:(CAAbsoluteTime) time;
 
