@@ -57,18 +57,25 @@
 // then bounds can't track frame, as bounds are in canvas space. So everytime
 // frame.size is changed, the bounds may need to be adjusted manually.
 //
+// TODO: maybe add some more trackers, for stable bounds center, stable bounds
+//       origin or so...
 enum
 {
    CALayerCanvasSizeTracksFrameSize = 0x1,
    CALayerBoundsSizeTracksFrameSize = 0x2
 };
 
+
 //
-@interface CALayer : NSObject < NSCopying, CGRenderObject>
+// The CALayer "private" animations are not stored or handled in a CAAnimator
+// object. They are triggered as part of the renderQueue creation. These
+// animations will run, separately from any "CAAnimator" animations. Therefore
+// making those animations "additive" should be good.
+//
+@interface CALayer : NSObject < NSCopying, CGRenderObject, CAAnimationStorageObject>
 {
    CALayer                     *_snapshot;
-   struct mulle_pointerarray   _animations; // can have holes!
-   NSUInteger                  _numberOfAnimations;
+   struct CAAnimationStorage   _animationStorage;
 }
 
 // animatable properties
@@ -96,13 +103,15 @@ enum
 //
 @property( observable) CGRect          canvas;
 
-// these properies are set by UIView, don't touch as they will get overwritten
-// on the next layout. They are also not animatable.. use opacity or
-// frame bounds for that
+// These properies are set by the UIView only! Don't touch them, as they will
+// get overwritten on the next render. Use opacity or frame/bounds for
+// Layer animation.
+
 @property( assign) CGAffineTransform   transform;
 @property( assign) CGRect              clipRect;
 @property( assign) CGFloat             alpha;
 
+// this is a bitfield that controls bounds/frame canvas/frame tracking
 @property( assign) NSUInteger          frameTracking;
 
 
@@ -139,10 +148,10 @@ enum
 
 
 //
-// Subclasses do their drawing in this method. The default implementation
+// Subclasses do their drawing in -drawInContext. The default implementation
 // calls the drawCallback if one is set, otherwise it does nothing.
 //
-// This method draws "canvas", the transformation has been setup for
+// This method should draw "canvas". The transformation has been setup for
 // frame/bounds projection already by renderInContext:
 //
 // The drawing context will have been saved before
@@ -176,6 +185,8 @@ enum
 - (CGSize) sizeThatFits:(CGSize) size
                 context:(CGContext *) context;
 
+
+- (struct CAAnimationStorage *) animationStorage;
 
 @end
 

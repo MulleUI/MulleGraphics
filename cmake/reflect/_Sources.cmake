@@ -8,19 +8,28 @@ if( MULLE_TRACE_INCLUDE)
    MESSAGE( STATUS "# Include \"${CMAKE_CURRENT_LIST_FILE}\"" )
 endif()
 
+#
+# contents selected with patternfile ??-source--sources
+#
 set( SOURCES
 src/CABasicAnimation+CGColor.m
 src/CAGradientLayer.m
+src/CAImageLayer+Cursor.m
+src/CAImageLayer.m
 src/CALayer+CAAnimation.m
 src/CALayer.m
+src/CAOpenGLLayer.m
 src/CAShapeLayer.m
+src/CATextLayer+Cursor.m
+src/CATextLayer+Selection.m
+src/CATextLayer.m
 src/MulleGraphics.m
-src/MulleImageLayer.m
-src/MulleTextLayer+Cursor.m
-src/MulleTextLayer+Selection.m
-src/MulleTextLayer.m
+src/NSObject+CAAnimation.m
 )
 
+#
+# contents selected with patternfile ??-source--stage2-sources
+#
 set( STAGE2_SOURCES
 src/MulleObjCLoader+MulleGraphics.m
 )

@@ -18,9 +18,14 @@
 
 - (id) init
 {
+   struct mulle_allocator   *allocator;
+
    self = [super init];
    if( ! self)
       return( self);
+
+   allocator = MulleObjCInstanceGetAllocator( self);
+   _mulle_pointerarray_init( &_animationStorage._animations, 0, allocator);
 
    _bounds.size.width   = INFINITY;
    _canvas.size.width   = INFINITY;
@@ -48,19 +53,12 @@
 
 - (void) dealloc
 {
-   struct mulle_allocator               *allocator;
-   struct mulle_pointerarrayenumerator   rover;
-   CAAnimation                           *animation;
+   struct mulle_allocator   *allocator;
 
    allocator = MulleObjCInstanceGetAllocator( self);
    mulle_allocator_free( allocator, _debugNameCString);
 
-   rover = mulle_pointerarray_enumerate( &_animations);
-   while( _mulle_pointerarrayenumerator_next( &rover, (void **) &animation))
-      [animation release];
-   mulle_pointerarrayenumerator_done( &rover);
-
-   mulle_pointerarray_done( &_animations);
+   [self removeAllAnimations];
 
    [_snapshot release];
 
@@ -76,17 +74,20 @@
 
 - (id) copy
 {
-   CALayer   *copy;
+   CALayer                  *clone;
+   struct mulle_allocator   *allocator;
 
    // this does a memcpy
-   copy = NSCopyObject( self, 0, NULL);
+   clone = NSCopyObject( self, 0, NULL);
 
    // nil out references to outside memory
-   copy->_snapshot    = nil;
-   _mulle_pointerarray_init( &copy->_animations, 0, NULL);
-   copy->_debugNameCString = NULL;
+   clone->_snapshot         = nil;
+   clone->_debugNameCString = NULL;
 
-   return( copy);
+   allocator = MulleObjCInstanceGetAllocator( clone);
+   _mulle_pointerarray_init( &clone->_animationStorage._animations, 0, allocator);
+
+   return( clone);
 }
 
 
@@ -146,6 +147,13 @@ static inline CGRect   getCanvas( CALayer *self)
    else
       _canvas.size = canvas.size;
 }
+
+
+- (struct CAAnimationStorage *) animationStorage
+{
+   return( &_animationStorage);
+}
+
 
 - (void) fillBackgroundInContext:(CGContext *) context
                            color:(CGColorRef) color

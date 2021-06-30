@@ -23,6 +23,18 @@
 //        (use mulle-sourcetree-to-c --unames for known values)
 #import <MulleUICore/MulleUICore.h>   // MulleUICore
 
+// You can tweak the following #import with these commands.
+// (Use 16295179-6216-4E0D-8313-A92671B4EE42 instead of MulleUIPerf if there are duplicate entries)
+//    remove:             `mulle-sourcetree mark MulleUIPerf no-header`
+//    rename:             `mulle-sde dependency|library set MulleUIPerf include whatever.h`
+//    reorder:            `mulle-sourcetree move MulleUIPerf <up|down>`
+//    toggle #import:     `mulle-sourcetree mark MulleUIPerf [no-]import`
+//    toggle public:      `mulle-sourcetree mark MulleUIPerf [no-]public`
+//    toggle optional:    `mulle-sourcetree mark MulleUIPerf [no-]require`
+//    remove for platform:`mulle-sourcetree mark MulleUIPerf no-platform-<uname>`
+//        (use mulle-sourcetree-to-c --unames for known values)
+#import <MulleUIPerf/MulleUIPerf.h>   // MulleUIPerf
+
 #ifdef __has_include
 # if __has_include( "_demos-include.h")
 #  include "_demos-include.h"

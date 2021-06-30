@@ -58,7 +58,7 @@ static void   setupSceneInWindow( UIWindow *window)
    // context.
    layer   = [CAImageLayer layerWithFrame:frame];
    [layer setDrawCallback:drawStuff];
-   [layer setBackgroundColor:CGColorCreateGenericRGB( 0.33, 0.33, 0.33, 1.0)];
+   [layer setBackgroundColor:CGColorMakeRGBA( 0.33, 0.33, 0.33, 1.0)];
 
    view = [UIView viewWithLayer:layer];
    [contentPlane addSubview:view];
@@ -73,7 +73,7 @@ int   main( int argc, char *argv[])
    app = [UIApplication sharedInstance];
    {
       window = [UIWindow windowWithFrame:CGRectMake( 0.0, 0.0, 800.0, 600.0)];
-      [window setBackgroundColor:CGColorCreateGenericRGB( 0.5, 0.5, 0.5, 1.0)];
+      [window setBackgroundColor:CGColorMakeRGBA( 0.5, 0.5, 0.5, 1.0)];
       [window setFrameRateHz:100];
       setupSceneInWindow( window);
 

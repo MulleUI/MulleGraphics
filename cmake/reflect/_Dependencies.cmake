@@ -35,7 +35,8 @@ if( NOT MULLE_CG_LIBRARY)
          CACHE INTERNAL "need to cache this"
       )
       #
-      # Inherit ObjC loader and link dependency info.
+      # Inherit information from dependency.
+      # Encompasses: no-cmake-searchpath,no-cmake-dependency,no-cmake-loader
       # Disable with: `mulle-sourcetree mark MulleCG no-cmake-inherit`
       #
       # temporarily expand CMAKE_MODULE_PATH
@@ -69,17 +70,9 @@ if( NOT MULLE_CG_LIBRARY)
          if( EXISTS "${_TMP_MULLE_CG_DIR}/DependenciesAndLibraries.cmake")
             unset( MULLE_CG_DEFINITIONS)
             list( INSERT CMAKE_MODULE_PATH 0 "${_TMP_MULLE_CG_DIR}")
-            # we only want top level INHERIT_OBJC_LOADERS, so disable them
-            if( NOT NO_INHERIT_OBJC_LOADERS)
-               set( NO_INHERIT_OBJC_LOADERS OFF)
-            endif()
-            list( APPEND _TMP_INHERIT_OBJC_LOADERS ${NO_INHERIT_OBJC_LOADERS})
-            set( NO_INHERIT_OBJC_LOADERS ON)
             #
             include( "${_TMP_MULLE_CG_DIR}/DependenciesAndLibraries.cmake")
             #
-            list( GET _TMP_INHERIT_OBJC_LOADERS -1 NO_INHERIT_OBJC_LOADERS)
-            list( REMOVE_AT _TMP_INHERIT_OBJC_LOADERS -1)
             #
             list( REMOVE_ITEM CMAKE_MODULE_PATH "${_TMP_MULLE_CG_DIR}")
             set( INHERITED_DEFINITIONS
@@ -110,6 +103,7 @@ if( NOT MULLE_CG_LIBRARY)
          endforeach()
       endif()
    else()
+      # Disable with: `mulle-sourcetree mark MulleCG no-require-link`
       message( FATAL_ERROR "MULLE_CG_LIBRARY was not found")
    endif()
 endif()
@@ -138,7 +132,8 @@ if( NOT MULLE_CA_LIBRARY)
          CACHE INTERNAL "need to cache this"
       )
       #
-      # Inherit ObjC loader and link dependency info.
+      # Inherit information from dependency.
+      # Encompasses: no-cmake-searchpath,no-cmake-dependency,no-cmake-loader
       # Disable with: `mulle-sourcetree mark MulleCA no-cmake-inherit`
       #
       # temporarily expand CMAKE_MODULE_PATH
@@ -172,17 +167,9 @@ if( NOT MULLE_CA_LIBRARY)
          if( EXISTS "${_TMP_MULLE_CA_DIR}/DependenciesAndLibraries.cmake")
             unset( MULLE_CA_DEFINITIONS)
             list( INSERT CMAKE_MODULE_PATH 0 "${_TMP_MULLE_CA_DIR}")
-            # we only want top level INHERIT_OBJC_LOADERS, so disable them
-            if( NOT NO_INHERIT_OBJC_LOADERS)
-               set( NO_INHERIT_OBJC_LOADERS OFF)
-            endif()
-            list( APPEND _TMP_INHERIT_OBJC_LOADERS ${NO_INHERIT_OBJC_LOADERS})
-            set( NO_INHERIT_OBJC_LOADERS ON)
             #
             include( "${_TMP_MULLE_CA_DIR}/DependenciesAndLibraries.cmake")
             #
-            list( GET _TMP_INHERIT_OBJC_LOADERS -1 NO_INHERIT_OBJC_LOADERS)
-            list( REMOVE_AT _TMP_INHERIT_OBJC_LOADERS -1)
             #
             list( REMOVE_ITEM CMAKE_MODULE_PATH "${_TMP_MULLE_CA_DIR}")
             set( INHERITED_DEFINITIONS
@@ -213,6 +200,7 @@ if( NOT MULLE_CA_LIBRARY)
          endforeach()
       endif()
    else()
+      # Disable with: `mulle-sourcetree mark MulleCA no-require-link`
       message( FATAL_ERROR "MULLE_CA_LIBRARY was not found")
    endif()
 endif()

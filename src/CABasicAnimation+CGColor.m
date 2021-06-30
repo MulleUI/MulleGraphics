@@ -41,20 +41,20 @@
 @implementation CABasicAnimation ( CGColor)
 
 
-- (id) initWithPropertySetter:(SEL) propertySetter
-                   startColor:(CGColorRef) start
-                     endColor:(CGColorRef) end
-                      options:(struct CABasicAnimationOptions *) options
+- (id) initWithProperty:(struct _mulle_objc_property *) property
+        startColorValue:(CGColorRef) start
+          endColorValue:(CGColorRef) end
+                options:(struct CABasicAnimationOptions *) options
 {
    struct CAAnimationValueRange  range;
 
    range.start = CGAnimationValueMakeWithCGColorRef( start);
    range.end   = CGAnimationValueMakeWithCGColorRef( end);
-   return( [self initWithPropertySetter:propertySetter
-                              valueType:CAAnimationValueCGFloat4
-                             valueRange:&range
-                            repeatStart:range.start
-                                options:options]);
+   return( [self initWithProperty:property
+                        valueType:CAAnimationValueCGFloat4
+                       valueRange:&range
+                      repeatStart:range.start
+                          options:options]);
 }
 
 @end

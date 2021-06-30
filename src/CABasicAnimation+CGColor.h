@@ -55,10 +55,10 @@ enum
 
 @interface CABasicAnimation( CGColor)
 
-- (id) initWithPropertySetter:(SEL) propertySetter
-                   startColor:(CGColorRef) start
-                     endColor:(CGColorRef) end
-                      options:(struct CABasicAnimationOptions *) options;
+- (id) initWithProperty:(struct _mulle_objc_property *) property
+        startColorValue:(CGColorRef) start
+          endColorValue:(CGColorRef) end
+                options:(struct CABasicAnimationOptions *) options;
 
 @end
 

@@ -8,20 +8,32 @@ if( MULLE_TRACE_INCLUDE)
    MESSAGE( STATUS "# Include \"${CMAKE_CURRENT_LIST_FILE}\"" )
 endif()
 
+#
+# contents are derived from the file locations
+
 set( INCLUDE_DIRS
 src
 src/reflect
 )
 
+#
+# contents selected with patternfile ??-header--private-generated-headers
+#
 set( PRIVATE_GENERATED_HEADERS
 src/reflect/_MulleGraphics-import-private.h
 src/reflect/_MulleGraphics-include-private.h
 )
 
+#
+# contents selected with patternfile ??-header--private-generic-headers
+#
 set( PRIVATE_GENERIC_HEADERS
 src/import-private.h
 )
 
+#
+# contents selected with patternfile ??-header--public-generated-headers
+#
 set( PUBLIC_GENERATED_HEADERS
 src/reflect/_MulleGraphics-export.h
 src/reflect/_MulleGraphics-import.h
@@ -29,24 +41,33 @@ src/reflect/_MulleGraphics-include.h
 src/reflect/_MulleGraphics-provide.h
 )
 
+#
+# contents selected with patternfile ??-header--public-generic-headers
+#
 set( PUBLIC_GENERIC_HEADERS
 src/import.h
 )
 
+#
+# contents selected with patternfile ??-header--public-headers
+#
 set( PUBLIC_HEADERS
 src/CABasicAnimation+CGColor.h
 src/CAGradientLayer.h
+src/CAImageLayer+Cursor.h
+src/CAImageLayer.h
 src/CALayer+CAAnimation.h
 src/CALayer.h
+src/CAOpenGLLayer.h
 src/CAShapeLayer.h
+src/CATextLayer+Cursor.h
+src/CATextLayer+Selection.h
+src/CATextLayer.h
 src/CGGeometry+MulleObjC.h
 src/MulleCursorProtocol.h
 src/MulleEdgeInsets+MulleObjC.h
 src/MulleGraphics.h
-src/MulleImageLayer.h
 src/MulleObjCLoader+MulleGraphics.h
-src/MulleTextLayer+Cursor.h
-src/MulleTextLayer+Selection.h
-src/MulleTextLayer.h
+src/NSObject+CAAnimation.h
 )
 

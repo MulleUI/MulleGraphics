@@ -15,6 +15,7 @@
 #import "CAImageLayer.h"
 #import "CALayer+CAAnimation.h"
 #import "CALayer.h"
+#import "CAOpenGLLayer.h"
 #import "CAShapeLayer.h"
 #import "CATextLayer+Cursor.h"
 #import "CATextLayer+Selection.h"
@@ -23,3 +24,4 @@
 #import "MulleCursorProtocol.h"
 #import "MulleEdgeInsets+MulleObjC.h"
 #import "MulleObjCLoader+MulleGraphics.h"
+#import "NSObject+CAAnimation.h"

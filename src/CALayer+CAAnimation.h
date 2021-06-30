@@ -1,33 +1,47 @@
 #import "CALayer.h"
 
 
-@interface CALayer( CAAnimation) <CAAnimatableObject, CAImplicitlyAnimatableObject>
+@class CAAnimationGroup;
 
+
+// A simplified sketch of a simple animation of a CALayer moving from
+// "fromR" to "toR". First the initial value is set outside of the transaction.
+// Then the transaction is started and the destination value is set. The
+// CALayer notices it's in a transaction and saves the previous value in a
+// snapshot. The layer also adds itself to the transaction. When the
+// transaction ends, the layer produces an animation for the frame and resets
+// the frame to the initial value.
 //
-- (NSUInteger) numberOfAnimations;
-- (BOOL) hasRunningAnimations;
-- (BOOL) hasAnimations;
-
-// Animations should not be shared with other layers as they have state.
-// If you did, one or many of the other layers would sometimes fail to do the
-// last animation step
 //
-- (void) addAnimation:(CAAnimation *) animation;
-- (void) removeAllAnimations;
+//       -[CALayer setFrame:fromR]  .---------------.-------------.
+//                 |                | CALayer       | -setFrame:  |
+//                 |                |               '-------------'
+//                 |                '---------------'
+//                 v
+//       -[CATransaction begin]
+//                 |                .---------------.-------------.
+//                 |                | CALayer       | -willChange |
+//                 |                |               .-------------.
+//                 v                '---------------| -snapshot   |
+//       -[CALayer setFrame:toR]                    .-------------.
+//                 |                                | -setFrame:  |
+//                 |                                '-------------'
+//                 |
+//                 v
+//       -[CATransaction commit]    .---------------.----------------.
+//                                  | CALayer       | -addAnimation: |
+//                                  |               '----------------'
+//                                  '---------------| -setFrame:     |
+//                                                  '----------------'
+//
+@interface CALayer( CAAnimation) <CAImplicitlyAnimatableObject>
 
-- (void) animateWithAbsoluteTime:(CAAbsoluteTime) time;
-
-- (void) animatePropertiesWithSnapshotlayer:(CALayer *) snapshot
-                          animationDelegate:(MulleAnimationDelegate *) animationDelegate
-                           animationOptions:(struct CABasicAnimationOptions *) animationOptions;
 //
 // called by UIView to create implicit animations from snapshotted values
 // the snapshot will be gone afterwards. Also cancels all other
 // animations. (?)
 //
-- (void) commitImplicitAnimationsWithID:(char *) animationsID
-                               delegate:(MulleAnimationDelegate *) animationDelegate
-                             parameters:(struct CAAnimationParameters *) info; // either UIView class or CATransaction
+- (void) commitImplicitAnimations:(CAAnimationGroup *) group; // either UIView class or CATransaction
 
 @end
 

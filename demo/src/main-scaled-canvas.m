@@ -1,88 +1,66 @@
 #import <MulleUICore/MulleUICore.h>
 
 
+
 //
-// The canvas is a drawing of 1024x1024. The bounds are used to pick out
-// a frame sized region off the canvas.
+// In this example we make it complicated. The canvas drawing is in OpenGL
+// like coordinates. x1/y1=-1,-1, x2/y2=1,1 (w=2, h=2). The frame is not
+// square shaped though. A circle is drawn in the canvas, and bounds are used
+// to map it to the frame. You can see that this leaves borders to the left
+// and to the right.
 //
-//           .----------------.
-//           | frame          |
-//           |                |
-//           |                |
-//           '----------------'
-//                    ^
-//                    |
-//   .----------------|---.
-//   |                |   |
-//   | canvas         |   |
-//   |       .----------------.
-//   |       | bounds         |
-//   |       |                |
-//   |       |                |
-//   |       '----------------'
-//   |                    |
-//   '--------------------'
+// A severe disadvantage of this (with nanovg) is, that the strokewidth has
+// to be scaled down to the ratio between canvas and frame, otherwise you get
+// a real big circle.
 //
-static UIEvent  *handleEvent( UIWindow *window, UIEvent *event)
-{
-   CALayer         *layer;
-   CGRect          bounds;
-   CGRect          contentRect;
-   UIWindowPlane   *contentPlane;
-   NSUInteger      n;
-   UIView          *view;
-   UIView          *views[ 1];
-
-   //
-   // any event carries mouseLocation information, so we actually needn't
-   // check this, but anyway...
-   //
-   if( [event eventType] != UIEventTypeMotion)
-      return( event);
-
-   // get our layer somewhat clumsily,
-   contentPlane = [window contentPlane];
-   contentRect  = [contentPlane contentRect];
-   n            = [contentPlane getSubviews:views
-                                     length:1];
-   assert( n == 1);
-   view  = views[ 0];
-   layer = [view layer];
-
-   //
-   // there we are, now use the mouse motion event to move the bounds
-   // could be nicer...
-   //
-   bounds           = [layer bounds];
-   bounds.origin    = [event mouseLocationInView:view];
-   bounds.origin.x *= contentRect.size.width / bounds.size.width;
-   bounds.origin.y *= contentRect.size.height / bounds.size.height;
-   [layer setBounds:bounds];
-
-   return( event);  // don't consume event, even if motion
-}
-
+// Also the line drawing quality is maybe not as nice.
+//
+//   0
+// 0 .----------------------------------.
+//   |                                  |
+//   |                                  |
+//   | frame                            | 300
+//   |                                  |
+//   |                                  |
+//   '----------------------------------'
+//                     ^       600
+//                     |
+//            -1/-1    |
+//   ***********.-----------.************
+//   *          |           |           *
+//   *          |           |           *
+//   * bounds   | canvas    | 2         * 2
+//   *          |           |           *
+//   *          |           |           *
+//   ***********'-----------'************
+//                    2
 
 static void  drawStuff( CALayer *layer, CGContext *context)
 {
-   CGFloat             canvasExtent;
-   CGFloat             radius;
-   CGFloat             strokeWidth;
-   CGRect              canvas;
    struct NVGcontext   *vg;
+   CGFloat             radius;
+   CGRect              canvas;
+   CGRect              frame;
+   CGFloat             strokeWidth;
+   CGFloat             canvasExtent;
+   CGFloat             frameExtent;
 
    canvas       = [layer canvas];
    canvasExtent = CGFloatMinimum( CGRectGetWidth( canvas),
                                   CGRectGetHeight( canvas));
-   strokeWidth  = 3.0;
+   frame        = [layer frame];
+   frameExtent  = CGFloatMinimum( CGRectGetWidth( frame),
+                                  CGRectGetHeight( frame));
+   strokeWidth  = canvasExtent / frameExtent;
+
    radius       = (canvasExtent - strokeWidth) / 2.0;
 
    vg = CGContextGetNVGContext( context);
    nvgBeginPath( vg);
    {
       nvgCircle( vg, CGRectGetMidX( canvas), CGRectGetMidY( canvas), radius);
-      nvgStrokeColor( vg, CGColorCreateGenericRGB( 1.0, 0.0, 0.0, 1.0));
-      nvgStrokeWidth( vg, strokeWidth);
+      nvgStrokeColor( vg, CGColorMakeRGBA( 1.0, 0.0, 0.0, 1.0));
+      nvgStrokeWidth( vg, strokeWidth);  // set to 1.0 for scaling effect :)
    }
    nvgStroke( vg);
 }
@@ -90,24 +68,47 @@ static void  drawStuff( CALayer *layer, CGContext *context)
 
 static void   setupSceneInView( UIView *contentPlane)
 {
-   CALayer   *layer;
+   UIView   *view;
+   CGRect   frame;
+   CGRect   bounds;
+   CALayer  *layer;
    CGFloat   aspectFactor;
-   CGRect    bounds;
-   CGRect    frame;
-   UIView    *view;
 
-   frame = CGSizeCenterInRect( CGSizeMake( 600, 400), [contentPlane contentRect]);
+   frame = CGSizeCenterInRect( CGSizeMake( 600, 300), [contentPlane contentRect]);
 
    view  = [[[UIView alloc] initWithFrame:frame] autorelease];
-   [view setBackgroundColor:CGColorCreateGenericRGB( 0.33, 0.33, 0.33, 1.0)];
+   [view setBackgroundColor:CGColorMakeRGBA( 0.33, 0.33, 0.33, 1.0)];
    [contentPlane addSubview:view];
 
    layer = [view layer];
    [layer setDrawCallback:drawStuff];
 
-   // The canvas is a square where we draw the circle unto.
+   // The canvas is a square where we draw the circle unto. The stroke width
+   // of the circle will have to be calculated so that it appears as 1 pixel
+   // wide in the frame.
+   [layer setCanvas:CGRectMake( -1, -1, 2, 2)];
 
-   [layer setCanvas:CGRectMake( 0, 0, 1024, 1024)];
+   //
+   // Bounds project a part of the square canvas unto the frame, which isn't
+   // square. So we have to increase the bounds (from -1, -1, 2, 2) to draw
+   // the circle aspect correct (not squished)
+   //
+   aspectFactor = CGSizeGetAspectRatio( frame.size);
+   // if > 0 then wider then high, else reverse
+   // we don't want to decrease bounds here
+   bounds       = CGRectMake( -1, -1, 2, 2);
+   if( aspectFactor >= 0.0)
+   {
+      bounds.origin.x   *= aspectFactor;
+      bounds.size.width *= aspectFactor;
+   }
+   else
+   {
+      bounds.origin.y    *= aspectFactor;
+      bounds.size.height *= aspectFactor;
+   }
+
+   [layer setBounds:bounds];
 }
 
 
@@ -121,8 +122,8 @@ int   main( int argc, char *argv[])
       window = [UIWindow windowWithFrame:CGRectMake( 0.0, 0.0, 800.0, 600.0)];
       assert( window);
 
-      [window setBackgroundColor:CGColorCreateGenericRGB( 1.0, 1.0, 1.0, 1.0)];
-      [window setEventCallback:handleEvent];
+      [window setBackgroundColor:CGColorMakeRGBA( 1.0, 1.0, 1.0, 1.0)];
+
       setupSceneInView( [window contentPlane]);
 
       [app addWindow:window];
@@ -130,6 +131,7 @@ int   main( int argc, char *argv[])
    }
    return( [app terminate]);
 }
+
 
 
 //

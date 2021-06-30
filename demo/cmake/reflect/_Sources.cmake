@@ -13,7 +13,12 @@ endif()
 #
 set( SOURCES
 src/main-checkerboard.m
+src/main-glut-teapot.m
 src/main-image.m
+src/main-layer.m
+src/main-lightlab.c
+src/main-opengl-mix.m
 src/main-panned-canvas.m
+src/main-radial-rainbows.m
 src/main-scaled-canvas.m
 )

@@ -49,7 +49,7 @@
 
    imageSize = [_image size];
    canvas    = [self canvas];
-   rect      = CGSizeApplyContentModeInRect( imageSize, _contentMode, canvas);
+   rect      = CGSizePlaceInRect( imageSize, canvas, _contentMode);
 
    options = CGDrawableOptionsMake( _cornerRadius,
                                     _selected ? 0.5 : 1.0,

@@ -1,6 +1,6 @@
 # 🌠 MulleGraphics
 
-#### 🌠 MulleGraphics provides CALayer
+#### 🌠 MulleGraphics provides CALayers
 
 This ties MulleCA and MulleCG together. It provides CALayer and an
 image layer and a text drawing layer.

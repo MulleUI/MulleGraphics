@@ -59,7 +59,7 @@ static void   setupSceneInWindow( UIWindow *window)
    [layer setDrawCallback:drawStuff];
 
    view  = [UIView viewWithLayer:layer];
-   [view setBackgroundColor:CGColorCreateGenericRGB( 0.33, 0.33, 0.33, 1.0)];
+   [view setBackgroundColor:CGColorMakeRGBA( 0.33, 0.33, 0.33, 1.0)];
 
    [contentPlane addSubview:view];
 }
@@ -75,7 +75,7 @@ int   main( int argc, char *argv[])
       window = [UIWindow windowWithFrame:CGRectMake( 0.0, 0.0, 800.0, 600.0)];
       assert( window);
 
-      [window setBackgroundColor:CGColorCreateGenericRGB( 0.5, 0.5, 0.5, 1.0)];
+      [window setBackgroundColor:CGColorMakeRGBA( 0.5, 0.5, 0.5, 1.0)];
 
       setupSceneInWindow( window);
 
