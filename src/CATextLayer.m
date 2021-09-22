@@ -855,7 +855,7 @@ static size_t   mulle_utf8_utf32length( mulle_utf8_t *s, size_t len)
 }
 
 
-char   *CATextLayerAlignmentModeCStringDescription( enum CATextLayerAlignmentMode mode)
+char   *CATextLayerAlignmentModeUTF8String( enum CATextLayerAlignmentMode mode)
 {
    switch( mode)
    {
@@ -867,7 +867,7 @@ char   *CATextLayerAlignmentModeCStringDescription( enum CATextLayerAlignmentMod
 }
 
 
-char   *CATextLayerVerticalAlignmentModeCStringDescription( enum CATextLayerVerticalAlignmentMode mode)
+char   *CATextLayerVerticalAlignmentModeUTF8String( enum CATextLayerVerticalAlignmentMode mode)
 {
    switch( mode)
    {

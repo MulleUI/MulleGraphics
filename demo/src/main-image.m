@@ -19,14 +19,16 @@ static void  drawStuff( CALayer *layer, CGContext *context)
    CGFrameInfo     *info;
    CGContentMode   mode;
    char            *filename;
+   NSUInteger      frameNumber;
 
-   info  = [context currentFrameInfo];
-   image = (CGImage *) [imageLayer image] ;
-   mode  = (info->frameNumber / 100) % N_CGContentModes;
+   info        = [context currentFrameInfo];
+   frameNumber = [context numberOfRenderedFrames];
+   image       = (CGImage *) [imageLayer image] ;
+   mode        = (frameNumber / 100) % N_CGContentModes;
 
    if( ! image || mode == 0)
    {
-      filename = filenames[ info->frameNumber / (100 * N_CGContentModes) & 1];
+      filename = filenames[ frameNumber / (100 * N_CGContentModes) & 1];
       image    = [[[CGImage alloc] initWithContentsOfFileCString:filename
                                                      imageFlags:0
                                                         context:context] autorelease];

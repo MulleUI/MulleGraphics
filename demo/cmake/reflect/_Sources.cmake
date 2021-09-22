@@ -12,13 +12,16 @@ endif()
 # contents selected with patternfile ??-source--sources
 #
 set( SOURCES
+src/main-canvas-bounds-frame.m
 src/main-checkerboard.m
+src/main-clip.m
 src/main-glut-teapot.m
 src/main-image.m
 src/main-layer.m
 src/main-lightlab.c
 src/main-opengl-mix.m
 src/main-panned-canvas.m
+src/main-plasma.m
 src/main-radial-rainbows.m
 src/main-scaled-canvas.m
 )

@@ -25,6 +25,9 @@ include( Files)
 
 include( Dependencies OPTIONAL)
 
+# remove this, we have freeglut or ?
+list( REMOVE_ITEM OS_SPECIFIC_LIBRARIES ${GLU_LIBRARY})
+
 foreach( MAIN_SOURCE ${SOURCES})
    # get rid off src/main- prefix and .m suffix
    #             offset 9  length -9 - 2

@@ -361,9 +361,9 @@ static inline CGRect   getCanvas( CALayer *self)
 #ifdef RENDER_DEBUG
    fprintf( stderr, "%s %s (f:%s b:%s)\n",
                         __PRETTY_FUNCTION__,
-                        [self cStringDescription],
-                        CGRectCStringDescription( _frame),
-                        CGRectCStringDescription( bounds));
+                        [self UTF8String],
+                        CGRectUTF8String( _frame),
+                        CGRectUTF8String( bounds));
 #endif
 
    if( _hidden == YES)
@@ -444,7 +444,7 @@ static inline CGRect   getCanvas( CALayer *self)
 }
 
 
-- (char *) cStringDescription
+- (char *) UTF8String
 {
    char        *result;
    char        *s;

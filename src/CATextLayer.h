@@ -14,7 +14,7 @@ typedef enum CATextLayerAlignmentMode
    // kCAAlignmentNatural,
 } CATextLayerAlignmentMode;
 
-char   *CATextLayerAlignmentModeCStringDescription( enum CATextLayerAlignmentMode mode);
+char   *CATextLayerAlignmentModeUTF8String( enum CATextLayerAlignmentMode mode);
 
 
 #define kCAAlignmentLeft    CAAlignmentLeft
@@ -31,7 +31,7 @@ typedef enum CATextLayerVerticalAlignmentMode
 } CATextLayerVerticalAlignmentMode;
 
 
-char   *CATextLayerVerticalAlignmentModeCStringDescription( enum CATextLayerVerticalAlignmentMode mode);
+char   *CATextLayerVerticalAlignmentModeUTF8String( enum CATextLayerVerticalAlignmentMode mode);
 
 struct CATextLayerRowGlyphs
 {

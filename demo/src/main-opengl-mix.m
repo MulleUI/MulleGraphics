@@ -208,12 +208,9 @@ static float cpData[][3] = {
           animate:(BOOL) animate
 {
    [super setFrame:frame];
-   if( ! [UIView isAnimating])
-   {
-      frame.origin.y += 100.0;
-      [self animateWithFrame:frame
-                    animator:nil];
-   }
+   frame.origin.y += 100.0;
+   [self animateWithFrame:frame
+                 animator:nil];
 }
 
 @end 
