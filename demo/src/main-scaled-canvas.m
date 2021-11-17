@@ -1,6 +1,4 @@
-#import <MulleUICore/MulleUICore.h>
-
-
+#import "import-private.h"
 
 //
 // In this example we make it complicated. The canvas drawing is in OpenGL
@@ -66,66 +64,57 @@ static void  drawStuff( CALayer *layer, CGContext *context)
 }
 
 
-static void   setupSceneInView( UIView *contentPlane)
-{
-   UIView   *view;
-   CGRect   frame;
-   CGRect   bounds;
-   CALayer  *layer;
-   CGFloat   aspectFactor;
-
-   frame = CGSizeCenterInRect( CGSizeMake( 600, 300), [contentPlane contentRect]);
-
-   view  = [[[UIView alloc] initWithFrame:frame] autorelease];
-   [view setBackgroundColor:CGColorMakeRGBA( 0.33, 0.33, 0.33, 1.0)];
-   [contentPlane addSubview:view];
-
-   layer = [view layer];
-   [layer setDrawCallback:drawStuff];
-
-   // The canvas is a square where we draw the circle unto. The stroke width
-   // of the circle will have to be calculated so that it appears as 1 pixel
-   // wide in the frame.
-   [layer setCanvas:CGRectMake( -1, -1, 2, 2)];
-
-   //
-   // Bounds project a part of the square canvas unto the frame, which isn't
-   // square. So we have to increase the bounds (from -1, -1, 2, 2) to draw
-   // the circle aspect correct (not squished)
-   //
-   aspectFactor = CGSizeGetAspectRatio( frame.size);
-   // if > 0 then wider then high, else reverse
-   // we don't want to decrease bounds here
-   bounds       = CGRectMake( -1, -1, 2, 2);
-   if( aspectFactor >= 0.0)
-   {
-      bounds.origin.x   *= aspectFactor;
-      bounds.size.width *= aspectFactor;
-   }
-   else
-   {
-      bounds.origin.y    *= aspectFactor;
-      bounds.size.height *= aspectFactor;
-   }
-
-   [layer setBounds:bounds];
-}
-
-
 int   main( int argc, char *argv[])
 {
    UIWindow        *window;
    UIApplication   *app;
+   UIView          *view;
+   CGRect          frame;
+   CGRect          bounds;
+   CALayer         *layer;
+   CGFloat         aspectFactor;
 
    app = [UIApplication sharedInstance];
    {
-      window = [UIWindow windowWithFrame:CGRectMake( 0.0, 0.0, 800.0, 600.0)];
-      assert( window);
+      view  = [[[UIView alloc] initWithFrame:CGRectMake( 0, 0, 600, 500)] autorelease];
+      [view setMargins:UIEdgeInsetsMake( 50, 100, 50, 100)];
+      [view setBackgroundColor:CGColorMakeRGBA( 0.33, 0.33, 0.33, 1.0)];
 
+      layer = [view layer];
+      assert( layer);
+
+      [layer setDrawCallback:drawStuff];
+
+      // The canvas is a square where we draw the circle unto. The stroke width
+      // of the circle will have to be calculated so that it appears as 1 pixel
+      // wide in the frame.
+      [layer setCanvas:CGRectMake( -1, -1, 2, 2)];
+
+      //
+      // Bounds project a part of the square canvas unto the frame, which isn't
+      // square. So we have to increase the bounds (from -1, -1, 2, 2) to draw
+      // the circle aspect correct (not squished)
+      //
+      aspectFactor = CGSizeGetAspectRatio( frame.size);
+      // if > 0 then wider then high, else reverse
+      // we don't want to decrease bounds here
+      bounds       = CGRectMake( -1, -1, 2, 2);
+      if( aspectFactor >= 0.0)
+      {
+         bounds.origin.x   *= aspectFactor;
+         bounds.size.width *= aspectFactor;
+      }
+      else
+      {
+         bounds.origin.y    *= aspectFactor;
+         bounds.size.height *= aspectFactor;
+      }
+
+      [layer setBounds:bounds];
+
+      window = [UIWindow windowWithView:view
+                        titleUTF8String:NULL];
       [window setBackgroundColor:CGColorMakeRGBA( 1.0, 1.0, 1.0, 1.0)];
-
-      setupSceneInView( [window contentPlane]);
-
       [app addWindow:window];
       [window renderLoop];
    }

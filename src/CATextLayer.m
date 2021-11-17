@@ -28,9 +28,9 @@
 {
    [super init];
 
-   _textColor           = MulleColorMake( 0x000000FF);
-   _textBackgroundColor = MulleColorMake( 0xFFFFFFFF);
-   _selectionColor      = MulleColorMake( 0x7FFF7F7F);
+   _textColor           = CGColorMakeWithUnsignedInteger( 0x000000FF);
+   _textBackgroundColor = CGColorMakeWithUnsignedInteger( 0xFFFFFFFF);
+   _selectionColor      = CGColorMakeWithUnsignedInteger( 0x7FFF7F7F);
    _textRange           = NSMakeRange( NSNotFound, 0);
 
    [self _init];
@@ -88,8 +88,12 @@
 
    copy->_fontName        = NULL;
    copy->_data.characters = NULL;
-   MulleObjCObjectSetDuplicatedCString( copy, (char **) &copy->_fontName, (char *) _fontName);
-   MulleObjCObjectSetDuplicatedCString( copy, (char **) &copy->_data.characters, (char *) _data.characters);
+   MulleObjCObjectSetDuplicatedUTF8String( copy,
+                                          (char **) &copy->_fontName,
+                                          (char *) _fontName);
+   MulleObjCObjectSetDuplicatedUTF8String( copy,
+                                           (char **) &copy->_data.characters,
+                                           (char *) _data.characters);
 
    return( copy);
 }
@@ -244,12 +248,12 @@ static void   assert_sane_font_name( char *s)
    }
 }
 
-// fontNameCString ?
+// fontNameUTF8String ?
 - (void) setFontName:(char *) s
 {
    assert_sane_font_name( s);
 
-   MulleObjCObjectSetDuplicatedCString( self, &_fontName, s);
+   MulleObjCObjectSetDuplicatedUTF8String( self, &_fontName, s);
 }
 
 
@@ -664,8 +668,8 @@ NSUInteger
    char                *name;
    int                 align;
 
-   font   = [context fontWithNameCString:_fontName ? _fontName : "sans"];
-   name   = [font nameCString];  // get actual name, which could have different address
+   font   = [context fontWithNameUTF8String:_fontName ? _fontName : "sans"];
+   name   = [font nameUTF8String];  // get actual name, which could have different address
    canvas = [self canvas];
    canvas = MulleEdgeInsetsInsetRect( _insets, canvas);
 
@@ -717,7 +721,7 @@ NSUInteger
 - (void) drawInContext:(CGContext *) context
 {
    struct NVGcontext       *vg;
-   CGColorRef              textBackgroundColor;
+   CGColor              textBackgroundColor;
    CGFloat                 fontPixelSize;
    CGPoint                 cursor;
    CGPoint                 offset;

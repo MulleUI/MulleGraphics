@@ -38,17 +38,17 @@
 
 
 static inline union CAAnimationValue
-   CGAnimationValueMakeWithCGColorRef( CGColorRef rect)
+   CGAnimationValueMakeWithCGColor( CGColor rect)
 {
    union CAAnimationValue   value;
 
-   *(CGColorRef *) &value.float4Value = rect;
+   *(CGColor *) &value.float4Value = rect;
    return( value);
 }
 
 enum
 {
-   CAAnimationValueCGColorRef = CAAnimationValueCGFloat4
+   CAAnimationValueCGColor = CAAnimationValueCGFloat4
 };
 
 
@@ -56,8 +56,8 @@ enum
 @interface CABasicAnimation( CGColor)
 
 - (id) initWithProperty:(struct _mulle_objc_property *) property
-        startColorValue:(CGColorRef) start
-          endColorValue:(CGColorRef) end
+        startColorValue:(CGColor) start
+          endColorValue:(CGColor) end
                 options:(struct CABasicAnimationOptions *) options;
 
 @end

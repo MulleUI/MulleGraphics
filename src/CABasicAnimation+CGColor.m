@@ -42,14 +42,14 @@
 
 
 - (id) initWithProperty:(struct _mulle_objc_property *) property
-        startColorValue:(CGColorRef) start
-          endColorValue:(CGColorRef) end
+        startColorValue:(CGColor) start
+          endColorValue:(CGColor) end
                 options:(struct CABasicAnimationOptions *) options
 {
    struct CAAnimationValueRange  range;
 
-   range.start = CGAnimationValueMakeWithCGColorRef( start);
-   range.end   = CGAnimationValueMakeWithCGColorRef( end);
+   range.start = CGAnimationValueMakeWithCGColor( start);
+   range.end   = CGAnimationValueMakeWithCGColor( end);
    return( [self initWithProperty:property
                         valueType:CAAnimationValueCGFloat4
                        valueRange:&range

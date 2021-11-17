@@ -1,4 +1,4 @@
-#import <MulleUICore/MulleUICore.h>
+#import "import-private.h"
 
 #import <string.h>
 
@@ -12,7 +12,7 @@
 @property( observable, assign) CGPoint      rotation;
 @property( observable, assign) NSUInteger   grid;
 
-@end 
+@end
 
 
 @implementation OpenGLTeapotLayer
@@ -157,7 +157,7 @@ static float cpData[][3] = {
 }
 
 
-- (void) drawOpenGLWithContext:(CGContext *) context 
+- (void) drawOpenGLWithContext:(CGContext *) context
 {
    glMatrixMode(GL_PROJECTION);
    glLoadIdentity();
@@ -188,21 +188,21 @@ static float cpData[][3] = {
 - (void) setFrame:(CGRect) frame
           animate:(BOOL) animate;
 
-- (void) animateWithFrame:(CGRect) frame 
+- (void) animateWithFrame:(CGRect) frame
                  animator:(CAAnimator *) animator;
 
-@end 
+@end
 
 
-@interface OpenGLTeapotView : UIView 
-@end 
+@interface OpenGLTeapotView : UIView
+@end
 
-@implementation OpenGLTeapotView 
+@implementation OpenGLTeapotView
 
 + (Class) layerClass
 {
    return( [OpenGLTeapotLayer class]);
-} 
+}
 
 - (void) setFrame:(CGRect) frame
           animate:(BOOL) animate
@@ -213,7 +213,7 @@ static float cpData[][3] = {
                  animator:nil];
 }
 
-@end 
+@end
 
 
 @implementation UIView (AnimateFrame)
@@ -247,7 +247,7 @@ static float cpData[][3] = {
 }
 
 
-- (void) animateWithFrame:(CGRect) frame 
+- (void) animateWithFrame:(CGRect) frame
                  animator:(CAAnimator *) animator
 {
    CAAnimationGroup   *group;
@@ -261,10 +261,10 @@ static float cpData[][3] = {
    [animator addAnimation:group];
 }
 
-@end 
+@end
 
 
-static UIView   *setupTeapotView( UIWindow *window, CGColorRef color, int grid)
+static UIView   *setupTeapotView( UIWindow *window, CGColor color, int grid)
 {
    CAAnimationGroup                 *group;
    CAAnimator                       *animator;
@@ -275,7 +275,7 @@ static UIView   *setupTeapotView( UIWindow *window, CGColorRef color, int grid)
    OpenGLTeapotView                 *view;
    struct CABasicAnimationOptions   options;
 
-   //frame.origin.x = CGRectGetMaxX( rect) - frame.size.width;  
+   //frame.origin.x = CGRectGetMaxX( rect) - frame.size.width;
 //   view  = [UIView viewWithFrame:CGRectZero];
    view  = [OpenGLTeapotView viewWithFrame:CGRectZero];
    [view setBackgroundColor:[UIColor darkGrayColor]];
@@ -286,7 +286,7 @@ static UIView   *setupTeapotView( UIWindow *window, CGColorRef color, int grid)
                                                INFINITY,
                                                0,
                                                CAAnimationCurveLinear);
-                                              
+
    layer     = (OpenGLTeapotLayer *) [view layer];
    animation = [[[CABasicAnimation alloc] initWithProperty:MulleObjCInstanceSearchProperty( layer, @selector( rotation))
                                            startPointValue:CGPointMake( 0, 0)
@@ -314,7 +314,7 @@ static BOOL   layoutRedView( UIView *view)
    greenView  = [view subviewWithTag:1];
    blueView   = [view subviewWithTag:2];
    yellowView = [view subviewWithTag:3];
-  
+
    frame = UIEdgeInsetsInsetRect( rects[ 0], UIEdgeInsetsMake( 0, 50, 50, 0));
    [greenView setFrame:frame
                animate:YES];
@@ -329,7 +329,7 @@ static BOOL   layoutRedView( UIView *view)
    frame.size.width  -= 40.0;
    frame.origin.y     = CGRectGetMidY( contentRect) - 5.0;
    frame.size.height  = 10.0;
-  
+
    [yellowView setFrame:frame];
 
    return( NO); // default code should not run
@@ -358,7 +358,7 @@ void   setupScene( UIWindow *window)
    [redView setBackgroundColor:[UIColor redColor]];
    [contentPlane addSubview:redView];
 
-   greenView = setupTeapotView( window, [UIColor greenColor], 14); // smooth  
+   greenView = setupTeapotView( window, [UIColor greenColor], 14); // smooth
    [greenView setTag:1];
    [redView addSubview:greenView];
 
@@ -369,7 +369,7 @@ void   setupScene( UIWindow *window)
    yellowView = [UIView viewWithFrame:CGRectZero];
    [yellowView setTag:3];
    [yellowView setBackgroundColor:[UIColor yellowColor]];
-  
+
    [redView addSubview:yellowView];
 }
 

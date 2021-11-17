@@ -1,50 +1,35 @@
-#import <MulleUICore/MulleUICore.h>
-
-
-void   setupScene( UIWindowPlane *contentPlane)
-{
-   UIView        *view;
-   CGRect         frame;
-   UIEdgeInsets   insets;
-   CALayer        *layer;
-
-   frame        = [contentPlane contentRect];
-   frame.origin = CGPointZero;
-
-   // shows that border is completely inside the frame
-   view  = [UIView viewWithFrame:CGRectMake( 100, 100, 200, 75)];
-   layer = [view layer];
-   [layer setBackgroundColor:MulleColorMakeRGB( 0.0, 1.0, 0.0)];
-   [layer setBorderColor:MulleColorMakeRGB( 1.0, 0.0, 0.0)];
-   [layer setCornerRadius:20];
-   [layer setBorderWidth:25];
-
-   [contentPlane addSubview:view];
-}
+#import "import-private.h"
 
 
 int   main()
 {
    UIWindow        *window;
    UIApplication   *app;
+   CALayer         *layer;
+   UIView          *view;
 
    /*
     * window and app
     */
    app = [UIApplication sharedInstance];
+   {
+      view  = [UIView viewWithFrame:CGRectMake( 0, 0, 200, 75)];
+      [view setMargins:UIEdgeInsetsMake( 10, 10, 10, 10)];
 
-   /*
-   * window and app
-   */
-   window = [UIWindow windowWithFrame:CGRectMake( 0.0, 0.0, 800, 600)];
-   [window setBackgroundColor:MulleColorMakeRGB( 1.0, 1.0, 1.0)];
+      layer = [view layer];
+      [layer setBackgroundColor:CGColorMakeRGB( 0.0, 1.0, 0.0)];
+      [layer setBorderColor:CGColorMakeRGB( 1.0, 0.0, 0.0)];
+      [layer setCornerRadius:20];
+      [layer setBorderWidth:25];
 
-   setupScene( [window contentPlane]);
+      window = [UIWindow windowWithView:view
+                        titleUTF8String:NULL];
 
-   [window dump];
+      [window dump];
 
-   [app addWindow:window];
-   [window renderLoop];
+      [app addWindow:window];
+      [window renderLoop];
+   }
    [app terminate];
 }
 

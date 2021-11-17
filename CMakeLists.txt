@@ -1,6 +1,8 @@
 cmake_minimum_required( VERSION 3.1)
 
 project( MulleGraphics C)
+add_definitions( -DMULLE_GRAPHICS_EXTERN_GLOBAL=extern)
+
 #
 # Turn a "Library" into an "Executable"
 # * touch src/main.m

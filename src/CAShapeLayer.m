@@ -32,8 +32,8 @@
 
    [super drawInContext:context];
 
-   fill   = ! MulleColorIsTransparent( _fillColor);
-   stroke = ! MulleColorIsTransparent( _strokeColor);
+   fill   = ! CGColorIsTransparent( _fillColor);
+   stroke = ! CGColorIsTransparent( _strokeColor);
 
    if( ! fill && ! stroke)
       return;

@@ -37,7 +37,8 @@
    _alpha             = 1.0;
    _transform         = CGAffineTransformMakeIdentity();
    _masksToBounds     = YES;
-   //_pixelCenter     = CGPointMake( 0.5, 0.5);
+
+    //_pixelCenter     = CGPointMake( 0.5, 0.5);
    return( self);
 }
 
@@ -56,7 +57,7 @@
    struct mulle_allocator   *allocator;
 
    allocator = MulleObjCInstanceGetAllocator( self);
-   mulle_allocator_free( allocator, _debugNameCString);
+   mulle_allocator_free( allocator, _debugNameUTF8String);
 
    [self removeAllAnimations];
 
@@ -82,7 +83,7 @@
 
    // nil out references to outside memory
    clone->_snapshot         = nil;
-   clone->_debugNameCString = NULL;
+   clone->_debugNameUTF8String = NULL;
 
    allocator = MulleObjCInstanceGetAllocator( clone);
    _mulle_pointerarray_init( &clone->_animationStorage._animations, 0, allocator);
@@ -156,7 +157,7 @@ static inline CGRect   getCanvas( CALayer *self)
 
 
 - (void) fillBackgroundInContext:(CGContext *) context
-                           color:(CGColorRef) color
+                           color:(CGColor) color
                            paint:(MullePaint *) paint
 {
    NVGcontext        *vg;
@@ -301,7 +302,7 @@ static inline CGRect   getCanvas( CALayer *self)
 
    // this is the "inherited" alpha from UIVIew
    // cull layers which are invisible
-   if( MulleAlphaIsTransparent( alpha))
+   if( CGAlphaIsTransparent( alpha))
       return( NULL);
 
    if( _frame.size.width == 0.0 || _frame.size.height == 0.0)
@@ -380,7 +381,7 @@ static inline CGRect   getCanvas( CALayer *self)
    if( ! vg)
       return;
 
-   if( ! MulleAlphaIsTransparent( CGColorGetAlpha( _backgroundColor) * alpha))
+   if( ! CGAlphaIsTransparent( CGColorGetAlpha( _backgroundColor) * alpha))
       [self drawBackgroundInContext:context];
 
    // bounds are dynamically calculated, if there is nothing to snip from
@@ -413,7 +414,7 @@ static inline CGRect   getCanvas( CALayer *self)
    //
    // we want to draw the border on top
    //
-   if( ! MulleAlphaIsTransparent( CGColorGetAlpha( _borderColor) * alpha))
+   if( ! CGAlphaIsTransparent( CGColorGetAlpha( _borderColor) * alpha))
    {
       // just setup the context again, to recover the "frame" transform
       vg = [self setupContext:context
@@ -431,7 +432,7 @@ static inline CGRect   getCanvas( CALayer *self)
 }
 
 
-- (void) setDebugNameCString:(char *) s
+- (void) setDebugNameUTF8String:(char *) s
 {
    struct mulle_allocator  *allocator;
 
@@ -439,8 +440,8 @@ static inline CGRect   getCanvas( CALayer *self)
    if( s)
       s = mulle_allocator_strdup( allocator, s);
 
-   mulle_allocator_free( allocator, _debugNameCString);
-   _debugNameCString = s;
+   mulle_allocator_free( allocator, _debugNameUTF8String);
+   _debugNameUTF8String = s;
 }
 
 
@@ -452,11 +453,11 @@ static inline CGRect   getCanvas( CALayer *self)
    size_t      len;
    char        *format;
 
-   s = MulleObjCClassGetNameCString( NSClassFromObject( self));
+   s = MulleObjCClassGetNameUTF8String( NSClassFromObject( self));
    sprintf( buf, "%p",  self);
 
    format = "<%s %s>";
-   len    = _debugNameCString ? strlen( _debugNameCString) : 0;
+   len    = _debugNameUTF8String ? strlen( _debugNameUTF8String) : 0;
    if( len)
    {
       format = "<%s %s \"%s\">";
@@ -464,7 +465,7 @@ static inline CGRect   getCanvas( CALayer *self)
    }
    len    += strlen( s) + strlen( buf) + 4; // < "">\0"
    result  = mulle_malloc( len);
-   sprintf( result, format, s, buf, _debugNameCString);
+   sprintf( result, format, s, buf, _debugNameUTF8String);
    MulleObjCAutoreleaseAllocation( result, NULL);
 
    return( result);

@@ -12,7 +12,7 @@
 {
    self = [super init];
    if( self)
-      _selectionColor = MulleColorMake( 0x7FFF7F7F);
+      _selectionColor = CGColorMakeWithUnsignedInteger( 0x7FFF7F7F);
    return( self);
 }
 
@@ -38,7 +38,7 @@
 
 - (void) drawInContext:(CGContext *) context
 {
-   int                 textureId;
+   int                 imageID;
    NVGpaint            imgPaint;
    CGSize              imageSize;
    CGRect              canvas;

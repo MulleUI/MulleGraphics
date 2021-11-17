@@ -240,7 +240,7 @@
       return;
 
    s = [self cString];
-   s = MulleCG_asprintf( "%.*s%C%s",
+   s = MulleObjC_asprintf( "%.*s%C%s",
                             (int) pos,
                             s,
                             (int) c,
@@ -274,7 +274,7 @@
    pos1           = [self characterIndexForCursor:cursorPosition];
 
    s              = [self cString];
-   s = MulleCG_asprintf( "%.*s%s", (int) pos1, s, &s[ pos2]);
+   s = MulleObjC_asprintf( "%.*s%s", (int) pos1, s, &s[ pos2]);
    [self setCString:s];
    [self setCursorPosition:cursorPosition];
 }

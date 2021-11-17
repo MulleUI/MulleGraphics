@@ -310,14 +310,14 @@ static void   animate_color_property( struct _mulle_objc_property *property,
                                       struct property_animation_context *ctx)
 {
    CAAnimation   *animation;
-   CGColorRef    startColor;
-   CGColorRef    endColor;
+   CGColor    startColor;
+   CGColor    endColor;
    SEL           getter;
    SEL           setter;
 
    getter     = mulle_objc_property_get_getter( property);
-   startColor = MulleObjectGetCGColorRef( ctx->snapshot, getter);
-   endColor   = MulleObjectGetCGColorRef( ctx->self, getter);
+   startColor = MulleObjectGetCGColor( ctx->snapshot, getter);
+   endColor   = MulleObjectGetCGColor( ctx->self, getter);
 
    if( CGColorEqualToColor( startColor,  endColor))
       return;
@@ -332,7 +332,7 @@ static void   animate_color_property( struct _mulle_objc_property *property,
       animation_add( ctx, animation);
 
       // reset to start position
-      MulleObjectSetCGColorRef( ctx->self, setter, startColor);
+      MulleObjectSetCGColor( ctx->self, setter, startColor);
    }
 }
 

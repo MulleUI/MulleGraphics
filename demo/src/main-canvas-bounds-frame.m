@@ -1,15 +1,6 @@
 #import "import-private.h"
 
-#import "CGContext.h"
-#import "CGGeometry+CString.h"
-#import "UIApplication.h"
-#import "UIWindow.h"
-#import "MulleLayout.h"
-#import "UIView.h"
-#import "UIView+Layout.h"
-#import "CALayer.h"
 #import <string.h>
-#import "UIEdgeInsets.h"
 
 // See ![](main-canvas-bounds-frame.png) how it should like.
 //
@@ -45,9 +36,9 @@ static void  drawStuff( CALayer *layer, CGContext *context)
       {
          nvgBeginPath( vg);
          if( (x ^ y) & 1)
-            nvgFillColor( vg, MulleColorMakeHSL( 0.2 * y / h + 0.8 * x / w, 1.0, 0.8));
+            nvgFillColor( vg, CGColorMakeHSL( 0.2 * y / h + 0.8 * x / w, 1.0, 0.8));
          else
-            nvgFillColor( vg, MulleColorMakeHSL( 0.8 * y / h + 0.2 * x / w, 0.8, 0.5));
+            nvgFillColor( vg, CGColorMakeHSL( 0.8 * y / h + 0.2 * x / w, 0.8, 0.5));
          nvgRect( vg, x * 20.0, y * 20.0, 20.0, 20.0);
          nvgFill( vg);
       }
@@ -57,7 +48,7 @@ static void  drawStuff( CALayer *layer, CGContext *context)
 #define COLS  3
 #define ROWS  3
 
-void   setupSceneInContentPlane( MulleWindowPlane *plane)
+void   setupSceneInContentPlane( UIWindowPlane *plane)
 {
    CGRect             contentRect;
    CGRect             bounds;
@@ -71,13 +62,13 @@ void   setupSceneInContentPlane( MulleWindowPlane *plane)
    CGRect             canvas;
 
    contentRect = [plane contentRect];
-   contentRect = CGRectInset( contentRect, 20, 40);
+   contentRect = CGRectInset( contentRect, 20.0, 40.0);
 
-   MulleRectPartitionVertically( contentRect, ROWS, row_frames, 20);
+   CGRectPartitionVertically( contentRect, 20.0, ROWS, row_frames);
 
    for( row = 0; row < ROWS; row++)
    {
-      MulleRectPartitionHorizontally( row_frames[ row], COLS, frames[ row], 20);
+      CGRectPartitionHorizontally( row_frames[ row], 20.0, COLS, frames[ row]);
       for( column = 0; column < COLS; column++)
       {
          frame = CGRectInset( frames[ row][ column], 5, 5);
@@ -85,7 +76,7 @@ void   setupSceneInContentPlane( MulleWindowPlane *plane)
          view  = [UIView viewWithFrame:frame];
          [view setDrawCallback:drawStuff];
          [view setBorderWidth:1.0];
-         [view setBorderColor:MulleColorMake( 0x00FF00FF)];
+         [view setBorderColor:CGColorMakeWithUnsignedInteger( 0x00FF00FF)];
          [plane addSubview:view];
 
          layer = [view layer];
@@ -123,12 +114,12 @@ void   setupSceneInContentPlane( MulleWindowPlane *plane)
          }
          [layer setBounds:bounds];
 
-         fprintf( stderr, "calc %ld.%ld: c=[%s] b=[%s]\n", 
-                     column, row, 
+         fprintf( stderr, "calc %ld.%ld: c=[%s] b=[%s]\n",
+                     column, row,
                      CGRectUTF8String( canvas),
                      CGRectUTF8String( bounds));
-         fprintf( stderr, "view %ld.%ld: c=[%s] b=[%s]\n\n", 
-                     column, row, 
+         fprintf( stderr, "view %ld.%ld: c=[%s] b=[%s]\n\n",
+                     column, row,
                      CGRectUTF8String( [[view layer] canvas]),
                      CGRectUTF8String( [[view layer] bounds]));
       }
@@ -138,12 +129,15 @@ void   setupSceneInContentPlane( MulleWindowPlane *plane)
 
 int   main()
 {
-   CGContext   *context;
-   UIWindow    *window;
+   CGContext       *context;
+   UIWindow        *window;
+   UIApplication   *app;
 
    /*
     * window and app
     */
+   app = [UIApplication sharedInstance];
+
    window = [UIWindow windowWithFrame:CGRectMake( 0.0, 0.0, 800, 600)];
    [window setBackgroundColor:CGColorMakeRGBA( 1.0, 1.0, 1.0, 1.0)];
 
@@ -151,8 +145,9 @@ int   main()
 
    [window dump];
 
-   [[UIApplication sharedInstance] addWindow:window];
+   [app addWindow:window];
    [window renderLoop];
-   [[UIApplication sharedInstance] terminate];
+
+   [app terminate];
 }
 

@@ -1,10 +1,10 @@
 #import "import-private.h"
 
-// stolen and adapted from paper.js JavaScript 
+// stolen and adapted from paper.js JavaScript
 // http://paperjs.org/examples/radial-rainbows/
 
-#define HZ                  120.0     
-#define N_COLORSTOPS        40          
+#define HZ                  120.0
+#define N_COLORSTOPS        40
 #define COLOR_CYCLES        2           // number of rainbows on screen at same time
 #define HOLE                0.0         // create hole in middle
 #define COLOR_CHANGE_SPEED  (0.7/HZ)    // manual fudge factor
@@ -13,8 +13,8 @@
 
 
 static void   circleWithHolePath( NVGcontext *vg,
-                                  CGPoint center, 
-                                  CGFloat innerRadius,   // hole 
+                                  CGPoint center,
+                                  CGFloat innerRadius,   // hole
                                   CGFloat outerRadius)
 {
    nvgBeginPath( vg);
@@ -26,8 +26,8 @@ static void   circleWithHolePath( NVGcontext *vg,
 
 
 //
-// ColorStop color components are kept in HSBA to avoid loss of information, 
-// that would be suffered during back and forth conversion (makes the 
+// ColorStop color components are kept in HSBA to avoid loss of information,
+// that would be suffered during back and forth conversion (makes the
 // demo unusable!)
 //
 struct ColorStop
@@ -39,18 +39,18 @@ struct ColorStop
 
 static inline struct ColorStop   ColorStopMake( CGFloat *components, CGFloat r)
 {
-   return( (struct ColorStop) { 
-                                 .components[ 0] = components[ 0], 
-                                 .components[ 1] = components[ 1], 
-                                 .components[ 2] = components[ 2], 
-                                 .components[ 3] = components[ 3], 
-                                 .radius = r 
+   return( (struct ColorStop) {
+                                 .components[ 0] = components[ 0],
+                                 .components[ 1] = components[ 1],
+                                 .components[ 2] = components[ 2],
+                                 .components[ 3] = components[ 3],
+                                 .radius = r
                               });
 }
 
-static inline CGColorRef   ColorStopGetColor( struct ColorStop *c)
+static inline CGColor   ColorStopGetColor( struct ColorStop *c)
 {
-   return( MulleColorMakeHSBA( c->components[ 0],
+   return( CGColorMakeHSBA( c->components[ 0],
                                c->components[ 1],
                                c->components[ 2],
                                c->components[ 3]));
@@ -60,7 +60,7 @@ static inline CGColorRef   ColorStopGetColor( struct ColorStop *c)
 
 @interface RadialGradientCircle : NSObject <CGVectorDrawable>
 {
-   struct mulle_structarray  _stops;  
+   struct mulle_structarray  _stops;
 }
 
 @property( assign) CGSize   size;
@@ -69,27 +69,27 @@ static inline CGColorRef   ColorStopGetColor( struct ColorStop *c)
           options:(CGDrawableOptions *) options
           context:(CGContext *) context;
 
-@end 
+@end
 
 
 @implementation RadialGradientCircle
 
-- (instancetype) init 
+- (instancetype) init
 {
-   mulle_structarray_init( &_stops, 
-                           sizeof( struct ColorStop), 
+   mulle_structarray_init( &_stops,
+                           sizeof( struct ColorStop),
                            alignof( struct ColorStop),
-                           0, 
+                           0,
                            MulleObjCInstanceGetAllocator( self));
    return( self);
 }
 
 
-- (void) dealloc 
+- (void) dealloc
 {
    mulle_structarray_done( &_stops);
    [super dealloc];
-} 
+}
 
 - (NSUInteger) numberOfColorStops
 {
@@ -97,23 +97,23 @@ static inline CGColorRef   ColorStopGetColor( struct ColorStop *c)
 }
 
 
-- (void) addColorStop:(struct ColorStop) stop 
+- (void) addColorStop:(struct ColorStop) stop
 {
    mulle_structarray_add( &_stops, &stop);
 }
 
 
-- (void) setColorStop:(struct ColorStop) stop 
-              atIndex:(NSUInteger) i 
+- (void) setColorStop:(struct ColorStop) stop
+              atIndex:(NSUInteger) i
 {
    struct ColorStop   *p;
-   
+
    p = mulle_structarray_get( &_stops, i);
    *p = stop;
 }
 
 
-- (struct ColorStop) colorStopAtIndex:(NSUInteger) i 
+- (struct ColorStop) colorStopAtIndex:(NSUInteger) i
 {
    struct ColorStop   *p;
 
@@ -124,7 +124,7 @@ static inline CGColorRef   ColorStopGetColor( struct ColorStop *c)
 
 static void   fillCircleWithHoleAndColorStops( NVGcontext *vg,
                                                CGPoint center,
-                                               struct ColorStop *inner, 
+                                               struct ColorStop *inner,
                                                struct ColorStop *outer)
 {
    NVGpaint   paint;
@@ -140,7 +140,7 @@ static void   fillCircleWithHoleAndColorStops( NVGcontext *vg,
 //                                  center.x + outer->radius, center.y + outer->radius,
 //                                  ColorStopGetColor( inner), ColorStopGetColor( outer));
 //
-   paint = nvgRadialGradient( vg, center.x, center.y, 
+   paint = nvgRadialGradient( vg, center.x, center.y,
                                   inner->radius, outer->radius,
                                   ColorStopGetColor( inner), ColorStopGetColor( outer));
    nvgFillPaint( vg, paint);
@@ -177,7 +177,7 @@ static void   fillCircleWithHoleAndColorStops( NVGcontext *vg,
    {
       ++i;
 //      if( (i & 1) != 0)
-      {   
+      {
          if( outer)
          {
             if( RIDGE == 0.0)
@@ -192,7 +192,7 @@ static void   fillCircleWithHoleAndColorStops( NVGcontext *vg,
             if( i != 2)
                hack.radius += 1.0 - RIDGE;
 
-            fillCircleWithHoleAndColorStops( vg, center, inner, &hack);         
+            fillCircleWithHoleAndColorStops( vg, center, inner, &hack);
          }
       }
       outer = inner;
@@ -200,7 +200,7 @@ static void   fillCircleWithHoleAndColorStops( NVGcontext *vg,
    mulle_structarrayreverseenumerator_done( &rover);
 }
 
-@end 
+@end
 
 
 @interface RadialGradientCircleAnimation : CAAnimation
@@ -222,7 +222,7 @@ normalizedRelativeTime:(double) t
    assert( [circle isKindOfClass:[RadialGradientCircle class]]);
 
    // animation values are calcuated for 60Hz framerate, check how
-   // much we need to multiply with for the elapsed time to make it 
+   // much we need to multiply with for the elapsed time to make it
    // look natural
    factor = time / (1.0 / HZ);  // expected elapsedTime
   //  fprintf( stderr, "%.3f\n", factor);
@@ -236,7 +236,7 @@ normalizedRelativeTime:(double) t
       if( c.components[ 0] < 0.0)
          c.components[ 0] = 1.0 + c.components[ 0];
       c.components[ 0] = fmodf( c.components[ 0], 1.0);
-   
+
       [circle setColorStop:c
                    atIndex:i];
    }
@@ -256,15 +256,15 @@ static void   setupCircle( RadialGradientCircle *circle, CGFloat r)
    struct ColorStop   c;
    CGFloat            components[ 4];
 
-   for( i = 0; i < N_COLORSTOPS; i++) 
+   for( i = 0; i < N_COLORSTOPS; i++)
    {
-#ifdef BRIGHTNESS_DIP  
+#ifdef BRIGHTNESS_DIP
       brightness = 1 - ((CGFloat) i / N_COLORSTOPS) * BRIGHTNESS_DIP;
       if( brightness < 0.0)
          brightness = 0.0;
 #else
       brightness = 0.5;
-#endif      
+#endif
       hue            = fmodf( ((CGFloat) i / N_COLORSTOPS) * COLOR_CYCLES, 1.0);
       components[ 0] = hue;
       components[ 1] = 1.0;
@@ -272,7 +272,7 @@ static void   setupCircle( RadialGradientCircle *circle, CGFloat r)
       components[ 3] = 1.0;
       c              = ColorStopMake( components, i * r + HOLE);
       [circle addColorStop:c];
-   }      
+   }
 }
 
 

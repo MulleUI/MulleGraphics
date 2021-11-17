@@ -14,16 +14,6 @@
 #ifndef _demos_include_h__
 #define _demos_include_h__
 
-// You can tweak the following #include with these commands.
-// (Use C3DC16BD-D0A9-45B8-B696-C8197E43BF19 instead of freeglut if there are duplicate entries)
-//    remove:             `mulle-sourcetree mark freeglut no-header`
-//    rename:             `mulle-sde dependency|library set freeglut include whatever.h`
-//    reorder:            `mulle-sourcetree move freeglut <up|down>`
-//    toggle #include:    `mulle-sourcetree mark freeglut [no-]import`
-//    toggle public:      `mulle-sourcetree mark freeglut [no-]public`
-//    toggle optional:    `mulle-sourcetree mark freeglut [no-]require`
-//    remove for platform:`mulle-sourcetree mark freeglut no-platform-<uname>`
-//        (use mulle-sourcetree-to-c --unames for known values)
-#include <GL/freeglut.h>   // freeglut
+/* no headers */
 
 #endif

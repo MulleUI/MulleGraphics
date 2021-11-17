@@ -12,8 +12,8 @@
 
 @interface CAShapeLayer : CALayer
 
-@property( observable) CGColorRef   strokeColor;
-@property( observable) CGColorRef   fillColor;
+@property( observable) CGColor   strokeColor;
+@property( observable) CGColor   fillColor;
 
 //
 // Ownership of CGPath is transferred to CALayer and CALayer will call

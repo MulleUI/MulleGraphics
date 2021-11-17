@@ -50,7 +50,7 @@ typedef enum NSLineBreakMode
 
 MULLE_C_NONNULL_FIRST
 static inline void   _CATextLayerRowGlyphsInit( struct CATextLayerRowGlyphs *p,
-                                                   struct mulle_allocator *allocator)
+                                                struct mulle_allocator *allocator)
 {
    _mulle_structarray_init( &p->glyphArray, sizeof( NVGglyphPosition),
                                             alignof( NVGglyphPosition),
@@ -92,7 +92,7 @@ NSUInteger   MulleNVGglyphPositionSearch( NVGglyphPosition *glyphs,
    NSUInteger                      _nRows;
 
 	struct mulle_structarray        _rowGlyphArray;
-   struct CATextLayerRowGlyphs  *_rowGlyphs;
+   struct CATextLayerRowGlyphs     *_rowGlyphs;
 
    CGPoint                         _origin;
    CGFloat                         _lineh;
@@ -132,14 +132,14 @@ NSUInteger   MulleNVGglyphPositionSearch( NVGglyphPosition *glyphs,
 // give the proper textRange back. Sometimes useful for animation
 //
 @property( observable, assign) NSRange   textRange;
-@property( observable) CGColorRef        selectionColor;
-@property( observable) CGColorRef        textColor;
+@property( observable) CGColor        selectionColor;
+@property( observable) CGColor        textColor;
 @property( observable) CGPoint           textOffset; // in pixels
 
 // for cleartype it's important to know the color the text is drawn on
 // if the layer backgroundColor is transparent, use this color to supply
 // the correct color to use
-@property( assign) CGColorRef                      textBackgroundColor;
+@property( assign) CGColor                      textBackgroundColor;
 @property( assign) enum CATextLayerAlignmentMode   alignmentMode;
 @property( assign) NSLineBreakMode                 lineBreakMode;
 

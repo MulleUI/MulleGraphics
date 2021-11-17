@@ -1,4 +1,4 @@
-#import <MulleUICore/MulleUICore.h>
+#import "import-private.h"
 
 #import <string.h>
 
@@ -8,49 +8,9 @@
 #include <GL/glu.h>
 
 
-#ifdef HAVE_IMAGE_FROM_NANOVG
+// This demo shows how you can fairly easily convert OpenGL code into
+// a CAOpenGLLayer subclass.
 
-static char    *filenames[ 2] =
-{
-   "tardbeaver.png",
-   "parrot.png"
-};
-
-
-//
-// we need to be rendering to create CGImages. "Real" code that uses
-// CAImageLayer will likely use UIImages.
-//
-static void  drawStuff( CALayer *layer, CGContext *context)
-{
-   CGImage         *image;
-   CAImageLayer    *imageLayer = (CAImageLayer *) layer;
-   CGFrameInfo     *info;
-   CGContentMode   mode;
-   char            *filename;
-
-   info  = [context currentFrameInfo];
-   image = (CGImage *) [imageLayer image] ;
-   mode  = (info->frameNumber / 100) % N_CGContentModes;
-
-   if( ! image || mode == 0)
-   {
-      filename = filenames[ info->frameNumber / (100 * N_CGContentModes) & 1];
-      image    = [[[CGImage alloc] initWithContentsOfFileCString:filename
-                                                     imageFlags:0
-                                                        context:context] autorelease];
-      if( ! image)
-      {
-         fprintf( stderr, "image \"%s\" not found\n", filename);
-         exit( 1);
-      }
-      [imageLayer setImage:image];
-   }
-
-   [imageLayer setContentMode:mode];
-}
-
-#endif
 
 
 /*
@@ -117,14 +77,14 @@ static inline float fabstrunc(float f){
 @property( assign) int   zoom;
 @property( assign) int   focus;
 @property( assign) int   speed;
-@property( assign) int   resolution;   
+@property( assign) int   resolution;
 
-@end 
+@end
 
 
 @implementation PlasmaLayer
 
-- (id) initWithFrame:(CGRect) frame 
+- (id) initWithFrame:(CGRect) frame
 {
    [super initWithFrame:frame];
 
@@ -219,11 +179,11 @@ static inline float fabstrunc(float f){
 
    glMatrixMode(GL_PROJECTION);
    glLoadIdentity();
-   gluOrtho2D(0.0f, 1.0f, 0.0f, 1.0f);
+   glOrtho(0.0f, 1.0f, 0.0f, 1.0f, -1, 1);
 }
 
 
-- (void) drawOpenGLWithContext:(CGContext *) context 
+- (void) drawOpenGLWithContext:(CGContext *) context
 {
    int     i, j;
    float   rgb[3];
@@ -317,16 +277,19 @@ static inline float fabstrunc(float f){
 @end
 
 
+//
+// here we use a custom View to react to changes in the view size
+// to pass it onto the layer
+//
+@interface PlasmaView : UIView
+@end
 
-@interface PlasmaView : UIView 
-@end 
-
-@implementation PlasmaView 
+@implementation PlasmaView
 
 + (Class) layerClass
 {
    return( [PlasmaLayer class]);
-} 
+}
 
 - (void) layoutLayers
 {
@@ -335,14 +298,14 @@ static inline float fabstrunc(float f){
    [super layoutLayers];
 }
 
-@end 
+@end
 
 
 @implementation UIView (AnimateFrame)
-@end 
+@end
 
 
-static PlasmaView   *setupPlasmaView( UIWindow *window, CGColorRef color)
+static PlasmaView   *setupPlasmaView( UIWindow *window, CGColor color)
 {
    PlasmaView   *view;
 
@@ -357,12 +320,8 @@ static PlasmaView   *setupPlasmaView( UIWindow *window, CGColorRef color)
 
 void   setupScene( UIWindow *window)
 {
-   PlasmaView     *plasmaView;
+   PlasmaView      *plasmaView;
    UIWindowPlane   *contentPlane;
-#ifdef HAVE_IMAGE_FROM_NANOVG
-   CAImageLayer    *layer;
-   UIView          *view;
-#endif
 
    contentPlane = [window contentPlane];
 
@@ -370,17 +329,6 @@ void   setupScene( UIWindow *window)
    [plasmaView setMargins:UIEdgeInsetsMake( 40, 40, 40, 40)];
    [plasmaView setAutoresizingMask:UIViewAutoresizingFlexibleWidth|UIViewAutoresizingFlexibleHeight];
    [contentPlane addSubview:plasmaView];
-
-#ifdef HAVE_IMAGE_FROM_NANOVG
-   // this works in one-window scenarios well, where there is only one
-   // context.
-   layer = [CAImageLayer layerWithFrame:CGRectMake( 70, 70, 200, 200)];
-   [layer setDrawCallback:drawStuff];
-   [layer setBackgroundColor:CGColorMakeRGBA( 0.33, 0.33, 0.33, 1.0)];
-
-   view = [UIView viewWithLayer:layer];
-   [contentPlane addSubview:view];
-#endif
 
    plasmaView = setupPlasmaView( window, [UIColor blackColor]);
    [plasmaView setMargins:UIEdgeInsetsMake( 120, 120, 120, 220)];
@@ -401,10 +349,10 @@ int   main( int argc, char *argv[])
    window = [UIWindow windowWithFrame:CGRectMake( 0.0f, 0.0f, 640.0f, 400.0f)];
    [window setBackgroundColor:CGColorMakeRGBA( 0.0, 0.0, 0.0, 1.0)];
    [window setFrameRateHz:120.0];
-   [app addWindow:window];
 
    setupScene( window);
 
+   [app addWindow:window];
    [window renderLoop];
 
    [app terminate];

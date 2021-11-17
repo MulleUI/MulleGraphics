@@ -66,6 +66,9 @@ enum
 };
 
 
+typedef void  CALayerDrawCallback_t( CALayer *layer, CGContext *ctxt);
+
+
 //
 // The CALayer "private" animations are not stored or handled in a CAAnimator
 // object. They are triggered as part of the renderQueue creation. These
@@ -82,8 +85,8 @@ enum
 @property( observable) CGFloat         cornerRadius;
 @property( observable) CGFloat         borderWidth;
 @property( observable) CGFloat         opacity;
-@property( observable) CGColorRef      borderColor;
-@property( observable) CGColorRef      backgroundColor;
+@property( observable) CGColor         borderColor;
+@property( observable) CGColor         backgroundColor;
 @property( observable) CGPoint         pixelCenter;
 @property( observable) BOOL            masksToBounds;
 
@@ -117,11 +120,11 @@ enum
 
 // non-observable why ?
 @property BOOL                         hidden;
-@property char                         *debugNameCString;  // useful for debugging
+@property char                         *debugNameUTF8String;  // useful for debugging
 
 // draw [layer canvas]
 // clip [layer bounds]
-@property void                         (*drawCallback)( CALayer *layer, CGContext *ctxt);
+@property CALayerDrawCallback_t        *drawCallback;
 
 
 + (instancetype) layerWithFrame:(CGRect) frame;
@@ -177,7 +180,7 @@ enum
 
 // only use this method in drawBackgroundInContext
 - (void) fillBackgroundInContext:(CGContext *) context
-                           color:(CGColorRef) color
+                           color:(CGColor) color
                            paint:(MullePaint *) paint;
 
 // Returns canvas.size. Subclasses may want to compute actual used space

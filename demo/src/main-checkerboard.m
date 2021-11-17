@@ -1,4 +1,4 @@
-#import <MulleUICore/MulleUICore.h>
+#import "import-private.h"
 
 
 
@@ -23,45 +23,23 @@ static uint8_t   imagedata[ 8][ 8][ 4] =
 //
 // Create a little checkerboard pattern, which repeats itself.
 //
-// We need to be rendering to create a CGImage
+// We need an active context create a CGImage. During rendering we get an
+// active context, so that's perfect. We can't create a CGImage in "main"
+// though.
 //
-static void  drawStuff( CALayer *layer, CGContext *context)
+static void   drawStuff( CALayer *layer, CGContext *context)
 {
-   CGImage  *image;
+   CAImageLayer  *imageLayer = (CAImageLayer *) layer;
+   CGImage       *image;
 
-   if( ! [(CAImageLayer *) layer image])
+   if( ! [imageLayer image])
    {
-      image   = [[[CGImage alloc] initWithRGBABytes:imagedata
-                                         bitmapSize:CGBitmapSizeMake( 8, 8)
-                                         imageFlags:NVG_IMAGE_REPEATX|NVG_IMAGE_REPEATY
-                                            context:context] autorelease];
-      [(CAImageLayer *) layer setImage:image];
+      image = [[[CGImage alloc] initWithRGBABytes:imagedata
+                                       bitmapSize:CGBitmapSizeMake( 8, 8)
+                                       imageFlags:NVG_IMAGE_REPEATX|NVG_IMAGE_REPEATY
+                                          context:context] autorelease];
+      [imageLayer setImage:image];
    }
-}
-
-
-
-static void   setupSceneInWindow( UIWindow *window)
-{
-   CAImageLayer    *layer;
-   CGImage         *image;
-   CGRect          frame;
-   UIView          *view;
-   UIWindowPlane   *contentPlane;
-
-   contentPlane = [window contentPlane];
-   frame        = [contentPlane contentRect];
-   frame        = UIEdgeInsetsInsetRect( frame, UIEdgeInsetsMake( 10, 10, 10, 10));
-
-   // this works in one-window scenarios well, where there is only one
-   // context.
-   layer   = [CAImageLayer layerWithFrame:frame];
-   [layer setDrawCallback:drawStuff];
-
-   view  = [UIView viewWithLayer:layer];
-   [view setBackgroundColor:CGColorMakeRGBA( 0.33, 0.33, 0.33, 1.0)];
-
-   [contentPlane addSubview:view];
 }
 
 
@@ -69,16 +47,15 @@ int   main( int argc, char *argv[])
 {
    UIWindow        *window;
    UIApplication   *app;
+   CAImageLayer    *imageLayer;
 
    app = [UIApplication sharedInstance];
    {
-      window = [UIWindow windowWithFrame:CGRectMake( 0.0, 0.0, 800.0, 600.0)];
-      assert( window);
+      imageLayer = [CAImageLayer layerWithFrame:CGRectMake( 0.0, 0.0, 800.0, 600.0)];
+      [imageLayer setDrawCallback:drawStuff];
 
-      [window setBackgroundColor:CGColorMakeRGBA( 0.5, 0.5, 0.5, 1.0)];
-
-      setupSceneInWindow( window);
-
+      window = [UIWindow runWindowWithLayer:imageLayer
+                            titleUTF8String:NULL];
       [app addWindow:window];
       [window renderLoop];
    }
