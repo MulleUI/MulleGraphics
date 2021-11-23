@@ -348,6 +348,12 @@ static inline CGRect   getCanvas( CALayer *self)
 }
 
 
+- (BOOL) drawsBackground
+{
+   return( ! CGAlphaIsTransparent( CGColorGetAlpha( _backgroundColor) * _opacity * _alpha));
+}
+
+
 - (void) renderInContext:(CGContext *) context
 {
    CGAffineTransform   localTransform;
@@ -381,7 +387,7 @@ static inline CGRect   getCanvas( CALayer *self)
    if( ! vg)
       return;
 
-   if( ! CGAlphaIsTransparent( CGColorGetAlpha( _backgroundColor) * alpha))
+   if( [self drawsBackground])
       [self drawBackgroundInContext:context];
 
    // bounds are dynamically calculated, if there is nothing to snip from

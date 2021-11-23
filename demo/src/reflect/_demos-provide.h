@@ -9,5 +9,8 @@
  *
  *      mulle-sde environment set MULLE_MATCH_TO_C_RUN DISABLE
  */
+#include "blur.frag.glsl.inc"
+#include "blur.vert.glsl.inc"
 #include "demos-version.h"
+#include "shader.glsl.inc"
 #include "tunnelstonetex.inc"

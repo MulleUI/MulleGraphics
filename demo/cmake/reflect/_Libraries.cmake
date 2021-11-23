@@ -14,7 +14,7 @@ endif()
 #
 # Generated from sourcetree: 9A7D25D7-D5E0-4C1D-B8DB-0E8F2530264A;Xi;no-all-load,no-build,no-cmake-inherit,no-delete,no-dependency,no-fs,no-header,no-import,no-share,no-update;
 # Disable with : `mulle-sourcetree mark Xi `
-# Disable for this platform: `mulle-sourcetree mark Xi no-cmake-platform-linux`
+# Disable for this platform: `mulle-sourcetree mark Xi no-cmake-platform-${MULLE_UNAME}`
 #
 if( NOT XI_LIBRARY)
    find_library( XI_LIBRARY NAMES Xi)

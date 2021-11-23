@@ -2,8 +2,25 @@
 
 #### 🌠 MulleGraphics provides CALayers
 
-This ties MulleCA and MulleCG together. It provides CALayer and an
-image layer and a text drawing layer.
+This library ties MulleCA and MulleCG together. It provides the **CALayer** and
+several useful subclasses for drawing images and text.
+
+To create your own drawings, it's easiest to use a CALayer and do a
+`-setDrawCallback:` to your C function. If you need to keep state between
+frames, subclass CALayer and override the `-drawInContext:` method.
+
+### Layer Classes
+
+Class             | Description
+------------------|-----------------------------------------
+`CACPUImageLayer` | A bitmap drawn by the CPU.
+`CAGradientLayer` | A gradient drawing layer
+`CAImageLayer`    | A layer that draws a vector image or a bitmap image
+`CALayer`         | Base class of all layers. Draws a border and sets the background.
+`CAOpenGLLayer`   | A layer to draw with OpenGL graphic commands.
+`CAShapeLayer`    | A layer for simple drawings with nanovg
+`CATextLayer`     | A layer for rendering short texts
+
 
 It's not nanovg agnostic (yet) as the layers use nanovg for drawing.
 

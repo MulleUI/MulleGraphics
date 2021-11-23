@@ -21,4 +21,7 @@
 // this flushes
 - (void) endOpenGLWithContext:(CGContext *) context;
 
+- (CGRect) viewPort;
+- (CGRect) scissor;
+
 @end 

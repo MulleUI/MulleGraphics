@@ -3,6 +3,17 @@
 #include <MulleCG/nanovg_gl_utils.h>
 
 
+
+static char *vertexShaderSource = ""
+#include "blur.vert.glsl.inc"
+;
+
+static char *fragmentShaderSource = ""
+#include "blur.frag.glsl.inc"
+;
+
+
+
 #define USE_BUFFERED_LAYER  
 
 // lifted straight from nanovg demo:
@@ -101,15 +112,16 @@ void  drawLine( CALayer *layer, CGContext *context)
 }
 
 
+#ifdef USE_BUFFERED_LAYER
+
 @interface CABufferedLayer : CALayer 
+{
+   int  _shaderProgram;
+}
 @end 
 
 
-#define USE_IMAGE
-
-
 @implementation CABufferedLayer  
-
 
 NSUInteger  checkForGLErrors( void) 
 {
@@ -131,6 +143,14 @@ NSUInteger  checkForGLErrors( void)
    }
 }
 
+
+- (void) initShaderProgramWithContext:(CGContext *) context
+{
+   _shaderProgram = [context compileVertexShader:vertexShaderSource
+                                  fragmentShader:fragmentShaderSource
+                                  nameUTF8String:"blur"];
+ }
+
 - (void) drawInContext:(CGContext *) context 
 {
    CGRect                canvas;
@@ -138,10 +158,14 @@ NSUInteger  checkForGLErrors( void)
    NVGcontext            *vg;
    NVGpaint              paint;
    NVGLUframebuffer      *fbo;
+   NVGLUframebuffer      *fbo2;
    CGFloat               oldAlpha;
    struct CGFrameInfo    oldInfo;
    struct CGFrameInfo    frameInfo;
    struct CGBitmapInfo   bitmapInfo;
+
+   if( ! _shaderProgram)
+      [self initShaderProgramWithContext:context];
 
    canvas = [self canvas]; // we draw to frame or canvas ?
 
@@ -155,6 +179,9 @@ NSUInteger  checkForGLErrors( void)
 
    checkForGLErrors();
 
+   //
+   // #1# Render "drawLine" into an intermediate texture
+   //
    nvgSave( vg);
    {
       bitmapInfo = CGBitmapInfoMake( CGBitmapSizeMake( canvas.size.width, canvas.size.height),
@@ -193,6 +220,66 @@ NSUInteger  checkForGLErrors( void)
    }
    nvgRestore( vg);
 
+#if 1
+   //
+   // #2# Blur pass into another intermediate texture
+   //
+   nvgSave( vg);
+   {
+      fbo2 = nvgluCreateFramebuffer( vg,
+                                    bitmapInfo.size.width,
+                                    bitmapInfo.size.height,
+                                    0);
+      assert( fbo2);
+      nvgluBindFramebuffer( fbo2);
+      assert( ! checkForGLErrors());
+
+      {
+         glClearColor( 1.0, 0.0, 0.0, 0.0);
+         glClear( GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT|GL_STENCIL_BUFFER_BIT);
+      }
+#if 0
+   //   glMatrixMode(GL_PROJECTION);
+   //   glLoadIdentity();
+   //   glMatrixMode(GL_TEXTURE);
+   //   glLoadIdentity();
+   //   glMatrixMode(GL_MODELVIEW);
+   //   glLoadIdentity();
+
+      glDisable(GL_DEPTH_TEST);
+      glEnable(GL_TEXTURE_2D);
+
+      // glUseProgram( _shaderProgram);
+
+      glUniform1i( glGetUniformLocation(_shaderProgram,"txr" ), 0);
+      glUniform1f( glGetUniformLocation(_shaderProgram,"xs"  ), bitmapInfo.size.width);
+      glUniform1f( glGetUniformLocation(_shaderProgram,"ys"  ), bitmapInfo.size.height);
+      glUniform1f( glGetUniformLocation(_shaderProgram,"r"   ), 15.0);
+      glUniform1i( glGetUniformLocation(_shaderProgram,"axis"), 0);
+#endif
+
+#if 1
+      // draw a gl quad spanning the whole screen to get fragment shader to work
+      glUseProgram( 0);
+//      glEnable(GL_TEXTURE_2D);
+//      glBindTexture( GL_TEXTURE_2D, (int) (intptr_t) [context gpuTextureForImageID:fbo->image]);
+      glBegin( GL_QUADS);
+      glColor3f(1,1,1);
+      glVertex2f(-0.5,-1.0);
+      glVertex2f(-1.0,+1.0);
+      glVertex2f(+1.0,+1.0);
+      glVertex2f(+1.0,-1.0);
+      glEnd();
+      glFlush();
+#endif
+      [context bindDefaultFramebuffer];
+   }
+   nvgRestore( vg);
+#endif
+
+   //
+   // #3# Render the created texture
+   //
    // rotation some time in the future
    nvgBeginPath( vg);
    nvgRoundedRect( vg, canvas.origin.x,
@@ -206,7 +293,7 @@ NSUInteger  checkForGLErrors( void)
                                  canvas.size.width,
                                  canvas.size.height,
                                  0.0,
-                                 fbo->image,
+                                 fbo2->image,
                                  1.0);
    nvgFillPaint( vg, paint);
 #else                                 
@@ -214,19 +301,21 @@ NSUInteger  checkForGLErrors( void)
 #endif   
    nvgFill( vg);
 
-#if 0
+#if 1
    // flush current, so that we can safely delete the framebuffer
    // if we don't want to do this, we should put the framebuffer into
    // a CGImage
    [context suspendRender];
    [context resumeRender];
 
+//	nvgluDeleteFramebuffer( fbo2);
 	nvgluDeleteFramebuffer( fbo);
 #endif   
 }
 
 @end 
 
+#endif
 
 
 
@@ -251,6 +340,7 @@ int   main( void)
       [layer setBorderColor:CGColorMakeRGBA( 0.5, 0.3, 0.0, 1.0)];
       [layer setCornerRadius:20];
       [layer setBorderWidth:1.5];
+     
       [layer setDrawCallback:drawLine];
 
       window = [UIWindow windowWithLayer:layer

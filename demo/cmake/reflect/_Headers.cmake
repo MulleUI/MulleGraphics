@@ -53,8 +53,11 @@ src/include.h
 # contents selected with patternfile ??-header--public-headers
 #
 set( PUBLIC_HEADERS
+src/blur.frag.glsl.inc
+src/blur.vert.glsl.inc
 src/demos-version.h
 src/reflect/_demos-include-public.h
+src/shader.glsl.inc
 src/tunnelstonetex.inc
 )
 

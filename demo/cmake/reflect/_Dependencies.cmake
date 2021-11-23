@@ -14,7 +14,7 @@ endif()
 #
 # Generated from sourcetree: 2E95F005-47DA-4EB0-A79D-B4113717DF09;MulleUICore;no-singlephase;
 # Disable with : `mulle-sourcetree mark MulleUICore no-link`
-# Disable for this platform: `mulle-sourcetree mark MulleUICore no-cmake-platform-linux`
+# Disable for this platform: `mulle-sourcetree mark MulleUICore no-cmake-platform-${MULLE_UNAME}`
 #
 if( NOT MULLE_UI_CORE_LIBRARY)
    find_library( MULLE_UI_CORE_LIBRARY NAMES ${CMAKE_STATIC_LIBRARY_PREFIX}MulleUICore${CMAKE_STATIC_LIBRARY_SUFFIX} MulleUICore NO_CMAKE_SYSTEM_PATH NO_SYSTEM_ENVIRONMENT_PATH)
@@ -94,7 +94,7 @@ endif()
 #
 # Generated from sourcetree: 4433B02B-9DD5-4A36-A862-ABE747D3BC5C;MulleObjC-startup;no-cmake-dependency,no-cmake-loader,no-cmake-searchpath,no-dynamic-link,no-header,no-intermediate-link;
 # Disable with : `mulle-sourcetree mark MulleObjC-startup no-link`
-# Disable for this platform: `mulle-sourcetree mark MulleObjC-startup no-cmake-platform-linux`
+# Disable for this platform: `mulle-sourcetree mark MulleObjC-startup no-cmake-platform-${MULLE_UNAME}`
 #
 if( NOT MULLE_OBJC_STARTUP_LIBRARY)
    find_library( MULLE_OBJC_STARTUP_LIBRARY NAMES ${CMAKE_STATIC_LIBRARY_PREFIX}MulleObjC-startup${CMAKE_STATIC_LIBRARY_SUFFIX} NO_CMAKE_SYSTEM_PATH NO_SYSTEM_ENVIRONMENT_PATH)
@@ -132,7 +132,7 @@ endif()
 #
 # Generated from sourcetree: 16295179-6216-4E0D-8313-A92671B4EE42;MulleUIPerf;no-singlephase;
 # Disable with : `mulle-sourcetree mark MulleUIPerf no-link`
-# Disable for this platform: `mulle-sourcetree mark MulleUIPerf no-cmake-platform-linux`
+# Disable for this platform: `mulle-sourcetree mark MulleUIPerf no-cmake-platform-${MULLE_UNAME}`
 #
 if( NOT MULLE_UI_PERF_LIBRARY)
    find_library( MULLE_UI_PERF_LIBRARY NAMES ${CMAKE_STATIC_LIBRARY_PREFIX}MulleUIPerf${CMAKE_STATIC_LIBRARY_SUFFIX} MulleUIPerf NO_CMAKE_SYSTEM_PATH NO_SYSTEM_ENVIRONMENT_PATH)
@@ -212,7 +212,7 @@ endif()
 #
 # Generated from sourcetree: 48AC8A46-36A7-4767-A88C-60420E2EE1BD;MulleUIImage;no-singlephase;
 # Disable with : `mulle-sourcetree mark MulleUIImage no-link`
-# Disable for this platform: `mulle-sourcetree mark MulleUIImage no-cmake-platform-linux`
+# Disable for this platform: `mulle-sourcetree mark MulleUIImage no-cmake-platform-${MULLE_UNAME}`
 #
 if( NOT MULLE_UI_IMAGE_LIBRARY)
    find_library( MULLE_UI_IMAGE_LIBRARY NAMES ${CMAKE_STATIC_LIBRARY_PREFIX}MulleUIImage${CMAKE_STATIC_LIBRARY_SUFFIX} MulleUIImage NO_CMAKE_SYSTEM_PATH NO_SYSTEM_ENVIRONMENT_PATH)

@@ -11,13 +11,18 @@ endif()
 # contents selected with patternfile ??-source--sources
 #
 set( SOURCES
+src/main-animate-circles.m
 src/main-canvas-bounds-frame.m
 src/main-checkerboard.m
 src/main-clip.m
 src/main-glow.m
+src/main-glsl-shader.m
 src/main-image.m
 src/main-layer.m
+src/main-opengllayer.m
 src/main-opengl-mix.m
+src/main-opengl-texture.m
+src/main-opengl-texturepain.m
 src/main-panned-canvas.m
 src/main-plasma-cpu.m
 src/main-plasma-opengl.m

@@ -54,8 +54,8 @@ int   main( int argc, char *argv[])
       imageLayer = [CAImageLayer layerWithFrame:CGRectMake( 0.0, 0.0, 800.0, 600.0)];
       [imageLayer setDrawCallback:drawStuff];
 
-      window = [UIWindow runWindowWithLayer:imageLayer
-                            titleUTF8String:NULL];
+      window = [UIWindow windowWithLayer:imageLayer
+                         titleUTF8String:NULL];
       [app addWindow:window];
       [window renderLoop];
    }

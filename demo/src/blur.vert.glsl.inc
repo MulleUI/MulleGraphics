@@ -1,0 +1,8 @@
+	"#version 420 core\n"
+	"layout(location=0) in vec4 vertex;\n"
+	"out vec2 pos;   // screen position <-1,+1>\n"
+	"void main()\n"
+	"    {\n"
+	"    pos=vertex.xy;\n"
+	"    gl_Position=vertex;\n"
+	"    }\n"
