@@ -66,6 +66,7 @@ src/CATextLayer.h
 src/CGGeometry+MulleObjC.h
 src/MulleCursorProtocol.h
 src/MulleEdgeInsets+MulleObjC.h
+src/MulleEdgeInsets+UTF8String.h
 src/MulleGraphics.h
 src/MulleObjCLoader+MulleGraphics.h
 src/NSObject+CAAnimation.h

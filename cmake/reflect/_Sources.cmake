@@ -23,6 +23,7 @@ src/CAShapeLayer.m
 src/CATextLayer+Cursor.m
 src/CATextLayer+Selection.m
 src/CATextLayer.m
+src/MulleEdgeInsets+UTF8String.m
 src/MulleGraphics.m
 src/NSObject+CAAnimation.m
 )

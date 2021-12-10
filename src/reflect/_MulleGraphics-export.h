@@ -24,5 +24,6 @@
 #import "CGGeometry+MulleObjC.h"
 #import "MulleCursorProtocol.h"
 #import "MulleEdgeInsets+MulleObjC.h"
+#import "MulleEdgeInsets+UTF8String.h"
 #import "MulleObjCLoader+MulleGraphics.h"
 #import "NSObject+CAAnimation.h"

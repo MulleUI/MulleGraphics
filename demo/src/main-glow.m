@@ -14,7 +14,7 @@ static char *fragmentShaderSource = ""
 
 
 
-#define USE_BUFFERED_LAYER  
+#define USE_BUFFERED_LAYER
 
 // lifted straight from nanovg demo:
 // https://github.com/memononen/nanovg/blob/master/example/demo.c
@@ -103,7 +103,7 @@ void  drawLine( CALayer *layer, CGContext *context)
    borderExtent = [layer borderWidth]; // / 2.0;
    canvas       = CGRectInset( canvas, borderExtent, borderExtent);
 
-   vg  = CGContextGetNVGContext( context); 
+   vg  = CGContextGetNVGContext( context);
    now = [context renderStartTime];
    now = fmod( now, 1000);  // don't want to overflow the float
    drawGraph( vg, canvas.origin.x, canvas.origin.y, canvas.size.width, canvas.size.height, now);
@@ -114,32 +114,28 @@ void  drawLine( CALayer *layer, CGContext *context)
 
 #ifdef USE_BUFFERED_LAYER
 
-@interface CABufferedLayer : CALayer 
+@interface CABufferedLayer : CALayer
 {
    int  _shaderProgram;
 }
-@end 
+@end
 
 
-@implementation CABufferedLayer  
+@implementation CABufferedLayer
 
-NSUInteger  checkForGLErrors( void) 
+NSUInteger  checkForGLErrors( void)
 {
 	NSUInteger   n;
 
-	for( n = 0;; n++) 
+	for( n = 0;; n++)
    {
-      switch( glGetError())
+      s = CGNVGBackEndErrorUTF8String();
+      if( s)
       {
-      case GL_INVALID_ENUM      : fprintf( stderr, "An unacceptable value was specified for an enumerated argument\n"); break;
-      case GL_INVALID_VALUE     : fprintf( stderr, "A numeric argument was out of range\n"); break;
-      case GL_INVALID_OPERATION : fprintf( stderr, "The specified operation is not allowed in the current state.\n"); break;
-      case GL_NO_ERROR          : return( n);
-      case GL_STACK_OVERFLOW    : fprintf( stderr, "This function caused a stack overflow.\n"); break;
-      case GL_STACK_UNDERFLOW   : fprintf( stderr, "This function caused a stack underflow.\n"); break;
-      case GL_OUT_OF_MEMORY     : fprintf( stderr, "There is not enough memory left to execute the function.\n"); break;
-      default                   : abort();
+         fprintf( stderr, "%s\n", s);
+         continue;
       }
+      return( n);
    }
 }
 
@@ -151,7 +147,7 @@ NSUInteger  checkForGLErrors( void)
                                   nameUTF8String:"blur"];
  }
 
-- (void) drawInContext:(CGContext *) context 
+- (void) drawInContext:(CGContext *) context
 {
    CGRect                canvas;
    CGRect                rect;
@@ -202,15 +198,15 @@ NSUInteger  checkForGLErrors( void)
          glClearColor( 0.0, 0.0, 0.0, 0.0);
          glClear( GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT|GL_STENCIL_BUFFER_BIT);
       }
-#if 0      
+#if 0
       nvgBeginPath( vg);
       nvgRoundedRect( vg, canvas.origin.x,
                           canvas.origin.y,
                           canvas.size.width,
-                          canvas.size.height, 
+                          canvas.size.height,
                           20.0);
-      nvgFillColor( vg, [UIColor blueColor]); 
-      nvgFill( vg);      
+      nvgFillColor( vg, [UIColor blueColor]);
+      nvgFill( vg);
 #else
       drawLine( self, context);
 #endif
@@ -296,9 +292,9 @@ NSUInteger  checkForGLErrors( void)
                                  fbo2->image,
                                  1.0);
    nvgFillPaint( vg, paint);
-#else                                 
-   nvgFillColor( vg, [UIColor blueColor]); 
-#endif   
+#else
+   nvgFillColor( vg, [UIColor blueColor]);
+#endif
    nvgFill( vg);
 
 #if 1
@@ -310,10 +306,10 @@ NSUInteger  checkForGLErrors( void)
 
 //	nvgluDeleteFramebuffer( fbo2);
 	nvgluDeleteFramebuffer( fbo);
-#endif   
+#endif
 }
 
-@end 
+@end
 
 #endif
 
@@ -330,17 +326,17 @@ int   main( void)
     */
    app = [UIApplication sharedInstance];
    {
-#ifdef USE_BUFFERED_LAYER      
+#ifdef USE_BUFFERED_LAYER
       layer = [CABufferedLayer layer];
 #else
       layer = [CALayer layer];
-#endif      
+#endif
       [layer setFrame:CGRectMake( 40, 40, 460, 320)];
       [layer setBackgroundColor:CGColorMakeRGB( 0.0, 0.2, 0.0)];
       [layer setBorderColor:CGColorMakeRGBA( 0.5, 0.3, 0.0, 1.0)];
       [layer setCornerRadius:20];
       [layer setBorderWidth:1.5];
-     
+
       [layer setDrawCallback:drawLine];
 
       window = [UIWindow windowWithLayer:layer

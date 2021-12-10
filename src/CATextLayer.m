@@ -155,7 +155,7 @@
 
 
 - (CGSize) sizeThatFits:(CGSize) max
-                context:(CGContext *) context
+                context:(id) context
 {
    CGRect   bounds;
 
@@ -721,7 +721,7 @@ NSUInteger
 - (void) drawInContext:(CGContext *) context
 {
    struct NVGcontext       *vg;
-   CGColor              textBackgroundColor;
+   CGColor                 textBackgroundColor;
    CGFloat                 fontPixelSize;
    CGPoint                 cursor;
    CGPoint                 offset;

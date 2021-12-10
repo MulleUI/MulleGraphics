@@ -432,7 +432,7 @@ static inline CGRect   getCanvas( CALayer *self)
 
 
 - (CGSize) sizeThatFits:(CGSize) size
-                context:(CGContext *) context
+                context:(id) context
 {
    return( [self canvas].size);
 }

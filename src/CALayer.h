@@ -179,6 +179,7 @@ typedef void  CALayerDrawCallback_t( CALayer *layer, CGContext *ctxt);
 - (void) drawBorderInContext:(CGContext *) context;
 
 // only use this method in drawBackgroundInContext
+// TODO: isn't MullePaint obsolete ?
 - (void) fillBackgroundInContext:(CGContext *) context
                            color:(CGColor) color
                            paint:(MullePaint *) paint;
@@ -186,7 +187,7 @@ typedef void  CALayerDrawCallback_t( CALayer *layer, CGContext *ctxt);
 // Returns canvas.size. Subclasses may want to compute actual used space
 // and return it. Used for layouting by UIView
 - (CGSize) sizeThatFits:(CGSize) size
-                context:(CGContext *) context;
+                context:(id) context;
 
 
 - (struct CAAnimationStorage *) animationStorage;

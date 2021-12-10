@@ -14,7 +14,7 @@ endif()
 #
 # Generated from sourcetree: 5D78374A-4911-4625-B4A2-EEC28CE39F50;MulleCG;no-singlephase;
 # Disable with : `mulle-sourcetree mark MulleCG no-link`
-# Disable for this platform: `mulle-sourcetree mark MulleCG no-cmake-platform-linux`
+# Disable for this platform: `mulle-sourcetree mark MulleCG no-cmake-platform-${MULLE_UNAME}`
 #
 if( NOT MULLE_CG_LIBRARY)
    find_library( MULLE_CG_LIBRARY NAMES ${CMAKE_STATIC_LIBRARY_PREFIX}MulleCG${CMAKE_STATIC_LIBRARY_SUFFIX} MulleCG NO_CMAKE_SYSTEM_PATH NO_SYSTEM_ENVIRONMENT_PATH)
@@ -94,7 +94,7 @@ endif()
 #
 # Generated from sourcetree: B3672511-8868-4FDC-98D2-8CEC828555AD;MulleCA;no-singlephase;
 # Disable with : `mulle-sourcetree mark MulleCA no-link`
-# Disable for this platform: `mulle-sourcetree mark MulleCA no-cmake-platform-linux`
+# Disable for this platform: `mulle-sourcetree mark MulleCA no-cmake-platform-${MULLE_UNAME}`
 #
 if( NOT MULLE_CA_LIBRARY)
    find_library( MULLE_CA_LIBRARY NAMES ${CMAKE_STATIC_LIBRARY_PREFIX}MulleCA${CMAKE_STATIC_LIBRARY_SUFFIX} MulleCA NO_CMAKE_SYSTEM_PATH NO_SYSTEM_ENVIRONMENT_PATH)
