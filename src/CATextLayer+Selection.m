@@ -14,12 +14,12 @@
                            textRange:(NSRange) textRange
                                  row:(NSUInteger) i
 {
-   NSInteger                        x;
-   float                            xyxy[ 4];
-   CGRect                           canvas;
+   NSInteger                     x;
+   float                         xyxy[ 4];
+   CGRect                        canvas;
    struct CATextLayerRowGlyphs   *p;
-   NSRange                          selectionRange;
-   CGRect                           rect;
+   NSRange                       selectionRange;
+   CGRect                        rect;
 
    selectionRange = NSIntersectionRange( textRange, _selection);
    if( ! selectionRange.length)

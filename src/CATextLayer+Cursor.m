@@ -25,12 +25,12 @@
 - (void) drawCursorWithNVGContext:(NVGcontext *) vg
                               row:(NSUInteger) i
 {
-   CGRect                           canvas;
+   CGRect                        canvas;
    struct CATextLayerRowGlyphs   *p;
-   NSUInteger                       x;
-   CGPoint                          offset;
-   CGFloat                          h;
-   CGFloat                          y;
+   NSUInteger                    x;
+   CGPoint                       offset;
+   CGFloat                       h;
+   CGFloat                       y;
 
    if( MulleIntegerPointGetRow( _cursorPosition) != i)
       return;
@@ -65,11 +65,11 @@
 
 - (CGFloat) offsetNeededToMakeCursorVisible
 {
-   CGPoint                          offset;
-   CGRect                           canvas;
-   CGFloat                          min;
-   CGFloat                          diff;
-   NVGglyphPosition                 *glyph;
+   CGPoint                       offset;
+   CGRect                        canvas;
+   CGFloat                       min;
+   CGFloat                       diff;
+   NVGglyphPosition              *glyph;
    struct CATextLayerRowGlyphs   *p;
 
    if( _cursorPosition.y >= _nRows)
@@ -99,8 +99,8 @@
 - (NSUInteger) characterIndexForCursor:(struct MulleIntegerPoint) cursor
 {
    struct CATextLayerRowGlyphs   *p;
-   NVGglyphPosition                 *glyph;
-   struct mulle_utf8data            data;
+   NVGglyphPosition              *glyph;
+   struct mulle_utf8data         data;
 
    if( cursor.y >= _nRows)
       return( NSNotFound);
@@ -135,7 +135,7 @@
 - (CGPoint) pointUnderCursorPosition:(struct MulleIntegerPoint) cursor
 {
    struct CATextLayerRowGlyphs   *p;
-   CGFloat                          h;
+   CGFloat                       h;
 
    if( cursor.y < 0 || cursor.y >= _nRows)
       return( CGPointMake( -1, -1));
@@ -149,14 +149,13 @@
 }
 
 
-
 - (struct MulleIntegerPoint) cursorPositionForPoint:(CGPoint) point
 {
-   CGFloat                          search;
-   CGRect                           rect;
-   NSInteger                        x;
-   NSInteger                        y;
-   struct MulleIntegerPoint         cursor;
+   CGFloat                       search;
+   CGRect                        rect;
+   NSInteger                     x;
+   NSInteger                     y;
+   struct MulleIntegerPoint      cursor;
    struct CATextLayerRowGlyphs   *p;
 
    // figure out the row that was hit, a row is _lineh and
@@ -290,7 +289,7 @@
    [self getCursorPosition:&cursorPosition];
    offset = [self characterIndexForCursor:cursorPosition];
 
-   data = [self UTF8DataInTextRange];
+   data                 = [self UTF8DataInTextRange];
    info.dataUpToCursor  = mulle_utf8data_make( data.characters, offset);
    info.dataAfterCursor = mulle_utf8data_make( &data.characters[ offset], data.length);
    return( info);

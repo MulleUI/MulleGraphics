@@ -28,8 +28,7 @@ int   main()
       [window dump];
 
       [app addWindow:window];
-      [window renderLoop];
    }
-   [app terminate];
+   return( [app run]);
 }
 

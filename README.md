@@ -1,28 +1,30 @@
 # 🌠 MulleGraphics
 
-#### 🌠 MulleGraphics provides CALayers
+#### 🌠 MulleGraphics provides CALayer subclasses
 
-This library ties MulleCA and MulleCG together. It provides the **CALayer** and
-several useful subclasses for drawing images and text.
+This library ties MulleCA and MulleCG together. It adds the drawing
+functionality to **CALayer** and adds several useful subclasses for drawing
+images and text.
+
+It's not nanovg agnostic (yet) as the layers use nanovg for drawing.
 
 To create your own drawings, it's easiest to use a CALayer and do a
-`-setDrawCallback:` to your C function. If you need to keep state between
-frames, subclass CALayer and override the `-drawInContext:` method.
+`-setDrawCallback:` to your C drawing code function. If you need to keep state
+between frames, subclass CALayer and override the `-drawInContext:` method.
 
-### Layer Classes
+
+### CALayer Subclasses
 
 Class             | Description
 ------------------|-----------------------------------------
 `CACPUImageLayer` | A bitmap drawn by the CPU.
 `CAGradientLayer` | A gradient drawing layer
 `CAImageLayer`    | A layer that draws a vector image or a bitmap image
-`CALayer`         | Base class of all layers. Draws a border and sets the background.
 `CAOpenGLLayer`   | A layer to draw with OpenGL graphic commands.
 `CAShapeLayer`    | A layer for simple drawings with nanovg
 `CATextLayer`     | A layer for rendering short texts
 
 
-It's not nanovg agnostic (yet) as the layers use nanovg for drawing.
 
 There is no event handling.
 There is no window setup.
@@ -34,29 +36,7 @@ available.
 
 ### You are here
 
-```
-  .--------------------------------.
-  | MulleUIFoundation              |
-  '--------------------------------'
-  .--------------------------------.
-  | MulleUIViews                   |
-  '--------------------------------'
-  .--------------. .---------------.
-  | MulleUIImage | | MulleUICore   |
-  '--------------' '---------------'
-
-  .================================.
-  | MulleGraphics                  |
-  '================================'
-
-  .--------------. .---------------.
-  | MulleCG      | | MulleCA       |
-  '--------------' '---------------'
-  .--------------------------------.
-  | MulleLayout                    |
-  '--------------------------------'
-
-```
+![Overview](overview.dot.svg)
 
 
 ## Add

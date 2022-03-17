@@ -51,24 +51,19 @@ src/import.h
 # contents selected with patternfile ??-header--public-headers
 #
 set( PUBLIC_HEADERS
-src/CABasicAnimation+CGColor.h
 src/CACPUImageLayer.h
 src/CAGradientLayer.h
 src/CAImageLayer+Cursor.h
 src/CAImageLayer.h
-src/CALayer+CAAnimation.h
-src/CALayer.h
+src/CALayer+MulleGraphics.h
 src/CAOpenGLLayer.h
 src/CAShapeLayer.h
 src/CATextLayer+Cursor.h
 src/CATextLayer+Selection.h
 src/CATextLayer.h
-src/CGGeometry+MulleObjC.h
 src/MulleCursorProtocol.h
-src/MulleEdgeInsets+MulleObjC.h
 src/MulleEdgeInsets+UTF8String.h
 src/MulleGraphics.h
 src/MulleObjCLoader+MulleGraphics.h
-src/NSObject+CAAnimation.h
 )
 

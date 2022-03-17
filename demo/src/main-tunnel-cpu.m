@@ -6,7 +6,7 @@
 
 // This demo shows how you can fairly easily convert C code into
 // a CACPUImagelayer subclass.
-// From: 
+// From:
 
 // texture from Unreal Tournament 2003 used w/o permission
 static char  tunnelstonetex_png_data[] =
@@ -59,7 +59,7 @@ static char  tunnelstonetex_png_data[] =
 
          _distanceTable[ y][ x] = distance;
          _angleTable[ y][ x]    = angle;
-      }   
+      }
 }
 
 
@@ -71,7 +71,7 @@ static char  tunnelstonetex_png_data[] =
 
    [super initWithFrame:frame];
 
-   _textureImage = [[UIBitmapImage alloc] initWithFileCData:mulle_data_make( tunnelstonetex_png_data, 
+   _textureImage = [[UIBitmapImage alloc] initWithFileCData:mulle_data_make( tunnelstonetex_png_data,
                                                                             s_tunnelstonetex_png_data)
                                    allocator:NULL];
    if( ! _textureImage)
@@ -120,7 +120,7 @@ static char  tunnelstonetex_png_data[] =
          dst_pixels[ y * W + x] = src_pixels[ y * TEX_W + x];
 #endif
 
-   animation = CAAbsoluteTimeNow();
+   animation = mulle_absolutetime_now();
 
     //calculate the shift values out of the animation value
    shiftX = (NSInteger) (TEX_W * 1.0 * animation);
@@ -165,7 +165,7 @@ int   main( int argc, char *argv[])
    TunnelView      *tunnelView;
    UIWindowPlane   *contentPlane;
    CGContext       *context;
-   
+
    /*
     * window and app
     */
@@ -190,10 +190,8 @@ int   main( int argc, char *argv[])
 
    [app addWindow:window];
    [window setFrameRateHz:FRAMERATE_HZ];
-   [window renderLoop];
 
-   [app terminate];
-   return( 0);
+   return( [app run]);
 }
 
 

@@ -12,9 +12,9 @@ char   *MulleEdgeInsetsUTF8String( MulleEdgeInsets insets)
    auto char  *s;
 
    s = MulleObjC_asprintf( "%.2f %.2f %.2f %.2f",
-         insets.top,
-         insets.left,
-         insets.bottom,
-         insets.right);
+          insets.top,
+          insets.left,
+          insets.bottom,
+          insets.right);
    return( s);
 }

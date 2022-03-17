@@ -57,9 +57,8 @@ int   main( int argc, char *argv[])
       window = [UIWindow windowWithLayer:imageLayer
                          titleUTF8String:NULL];
       [app addWindow:window];
-      [window renderLoop];
    }
-   return( [app terminate]);
+   return( [app run]);
 }
 
 

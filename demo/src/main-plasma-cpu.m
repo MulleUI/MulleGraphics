@@ -97,7 +97,7 @@ static inline NSUInteger   plasma_function( NSUInteger x, NSUInteger y)
    assert( CGBitmapSizeEqualToSize( CGBitmapInfoGetSize( bitmapInfo), CGBitmapSizeMake( W, H)));
 
    // the parameter to shift the palette varies with time
-   paletteShift = (NSUInteger) (CAAbsoluteTimeNow() * FRAMERATE_HZ);
+   paletteShift = (NSUInteger) (mulle_absolutetime_now() * FRAMERATE_HZ);
    pixels       = texture;
     //draw every pixel again, with the shifted palette color
 
@@ -241,10 +241,8 @@ int   main( int argc, char *argv[])
 
    [app addWindow:window];
    [window setFrameRateHz:FRAMERATE_HZ];
-   [window renderLoop];
 
-   [app terminate];
-   return( 0);
+   return( [app run]);
 }
 
 

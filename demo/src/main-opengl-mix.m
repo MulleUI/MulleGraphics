@@ -282,7 +282,7 @@ static UIView   *setupTeapotView( UIWindow *window, CGColor color, int grid)
    [view setBorderColor:color];
    [view setBorderWidth:6.0];
 
-   options = CABasicAnimationOptionsMakeCurve( CARelativeTimeRangeMake( 0, 3.0),
+   options = CABasicAnimationOptionsMakeCurve( mulle_relativetimerange_make( 0, 3.0),
                                                INFINITY,
                                                0,
                                                CAAnimationCurveLinear);
@@ -389,10 +389,7 @@ int   main( int argc, char *argv[])
 
    setupScene( window);
 
-   [window renderLoop];
-
-   [app terminate];
-   return( 0);
+   return( [app run]);
 }
 
 

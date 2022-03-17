@@ -210,7 +210,7 @@ static void   fillCircleWithHoleAndColorStops( NVGcontext *vg,
 
 - (void) animateObject:(id) object
 normalizedRelativeTime:(double) t
-           elapsedTime:(CARelativeTime) time
+           elapsedTime:(mulle_relativetime_t) time
 {
    CAImageLayer           *imageLayer = object;
    RadialGradientCircle   *circle;
@@ -297,7 +297,7 @@ static void   setupScene( UIWindow *window)
    view  = [UIView viewWithLayer:layer];
    [[window contentPlane] addSubview:view];
 
-   options   = CAAnimationOptionsMake( CARelativeTimeRangeMake( 0, INFINITY), 0.0, 0);
+   options   = CAAnimationOptionsMake( mulle_relativetimerange_make( 0, INFINITY), 0.0, 0);
    animation = [RadialGradientCircleAnimation animationWithAnimationOptions:&options];
    [layer addAnimation:animation];
 }
@@ -314,15 +314,16 @@ int   main( int argc, char *argv[])
       window = [UIWindow windowWithFrame:CGRectMake( 0.0, 0.0, 800.0, 600.0)];
       assert( window);
 
-      perf = [MulleUIPerf object];
-      [window setRenderDelegate:perf];
       [window setFrameRateHz:HZ];
 
       setupScene( window);
 
       [app addWindow:window];
-      [window renderLoop];
    }
-   return( [app terminate]);
+
+   perf = [MulleUIPerf object];
+   [window setFrameDelegate:perf];
+
+   return( [app run]);
 }
 

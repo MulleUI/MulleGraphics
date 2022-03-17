@@ -404,11 +404,7 @@ int   main( int argc, char *argv[])
 
    setupSceneInWindow( window);
 
-   [window renderLoop];
-
-   [app terminate];
-
-   return( 0);
+   return( [app run]);
 }
 
 

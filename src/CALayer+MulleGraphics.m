@@ -1,159 +1,10 @@
+#import "CALayer+MulleGraphics.h"
+
 #import "import-private.h"
 
-#import "CALayer.h"
 
 
-#pragma clang diagnostic ignored "-Wparentheses"
-// #define RENDER_DEBUG
-// #define CALAYER_DEBUG
-
-@implementation CALayer
-
-
-+ (instancetype) layerWithFrame:(CGRect) frame
-{
-   return( [[[self alloc] initWithFrame:frame] autorelease]);
-}
-
-
-- (id) init
-{
-   struct mulle_allocator   *allocator;
-
-   self = [super init];
-   if( ! self)
-      return( self);
-
-   allocator = MulleObjCInstanceGetAllocator( self);
-   _mulle_pointerarray_init( &_animationStorage._animations, 0, allocator);
-
-   _bounds.size.width   = INFINITY;
-   _canvas.size.width   = INFINITY;
-   _clipRect.size.width = INFINITY; // means no clipRect
-
-   // by default only track bounds
-   _frameTracking     = CALayerBoundsSizeTracksFrameSize;
-   _opacity           = 1.0;
-   _alpha             = 1.0;
-   _transform         = CGAffineTransformMakeIdentity();
-   _masksToBounds     = YES;
-
-    //_pixelCenter     = CGPointMake( 0.5, 0.5);
-   return( self);
-}
-
-
-- (instancetype) initWithFrame:(CGRect) frame
-{
-   self = [self init];
-   if( self)
-      _frame = frame;
-   return( self);
-}
-
-
-- (void) dealloc
-{
-   struct mulle_allocator   *allocator;
-
-   allocator = MulleObjCInstanceGetAllocator( self);
-   mulle_allocator_free( allocator, _debugNameUTF8String);
-
-   [self removeAllAnimations];
-
-   [_snapshot release];
-
-   [super dealloc];
-}
-
-
-+ (instancetype) layer
-{
-   return( [self object]);
-}
-
-
-- (id) copy
-{
-   CALayer                  *clone;
-   struct mulle_allocator   *allocator;
-
-   // this does a memcpy
-   clone = NSCopyObject( self, 0, NULL);
-
-   // nil out references to outside memory
-   clone->_snapshot         = nil;
-   clone->_debugNameUTF8String = NULL;
-
-   allocator = MulleObjCInstanceGetAllocator( clone);
-   _mulle_pointerarray_init( &clone->_animationStorage._animations, 0, allocator);
-
-   return( clone);
-}
-
-
-static inline CGRect   getBounds( CALayer *self)
-{
-   CGRect  bounds;
-
-   bounds.origin = self->_bounds.origin;
-   bounds.size   = self->_bounds.size.width == INFINITY
-                     ? self->_frame.size
-                     : self->_bounds.size;
-   return( bounds);
-}
-
-
-- (CGRect) bounds
-{
-   return( getBounds( self));
-}
-
-
-- (void) setBounds:(CGRect) bounds
-{
-   _bounds.origin = bounds.origin;
-   if( (_frameTracking & CALayerBoundsSizeTracksFrameSize) &&
-         CGSizeEqualToSize( _frame.size, bounds.size))
-      _bounds.size.width = INFINITY;
-   else
-      _bounds.size = bounds.size;
-}
-
-
-static inline CGRect   getCanvas( CALayer *self)
-{
-   CGRect  canvas;
-
-   canvas.origin = self->_canvas.origin;
-   canvas.size   = self->_canvas.size.width == INFINITY
-                     ? self->_frame.size
-                     : self->_canvas.size;
-   return( canvas);
-}
-
-
-- (CGRect) canvas
-{
-   return( getCanvas( self));
-}
-
-
-- (void) setCanvas:(CGRect) canvas
-{
-   _canvas.origin = canvas.origin;
-   if( (_frameTracking & CALayerCanvasSizeTracksFrameSize) &&
-         CGSizeEqualToSize( _frame.size, canvas.size))
-      _canvas.size.width = INFINITY;
-   else
-      _canvas.size = canvas.size;
-}
-
-
-- (struct CAAnimationStorage *) animationStorage
-{
-   return( &_animationStorage);
-}
+@implementation CALayer ( MulleGraphics)
 
 
 - (void) fillBackgroundInContext:(CGContext *) context
@@ -347,13 +198,6 @@ static inline CGRect   getCanvas( CALayer *self)
    return( vg);
 }
 
-
-- (BOOL) drawsBackground
-{
-   return( ! CGAlphaIsTransparent( CGColorGetAlpha( _backgroundColor) * _opacity * _alpha));
-}
-
-
 - (void) renderInContext:(CGContext *) context
 {
    CGAffineTransform   localTransform;
@@ -387,7 +231,8 @@ static inline CGRect   getCanvas( CALayer *self)
    if( ! vg)
       return;
 
-   if( [self drawsBackground])
+   // TODO: should we use context alpha here ?
+   if( ! CGAlphaIsTransparent( CGColorGetAlpha( _backgroundColor) * alpha))
       [self drawBackgroundInContext:context];
 
    // bounds are dynamically calculated, if there is nothing to snip from
@@ -432,50 +277,9 @@ static inline CGRect   getCanvas( CALayer *self)
 
 
 - (CGSize) sizeThatFits:(CGSize) size
-                context:(id) context
+                context:(CGContext *) context
 {
    return( [self canvas].size);
 }
 
-
-- (void) setDebugNameUTF8String:(char *) s
-{
-   struct mulle_allocator  *allocator;
-
-   allocator = MulleObjCInstanceGetAllocator( self);
-   if( s)
-      s = mulle_allocator_strdup( allocator, s);
-
-   mulle_allocator_free( allocator, _debugNameUTF8String);
-   _debugNameUTF8String = s;
-}
-
-
-- (char *) UTF8String
-{
-   char        *result;
-   char        *s;
-   auto char   buf[ 64];
-   size_t      len;
-   char        *format;
-
-   s = MulleObjCClassGetNameUTF8String( NSClassFromObject( self));
-   sprintf( buf, "%p",  self);
-
-   format = "<%s %s>";
-   len    = _debugNameUTF8String ? strlen( _debugNameUTF8String) : 0;
-   if( len)
-   {
-      format = "<%s %s \"%s\">";
-      len   += 3; // < "">\0"
-   }
-   len    += strlen( s) + strlen( buf) + 4; // < "">\0"
-   result  = mulle_malloc( len);
-   sprintf( result, format, s, buf, _debugNameUTF8String);
-   MulleObjCAutoreleaseAllocation( result, NULL);
-
-   return( result);
-}
-
 @end
-

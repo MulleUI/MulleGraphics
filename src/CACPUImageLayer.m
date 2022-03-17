@@ -37,6 +37,8 @@
 
 #import "import-private.h"
 
+#import "CALayer+MulleGraphics.h"
+
 
 
 @implementation CACPUImageLayer

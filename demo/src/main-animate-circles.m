@@ -19,7 +19,7 @@
    [super initWithFrame:frame];
 
    _scale = 1;
-   _color = CGColorMakeWithUnsignedInteger( 0x000000FF);
+   _color = CGColorMakeWithHexColor( 0x000000FF);
    _box   = [self canvas];
 
    return( self);
@@ -75,7 +75,7 @@ void  setupAnimation( UIWindow *window, CircleLayer *layer)
       [UIView setAnimationRepeatCount:20];
 
       [layer setScale:-1.0];
-      [layer setColor:CGColorMakeWithUnsignedInteger( 0x0000FFFF)];
+      [layer setColor:CGColorMakeWithHexColor( 0x0000FFFF)];
       [layer setBox:CGRectMake( 100, 100, 100, 100)];
    }
    group = [UIView commitAnimations];
@@ -96,7 +96,7 @@ void   setupSceneAndAnimation( UIWindow *window)
    frame  = UIEdgeInsetsInsetRect( frame, insets);
 
    layer = [CircleLayer layerWithFrame:frame];
-   [layer setColor:CGColorMakeWithUnsignedInteger( 0xFF0000FF)];
+   [layer setColor:CGColorMakeWithHexColor( 0xFF0000FF)];
    [layer setDrawCallback:drawStuff];
 
    view  = [UIView viewWithLayer:layer];
@@ -125,9 +125,8 @@ int   main( int argc, char *argv[])
    [window dump];
 
    [app addWindow:window];
-   [window renderLoop];
 
-   return( [app terminate]);
+   return( [app run]);
 }
 
 

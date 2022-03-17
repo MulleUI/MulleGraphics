@@ -21,8 +21,7 @@ int   main()
       [window setFrameRate:UIWindowFrameRateAsync];
 
       [app addWindow:window];
-      [window renderLoop];
    }
-   [app terminate];
+   return( [app run]);
 }
 

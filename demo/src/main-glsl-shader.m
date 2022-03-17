@@ -124,9 +124,8 @@ int   main( int argc, char *argv[])
                          titleUTF8String:NULL];
       [window setFrameRateHz:30.0];
       [app addWindow:window];
-      [window renderLoop];
    }
-   return( [app terminate]);
+   return( [app run]);
 }
 
 

@@ -13,7 +13,7 @@ static char  tunnelstonetex_png_data[] =
 #define B  { 0x00, 0xFF, 0xFF, 0xFF }
 #define Y  { 0xFF, 0xFF, 0x00, 0xFF }
 
-static char   texture[ 8 * 8][ 4] = 
+static char   texture[ 8 * 8][ 4] =
 {
    R, R, R, R,   Y, Y, Y, Y,
    R, R, R, R,   Y, Y, Y, Y,
@@ -27,13 +27,14 @@ static char   texture[ 8 * 8][ 4] =
 };
 
 
-static void  checkGLError( const char* str)
+static void   checkGLError( const char* str)
 {
-	GLenum err;
+	GLenum   err;
 
 	err = glGetError();
-	if (err != GL_NO_ERROR) {
-		printf("Error %08x after %s\n", err, str);
+	if (err != GL_NO_ERROR)
+   {
+		mulle_fprintf( stderr, "Error %08x after %s\n", err, str);
 		return;
 	}
 }
@@ -50,11 +51,11 @@ static void  checkGLError( const char* str)
 
 @implementation TriangleLayer
 
-- (instancetype) initWithFrame:(CGRect) frame 
+- (instancetype) initWithFrame:(CGRect) frame
 {
    [super initWithFrame:frame];
 
-   _textureImage = [[UIBitmapImage alloc] initWithFileCData:mulle_data_make( tunnelstonetex_png_data, 
+   _textureImage = [[UIBitmapImage alloc] initWithFileCData:mulle_data_make( tunnelstonetex_png_data,
                                                                             s_tunnelstonetex_png_data)
                                                   allocator:NULL];
    if( ! _textureImage)
@@ -67,7 +68,7 @@ static void  checkGLError( const char* str)
 }
 
 
-- (void) dealloc 
+- (void) dealloc
 {
    [_textureImage release];
    [super dealloc];
@@ -89,28 +90,28 @@ static void  checkGLError( const char* str)
       glBindTexture( GL_TEXTURE_2D, _glTextureID);
       glPixelStorei( GL_UNPACK_ALIGNMENT, 1);
       checkGLError( "generate");
- 
+
       glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
       glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
       glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP);
       glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP);
-#if 0      
+#if 0
       glTexImage2D( GL_TEXTURE_2D, 0,        // mimmap level
                                    GL_RGBA,  // openGL format
-                                   (GLsizei) bitmapInfo.size.width, 
-                                   (GLsizei) bitmapInfo.size.height, 
+                                   (GLsizei) bitmapInfo.size.width,
+                                   (GLsizei) bitmapInfo.size.height,
                                    0,       // border (0 or 1)
                                    GL_RGBA,  // incoming bitmap format
-                                   GL_UNSIGNED_BYTE, 
+                                   GL_UNSIGNED_BYTE,
                                    [_textureImage bytes]);
-#else                                   
+#else
       glTexImage2D( GL_TEXTURE_2D, 0,        // mimmap level
                                    GL_RGBA,  // openGL format
-                                   (GLsizei) 8, 
-                                   (GLsizei) 8, 
+                                   (GLsizei) 8,
+                                   (GLsizei) 8,
                                    0,       // border (0 or 1)
                                    GL_RGBA,  // incoming bitmap format
-                                   GL_UNSIGNED_BYTE, 
+                                   GL_UNSIGNED_BYTE,
                                    texture);
 #endif
       checkGLError( "upload");
@@ -157,9 +158,8 @@ int   main( int argc, char *argv[])
                          titleUTF8String:NULL];
       [window setFrameRateHz:30.0];
       [app addWindow:window];
-      [window renderLoop];
    }
-   return( [app terminate]);
+   return( [app run]);
 }
 
 

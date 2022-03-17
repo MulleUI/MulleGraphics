@@ -126,11 +126,11 @@ static void  checkGLError( const char* str)
    // flip for OpenGL, remember y is on the bottom!
    // as OpenGL view/scissor is integer based use CGRectIntegral..
    //
-   _viewPort.origin.y = info->framebufferSize.height - _viewPort.size.height - _viewPort.origin.y;
+   _viewPort.origin.y = info->window.framebufferSize.height - _viewPort.size.height - _viewPort.origin.y;
    _viewPort          = CGRectIntegral( _viewPort);
 
    _scissor          = [self clipRect]; // already in screen coordinates
-   _scissor.origin.y = info->framebufferSize.height - _scissor.size.height - _scissor.origin.y;
+   _scissor.origin.y = info->window.framebufferSize.height - _scissor.size.height - _scissor.origin.y;
    _scissor          = CGRectIntegral( _scissor);
 
    checkGLError( "-[CAOpenGLLayer drawInContext:] before beginOpenGLWithContext:");

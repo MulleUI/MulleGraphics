@@ -1,5 +1,8 @@
 #import "CATextLayer.h"
 
+#import "import-private.h"
+
+#import "CALayer+MulleGraphics.h"
 #import "CATextLayer+Cursor.h"
 #import "CATextLayer+Selection.h"
 
@@ -28,9 +31,9 @@
 {
    [super init];
 
-   _textColor           = CGColorMakeWithUnsignedInteger( 0x000000FF);
-   _textBackgroundColor = CGColorMakeWithUnsignedInteger( 0xFFFFFFFF);
-   _selectionColor      = CGColorMakeWithUnsignedInteger( 0x7FFF7F7F);
+   _textColor           = CGColorMakeWithHexColor( 0x000000FF);
+   _textBackgroundColor = CGColorMakeWithHexColor( 0xFFFFFFFF);
+   _selectionColor      = CGColorMakeWithHexColor( 0x7FFF7F7F);
    _textRange           = NSMakeRange( NSNotFound, 0);
 
    [self _init];

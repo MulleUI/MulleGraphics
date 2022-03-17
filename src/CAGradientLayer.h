@@ -9,6 +9,9 @@
 
 #import "import.h"
 
+
+// TODO: change this to a struct that's identical
+//       to NanoVG paint minus the image handle
 @class MullePaint;
 
 

@@ -5,9 +5,9 @@
 
 /*
  * This demo is the MulleUICore mulle-glfw-texture demo, which was derived
- * from GLUT and puts it into a CGOpenGLLayer. This will create lots of 
- * changes. There are advantages in doing so, as the new layer subclass can
- * be used multiple times.
+ * from GLUT, and puts it into a CGOpenGLLayer. This requires lots of changes
+ * to the code. There are advantages to using CGOpenGLLayer, as this new layer
+ * subclass can be used multiple times.
  *
  */
 
@@ -17,13 +17,13 @@
  *
  * @author  Prof. David Bernstein, James Madison University
  */
-@interface RotatingQuadLayer : CAOpenGLLayer < UIWindowRenderDelegate>
+@interface RotatingQuadLayer : CAOpenGLLayer < UIWindowFrameDelegate>
 {
    GLuint    textureName;
    GLfloat   angle[3];
    GLint     axis;
 }
-@end 
+@end
 
 @implementation RotatingQuadLayer
 
@@ -32,7 +32,7 @@
 #define B  { 0x3F, 0x00, 0x7F, 0xFF }
 #define Y  { 0x5F, 0x5F, 0x00, 0xFF }
 
-static char   texture[ 8 * 8][ 4] = 
+static char   texture[ 8 * 8][ 4] =
 {
    R, R, R, R,   Y, Y, Y, Y,
    R, R, R, R,   Y, Y, Y, Y,
@@ -46,7 +46,7 @@ static char   texture[ 8 * 8][ 4] =
 };
 
 
-- (instancetype) initWithFrame:(CGRect) frame  
+- (instancetype) initWithFrame:(CGRect) frame
 {
    [super initWithFrame:frame];
    axis = 2;
@@ -68,11 +68,11 @@ static char   texture[ 8 * 8][ 4] =
    glTexParameterf( GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
    glTexParameterf( GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
 
-   //  glTexEnvi has no effect when a fragment shader is bound. 
+   //  glTexEnvi has no effect when a fragment shader is bound.
    glTexEnvi( GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_REPLACE);
 
    glTexImage2D( GL_TEXTURE_2D, 0,                 // One resolution (i.e. level 0)
-                                GL_RGBA,          
+                                GL_RGBA,
                                 8,                 // Width
                                 8,                 // Height
                                 0,                 // Border width
@@ -84,7 +84,7 @@ static char   texture[ 8 * 8][ 4] =
 }
 
 
-- (void) display 
+- (void) display
 {
    static GLint faces[][4] = {{4,5,6,7},
                               {1,2,6,5},
@@ -97,11 +97,11 @@ static char   texture[ 8 * 8][ 4] =
 // Vertices
    static GLfloat vertices[][3] = {{-1.0,-1.0,-1.0},
                                    { 1.0,-1.0,-1.0},
-                                   { 1.0, 1.0,-1.0}, 
-                                   {-1.0, 1.0,-1.0}, 
-                                   {-1.0,-1.0, 1.0}, 
-                                   { 1.0,-1.0, 1.0}, 
-                                   { 1.0, 1.0, 1.0}, 
+                                   { 1.0, 1.0,-1.0},
+                                   {-1.0, 1.0,-1.0},
+                                   {-1.0,-1.0, 1.0},
+                                   { 1.0,-1.0, 1.0},
+                                   { 1.0, 1.0, 1.0},
                                    {-1.0, 1.0, 1.0}};
 
 // don't clear the framebuffer anymore!
@@ -116,7 +116,7 @@ static char   texture[ 8 * 8][ 4] =
 
    // Draw the cube
 
-   for(int f = 0; f < 6; f++) 
+   for(int f = 0; f < 6; f++)
    {
       glBegin(GL_POLYGON);
 
@@ -154,18 +154,18 @@ static char   texture[ 8 * 8][ 4] =
    CGSize   size;
 
    size = [self viewPort].size;
-   if( size.width <= size.height) 
+   if( size.width <= size.height)
    {
       aspect = (GLfloat) size.height / (GLfloat) size.width;
       glOrtho(-2.0, 2.0, -2.0 * aspect, 2.0 * aspect, -10.0, 10.0);
-   } 
-   else 
+   }
+   else
    {
       aspect = (GLfloat) size.width / (GLfloat) size.height;
       glOrtho(-2.0 * aspect, 2.0 * aspect, -2.0, 2.0, -10.0, 10.0);
    }
 }
- 
+
 
 // as we are now coexisting with others, the update can not setup global state
 // so the function has been split into update and rotate
@@ -181,7 +181,7 @@ static char   texture[ 8 * 8][ 4] =
 {
    glRotatef(angle[0], 1.0, 0.0, 0.0);
    glRotatef(angle[1], 0.0, 1.0, 0.0);
-   glRotatef(angle[2], 0.0, 0.0, 1.0);   
+   glRotatef(angle[2], 0.0, 0.0, 1.0);
 }
 
 
@@ -190,7 +190,7 @@ static char   texture[ 8 * 8][ 4] =
    [super beginOpenGLWithContext:context];
 
    if( ! textureName)
-      [self initTexture];    
+      [self initTexture];
 }
 
 
@@ -202,29 +202,31 @@ static char   texture[ 8 * 8][ 4] =
 }
 
 
-- (void) windowWillBeginRender:(UIWindow *) window
-                       context:(CGContext *) context
+- (void) window:(UIWindow *) window
+ willBeginFrame:(struct CGFrameInfo *) info
+        context:(CGContext *) context
 {
-}                       
+}
 
-- (void) windowWillEndRender:(UIWindow *) window
-                     context:(CGContext *) context
+- (void) window:(UIWindow *) window
+   willEndFrame:(struct CGFrameInfo *) info
+        context:(CGContext *) context
 {
-}                       
+}
 
-- (void) windowDidEndRender:(UIWindow *)  window
+- (void) windowDidEndFrame:(UIWindow *)  window
 {
    [self update];
 }
 
-@end 
+@end
 
 
 int   main( int argc, char *argv[])
 {
    UIWindow                          *window;
    UIApplication                     *app;
-   CALayer<UIWindowRenderDelegate>   *layer;
+   CALayer<UIWindowFrameDelegate>   *layer;
 
    app = [UIApplication sharedInstance];
    {
@@ -235,11 +237,10 @@ int   main( int argc, char *argv[])
       assert( window);
 
       [window setFrameRateHz:1000/20.0];
-      [window setRenderDelegate:layer];
+      [window setFrameDelegate:layer];
 
-      [window renderLoop];
    }
-   return( [app terminate]);
+   return( [app run]);
 }
 
 

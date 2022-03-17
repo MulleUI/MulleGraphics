@@ -145,7 +145,8 @@ NSUInteger  checkForGLErrors( void)
    _shaderProgram = [context compileVertexShader:vertexShaderSource
                                   fragmentShader:fragmentShaderSource
                                   nameUTF8String:"blur"];
- }
+}
+
 
 - (void) drawInContext:(CGContext *) context
 {
@@ -191,9 +192,9 @@ NSUInteger  checkForGLErrors( void)
       nvgluBindFramebuffer( fbo);
       assert( ! checkForGLErrors());
 
+
       frameInfo = CGFrameInfoFBMake( bitmapInfo.size, oldInfo.pixelRatio, 1.0);
-      [context changeRender:&frameInfo
-                      alpha:1.0];
+      [context changeRender:&frameInfo];
       {
          glClearColor( 0.0, 0.0, 0.0, 0.0);
          glClear( GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT|GL_STENCIL_BUFFER_BIT);
@@ -210,9 +211,8 @@ NSUInteger  checkForGLErrors( void)
 #else
       drawLine( self, context);
 #endif
-      [context changeRender:&oldInfo
-                      alpha:oldAlpha];
-      [context bindDefaultFramebuffer];
+      [context changeRender:&oldInfo];
+      nvgluBindFramebuffer( 0);
    }
    nvgRestore( vg);
 
@@ -268,7 +268,7 @@ NSUInteger  checkForGLErrors( void)
       glEnd();
       glFlush();
 #endif
-      [context bindDefaultFramebuffer];
+      nvgluBindFramebuffer( 0);
    }
    nvgRestore( vg);
 #endif
@@ -345,8 +345,8 @@ int   main( void)
       [window dump];
 
       [app addWindow:window];
-      [window renderLoop];
    }
-   [app terminate];
+
+   return( [app run]);
 }
 

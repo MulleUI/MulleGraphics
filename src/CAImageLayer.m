@@ -2,6 +2,8 @@
 
 #import "import-private.h"
 
+#import "CALayer+MulleGraphics.h"
+
 
 // #define RENDER_DEBUG
 
@@ -12,7 +14,7 @@
 {
    self = [super init];
    if( self)
-      _selectionColor = CGColorMakeWithUnsignedInteger( 0x7FFF7F7F);
+      _selectionColor = CGColorMakeWithHexColor( 0x7FFF7F7F);
    return( self);
 }
 

@@ -23,3 +23,6 @@
 @property( assign) struct CGPath  *path;
 
 @end
+
+
+// Actual drawing implemented by category

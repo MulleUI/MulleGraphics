@@ -1,4 +1,10 @@
-#import "CALayer.h"
+#ifdef __has_include
+# if __has_include( "CALayer.h")
+#  import "CALayer.h"
+# endif
+#endif
+
+#import "import.h"
 
 #import "MulleCursorProtocol.h"
 
@@ -86,25 +92,25 @@ NSUInteger   MulleNVGglyphPositionSearch( NVGglyphPosition *glyphs,
    // values exist after a frame is drawn,
    // will change on next redraw possibly
 @private
-   struct mulle_utf8data           _data;
-	struct mulle_structarray        _rowArray;
-   NVGtextRow                      *_rows;
-   NSUInteger                      _nRows;
+   struct mulle_utf8data         _data;
+	struct mulle_structarray      _rowArray;
+   NVGtextRow                    *_rows;
+   NSUInteger                    _nRows;
 
-	struct mulle_structarray        _rowGlyphArray;
-   struct CATextLayerRowGlyphs     *_rowGlyphs;
+	struct mulle_structarray      _rowGlyphArray;
+   struct CATextLayerRowGlyphs   *_rowGlyphs;
 
-   CGPoint                         _origin;
-   CGFloat                         _lineh;
-   CGFloat                         _ascender;
-   CGFloat                         _descender;
-   NSUInteger                      _startSelection;
-   float                           _textBounds[ 4];
+   CGPoint                       _origin;
+   CGFloat                       _lineh;
+   CGFloat                       _ascender;
+   CGFloat                       _descender;
+   NSUInteger                    _startSelection;
+   float                         _textBounds[ 4];
 
    enum CATextLayerVerticalAlignmentMode   _verticalAlignmentMode;
 }
 
-@property( assign) char                        *fontName;
+@property( assign) char                         *fontName;
 @property( observable, assign) CGFloat          fontPixelSize;
 @property( observable, assign) MulleEdgeInsets  insets;
 
@@ -132,14 +138,14 @@ NSUInteger   MulleNVGglyphPositionSearch( NVGglyphPosition *glyphs,
 // give the proper textRange back. Sometimes useful for animation
 //
 @property( observable, assign) NSRange   textRange;
-@property( observable) CGColor        selectionColor;
-@property( observable) CGColor        textColor;
+@property( observable) CGColor           selectionColor;
+@property( observable) CGColor           textColor;
 @property( observable) CGPoint           textOffset; // in pixels
 
 // for cleartype it's important to know the color the text is drawn on
 // if the layer backgroundColor is transparent, use this color to supply
 // the correct color to use
-@property( assign) CGColor                      textBackgroundColor;
+@property( assign) CGColor                         textBackgroundColor;
 @property( assign) enum CATextLayerAlignmentMode   alignmentMode;
 @property( assign) NSLineBreakMode                 lineBreakMode;
 

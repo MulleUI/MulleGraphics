@@ -80,9 +80,8 @@ int   main( int argc, char *argv[])
       setupSceneInWindow( window);
 
       [app addWindow:window];
-      [window renderLoop];
    }
-   return( [app terminate]);
+   return( [app run]);
 }
 
 

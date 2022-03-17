@@ -353,10 +353,8 @@ int   main( int argc, char *argv[])
    setupScene( window);
 
    [app addWindow:window];
-   [window renderLoop];
 
-   [app terminate];
-   return( 0);
+   return( [app run]);
 }
 
 

@@ -76,7 +76,7 @@ void   setupSceneInContentPlane( UIWindowPlane *plane)
          view  = [UIView viewWithFrame:frame];
          [view setDrawCallback:drawStuff];
          [view setBorderWidth:1.0];
-         [view setBorderColor:CGColorMakeWithUnsignedInteger( 0x00FF00FF)];
+         [view setBorderColor:CGColorMakeWithHexColor( 0x00FF00FF)];
          [plane addSubview:view];
 
          layer = [view layer];
@@ -146,8 +146,7 @@ int   main()
    [window dump];
 
    [app addWindow:window];
-   [window renderLoop];
 
-   [app terminate];
+   return( [app run]);
 }
 
