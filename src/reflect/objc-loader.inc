@@ -1,5 +1,6 @@
       { @selector( MulleObjCLoader), @selector( MulleCA) },      // 47a9beb6;MulleObjCLoader;3422b8ab;MulleCA
       { @selector( MulleObjCLoader), @selector( MulleCG) },      // 47a9beb6;MulleObjCLoader;d422218a;MulleCG
+      { @selector( MulleObjCLoader), @selector( MulleUIBase) },      // 47a9beb6;MulleObjCLoader;3ebba954;MulleUIBase
       { @selector( CACPUImageLayer), MULLE_OBJC_NO_CATEGORYID },      // 3d4aedfb;CACPUImageLayer;;
       { @selector( CAGradientLayer), MULLE_OBJC_NO_CATEGORYID },      // cf9da5a2;CAGradientLayer;;
       { @selector( CAImageLayer), @selector( Cursor) },      // 2a9d3438;CAImageLayer;58a502f5;Cursor

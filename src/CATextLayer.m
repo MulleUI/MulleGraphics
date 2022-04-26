@@ -682,8 +682,8 @@ NSUInteger
    if( fontPixelSize == 0.0)
       fontPixelSize = (int) canvas.size.height;
 
-   nvgFontSize( vg, fontPixelSize);
    nvgFontFace( vg, name);
+   nvgFontSize( vg, fontPixelSize);
 
    // I see no difference with different alignment options, for the metrics
    // likely because these are font (size) properties (duh!)

@@ -6,44 +6,29 @@
 #include <GL/gl.h>
 
 
-static void  checkGLError( const char* str)
-{
-#ifdef DEBUG   
-	GLenum err;
-
-	err = glGetError();
-	if (err != GL_NO_ERROR) {
-		printf("Error %08x after %s\n", err, str);
-      assert( err == GL_NO_ERROR);
-		return;
-	}
-#endif   
-}
+@implementation CAOpenGLLayer
 
 
-@implementation CAOpenGLLayer 
-
-
-- (instancetype) initWithFrame:(CGRect) frame 
+- (instancetype) initWithFrame:(CGRect) frame
 {
    [super initWithFrame:frame];
 
-   // this is not really used 
-   [self setCanvas:CGRectMake( -1.0, 1.0, 2.0, -2.0)]; 
+   // this is not really used
+   [self setCanvas:CGRectMake( -1.0, 1.0, 2.0, -2.0)];
 
    return( self);
 }
 
 //
 // we always draw a background even if its clear color
-// otherwise textured elements dont't show up. Stencil 
+// otherwise textured elements dont't show up. Stencil
 // buffer ?
-// 
+//
 - (BOOL) drawsBackground
 {
    return( YES);
 }
- 
+
 // default draw implementation
 - (void) drawOpenGLWithContext:(CGContext *) context
 {
@@ -60,40 +45,45 @@ static void  checkGLError( const char* str)
       glVertex3f( 0.9f, -0.9f, 0.0f );
    glEnd();
 
-   checkGLError( "after draw triangle");
+   CGContextCheckBackendError( context, "after draw triangle");
 }
 
 //
 // using the viewport is simpler than using glTranslate and glScale calls
 // but we obstruct the future use of rotations. Sill it is kind of the simplest
-// way to do this 
+// way to do this
 //
 - (void) beginOpenGLWithContext:(CGContext *) context
 {
-   glViewport( (int) _viewPort.origin.x, 
-               (int) _viewPort.origin.y, 
-               (int) _viewPort.size.width, 
+   glViewport( (int) _viewPort.origin.x,
+               (int) _viewPort.origin.y,
+               (int) _viewPort.size.width,
                (int) _viewPort.size.height);
-   checkGLError( "after glViewport");
+   CGContextCheckBackendError( context, "after glViewport");
 
    glEnable( GL_SCISSOR_TEST);
-   glScissor( (int) _scissor.origin.x, 
-              (int) _scissor.origin.y, 
-              (int) _scissor.size.width, 
+   CGContextCheckBackendError( context, "after glEnable( GL_SCISSOR_TEST)");
+
+   glScissor( (int) _scissor.origin.x,
+              (int) _scissor.origin.y,
+              (int) _scissor.size.width,
               (int) _scissor.size.height);
+   CGContextCheckBackendError( context, "after glScissor");
 
    glMatrixMode(GL_PROJECTION);
    glLoadIdentity();
    glMatrixMode(GL_MODELVIEW);
    glLoadIdentity();
+   CGContextCheckBackendError( context, "after glLoadIdentity");
 }
 
 
 - (void) endOpenGLWithContext:(CGContext *) context
 {
    glDisable( GL_SCISSOR_TEST); //hmm..
-   glFlush();   
-   checkGLError( "after glFlush");
+   CGContextCheckBackendError( context, "after glDisable( GL_SCISSOR_TEST)");
+   glFlush();
+   CGContextCheckBackendError( context, "after glFlush");
 }
 
 
@@ -106,12 +96,12 @@ static void  checkGLError( const char* str)
 
    // flush current draw state, so that it appears beneath the OpenGL
    // drawing
-   checkGLError( "-[CAOpenGLLayer drawInContext:] before suspendRender");
-   [context suspendRender];   
+   CGContextCheckBackendError( context, "-[CAOpenGLLayer drawInContext:] before suspendRender");
+   [context suspendRender];
 
    // set up transform for OpenGL (again, because nanovg doesn't use OpenGL
    // transforms. OpenGL draws to the whole screen. We use translate and scale
-   // to place this into our layer. A problem is, that this doesn't scale 
+   // to place this into our layer. A problem is, that this doesn't scale
    // things like linewidth so or does it ?
    //
    info      = [context currentFrameInfo];
@@ -133,16 +123,15 @@ static void  checkGLError( const char* str)
    _scissor.origin.y = info->window.framebufferSize.height - _scissor.size.height - _scissor.origin.y;
    _scissor          = CGRectIntegral( _scissor);
 
-   checkGLError( "-[CAOpenGLLayer drawInContext:] before beginOpenGLWithContext:");
+   CGContextCheckBackendError( context, "-[CAOpenGLLayer drawInContext:] before beginOpenGLWithContext:");
    [self beginOpenGLWithContext:context];
-   checkGLError( "-[CAOpenGLLayer drawInContext:] before drawOpenGLWithContext:");
+   CGContextCheckBackendError( context, "There were OpenGL errors in beginOpenGLWithContext. Is the OpenGL version compatible with your code?");
    [self drawOpenGLWithContext:context];
-   checkGLError( "-[CAOpenGLLayer drawInContext:] before endOpenGLWithContext:");
+   CGContextCheckBackendError( context, "There were OpenGL errors in drawOpenGLWithContext. Is the OpenGL version compatible with your code?");
    [self endOpenGLWithContext:context];
-   checkGLError( "-[CAOpenGLLayer drawInContext:] before resumeRender:");
+   CGContextCheckBackendError( context, "There were OpenGL errors in endOpenGLWithContext. Is the OpenGL version compatible with your code?");
 
    [context resumeRender];
-   checkGLError( "-[CAOpenGLLayer drawInContext:] after suspendRender");
 }
 
 - (CGRect) viewPort
@@ -155,4 +144,4 @@ static void  checkGLError( const char* str)
    return( _scissor);
 }
 
-@end 
+@end
