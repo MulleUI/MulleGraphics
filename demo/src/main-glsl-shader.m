@@ -1,4 +1,4 @@
-#import <MulleUICore/MulleUICore.h>
+#import "import.h"
 
 
 
@@ -18,6 +18,7 @@ static char *fragmentShaderSource = "#version 330 core\n"
     "{\n"
     "   FragColor = ourColor;\n"
     "}\n\0";
+
 
 
 @interface DemoLayer : CAOpenGLLayer
@@ -68,9 +69,9 @@ static char *fragmentShaderSource = "#version 330 core\n"
 - (void) drawOpenGLWithContext:(CGContext *) context;
 {
    float    timeValue;
-   float   greenValue;
-   GLint   vertexColorLocation;
-   GLfloat rgba[ 4];
+   float    greenValue;
+   GLint    vertexColorLocation;
+   GLfloat  rgba[ 4];
 
    if( ! VAO)
       [self initVertexBuffer];

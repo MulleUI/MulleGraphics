@@ -2,10 +2,9 @@
 
 #import "import-private.h"
 
-
+#define USE_SCISSOR 
 
 @implementation CALayer ( MulleGraphics)
-
 
 - (void) fillBackgroundInContext:(CGContext *) context
                            color:(CGColor) color
@@ -151,14 +150,6 @@
    CGRect        bounds;
    CGRect        localClipRect;
 
-   // this is the "inherited" alpha from UIVIew
-   // cull layers which are invisible
-   if( CGAlphaIsTransparent( alpha))
-      return( NULL);
-
-   if( _frame.size.width == 0.0 || _frame.size.height == 0.0)
-      return( NULL);
-
    vg = CGContextGetNVGContext( context);
 
    //
@@ -167,14 +158,16 @@
    //
    nvgReset( vg);
 
+#ifdef USE_SCISSOR
    // these are the bounds in global screen space
    if( _clipRect.size.width != INFINITY)  // transform set by UIView during layout
       nvgScissor( vg, _clipRect.origin.x,
                       _clipRect.origin.y,
                       _clipRect.size.width,
                       _clipRect.size.height);
+#endif
 
-   // this is the "inherited" transform from UIVIew
+   // this is the "inherited" transform from UIView
    nvgTransform( vg, _transform.a,
                      _transform.b,
                      _transform.c,
@@ -184,6 +177,7 @@
 
    // we are still in frame space, here so calculate the bounds scissor
    // somewhat inconveniently
+#ifdef USE_SCISSOR
    if( _masksToBounds)
    {
       bounds        = [self bounds];
@@ -194,9 +188,11 @@
                                localClipRect.size.width,
                                localClipRect.size.height);
    }
+#endif
    nvgGlobalAlpha( vg, alpha);
    return( vg);
 }
+
 
 - (void) renderInContext:(CGContext *) context
 {
@@ -208,28 +204,36 @@
 
    assert( context);
 
-   bounds = [self bounds];
 #ifdef RENDER_DEBUG
    fprintf( stderr, "%s %s (f:%s b:%s)\n",
                         __PRETTY_FUNCTION__,
                         [self UTF8String],
                         CGRectUTF8String( _frame),
-                        CGRectUTF8String( bounds));
+                        CGRectUTF8String( [self bounds]));
 #endif
 
    if( _hidden == YES)
       return;
 
+   alpha = _opacity * _alpha;
+
+   // this is the "inherited" alpha from UIVIew
+   // cull layers which are invisible
+   if( CGAlphaIsTransparent( alpha))
+      return;
+
    //
    // if any dimension is zero size, nothing gets painted anyway...
    //
-   localTransform = CGAffineTransformMakeProjection( _frame, bounds);
-   alpha           = _opacity * _alpha;
-   vg              = [self setupContext:context
-                         localTransform:&localTransform
-                                  alpha:alpha];
-   if( ! vg)
+   if( _frame.size.width == 0.0 || _frame.size.height == 0.0)
       return;
+
+   bounds         = [self bounds];
+   localTransform = CGAffineTransformMakeProjection( _frame, bounds);
+
+   vg  = [self setupContext:context
+             localTransform:&localTransform
+                      alpha:alpha];
 
    // TODO: should we use context alpha here ?
    if( ! CGAlphaIsTransparent( CGColorGetAlpha( _backgroundColor) * alpha))
@@ -243,6 +247,7 @@
       // _transform as the values are animatable and the _transform may not be
       // set again until the next layout, which hopefully doesn't run every
       // frame
+      // Is this true: the transform is set by the renderQueue:
       nvgTransform( vg, localTransform.a,
                         localTransform.b,
                         localTransform.c,
@@ -267,7 +272,7 @@
    //
    if( ! CGAlphaIsTransparent( CGColorGetAlpha( _borderColor) * alpha))
    {
-      // just setup the context again, to recover the "frame" transform
+      // "just" setup the context again, to recover the "frame" transform
       vg = [self setupContext:context
                localTransform:&localTransform
                         alpha:alpha];

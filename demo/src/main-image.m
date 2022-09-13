@@ -1,5 +1,7 @@
 #import "import-private.h"
 
+#include <unistd.h>
+
 
 static char    *filenames[ 2] =
 {
@@ -22,7 +24,7 @@ static void  drawStuff( CALayer *layer, CGContext *context)
    NSUInteger      frameNumber;
 
    info        = [context currentFrameInfo];
-   frameNumber = [context numberOfRenderedFrames];
+   frameNumber = [context numberOfFrames];
    image       = (CGImage *) [imageLayer image] ;
    mode        = (frameNumber / 100) % N_CGContentModes;
 
@@ -35,7 +37,7 @@ static void  drawStuff( CALayer *layer, CGContext *context)
       if( ! image)
       {
          fprintf( stderr, "image \"%s\" not found\n", filename);
-         exit( 1);
+         _exit( 1);
       }
       [imageLayer setImage:image];
    }
@@ -60,7 +62,7 @@ static void   setupSceneInWindow( UIWindow *window)
    // context.
    layer   = [CAImageLayer layerWithFrame:frame];
    [layer setDrawCallback:drawStuff];
-   [layer setBackgroundColor:CGColorMakeRGBA( 0.33, 0.33, 0.33, 1.0)];
+   [layer setBackgroundColor:CGColorMakeWithRGBA( 0.33, 0.33, 0.33, 1.0)];
 
    view = [UIView viewWithLayer:layer];
    [contentPlane addSubview:view];
@@ -75,7 +77,7 @@ int   main( int argc, char *argv[])
    app = [UIApplication sharedInstance];
    {
       window = [UIWindow windowWithFrame:CGRectMake( 0.0, 0.0, 800.0, 600.0)];
-      [window setBackgroundColor:CGColorMakeRGBA( 0.5, 0.5, 0.5, 1.0)];
+      [window setBackgroundColor:CGColorMakeWithRGBA( 0.5, 0.5, 0.5, 1.0)];
       [window setFrameRateHz:100];
       setupSceneInWindow( window);
 

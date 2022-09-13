@@ -19,6 +19,19 @@
 }
 
 
+- (id) initWithImage:(NSObject <CGDrawable> *)  image
+{
+   CGRect   frame;
+
+   frame.origin = CGPointZero;
+   frame.size   = [image size];
+   
+   self = [self initWithFrame:frame];
+   [self setImage:image];
+   return( self);
+}
+
+
 - (void) drawSelectionRect:(CGRect) canvas
                  inContext:(CGContext *) context
 {
@@ -52,11 +65,13 @@
    imageSize = [_image size];
    canvas    = [self canvas];
    rect      = CGSizePlaceInRect( imageSize, canvas, _contentMode);
-
-   options = CGDrawableOptionsMake( _cornerRadius,
-                                    _selected ? 0.5 : 1.0,
-                                    0.0,
-                                    YES);
+   options = CGDrawableOptionsMake(  _selected ? 0.5 : 1.0,
+                                     _cornerRadius,
+                                     CGRotationNone,
+                                     [_image isRepeating] ?  CGScaleNone : CGScaleToFit,
+                                     CGFlipNone,
+                                     CGRepeatAsIs,
+                                     CGContentModeCenterPoint);
    [_image drawRect:rect
             options:&options
             context:context];

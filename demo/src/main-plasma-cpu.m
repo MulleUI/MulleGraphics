@@ -52,8 +52,8 @@ static inline NSUInteger   plasma_function( NSUInteger x, NSUInteger y)
 
    for( x = 0; x < N_PALETTE_COLORS; x++)
    {
-      color       = CGColorMakeHSV( x / 255.0, 1.0, 1.0);
-      _palette[x] = CGColorGetUnsignedInteger( color);
+      color       = CGColorMakeWithHSV( x / 255.0, 1.0, 1.0);
+      _palette[x] = CGColorGetHexColor( color);
    }
 }
 
@@ -94,7 +94,7 @@ static inline NSUInteger   plasma_function( NSUInteger x, NSUInteger y)
    NSUInteger    x, y;
 
    assert( CGBitmapInfoGetEncoding( bitmapInfo) == CGBitmapEncodingRGBABytes);
-   assert( CGBitmapSizeEqualToSize( CGBitmapInfoGetSize( bitmapInfo), CGBitmapSizeMake( W, H)));
+   assert( MulleIntegerSizeEqualToIntegerSize( CGBitmapInfoGetSize( bitmapInfo), MulleIntegerSizeMake( W, H)));
 
    // the parameter to shift the palette varies with time
    paletteShift = (NSUInteger) (mulle_absolutetime_now() * FRAMERATE_HZ);
@@ -224,7 +224,7 @@ int   main( int argc, char *argv[])
    [CGContext setDebugEnabled:YES];
 
    window = [UIWindow windowWithFrame:CGRectMake( 0.0f, 0.0f, 640.0f, 400.0f)];
-   [window setBackgroundColor:CGColorMakeRGBA( 0.0, 0.0, 0.0, 1.0)];
+   [window setBackgroundColor:CGColorMakeWithRGBA( 0.0, 0.0, 0.0, 1.0)];
    {
       contentPlane = [window contentPlane];
 

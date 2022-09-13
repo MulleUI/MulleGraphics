@@ -1,4 +1,4 @@
-#import <MulleUICore/MulleUICore.h>
+#import "import.h"
 
 #include <math.h>
 
@@ -24,6 +24,7 @@
    GLint     axis;
 }
 @end
+
 
 @implementation RotatingQuadLayer
 
@@ -58,6 +59,7 @@ static char   texture[ 8 * 8][ 4] =
 //
 - (void) initTexture
 {
+#if 0        
    glClearColor( 0.0, 0.0, 0.0, 0.0);
 
    glGenTextures( 1, &textureName);
@@ -81,11 +83,13 @@ static char   texture[ 8 * 8][ 4] =
                                 texture);
 
    glEnable( GL_TEXTURE_2D);
+#endif   
 }
 
 
 - (void) display
 {
+#if 0        
    static GLint faces[][4] = {{4,5,6,7},
                               {1,2,6,5},
                               {0,1,5,4},
@@ -145,11 +149,13 @@ static char   texture[ 8 * 8][ 4] =
       glEnd();
    }
    // glEnable( GL_DEPTH_TEST); //hmm..
+#endif   
 }
 
 
 - (void) reshape
 {
+#if 0
    GLfloat  aspect;
    CGSize   size;
 
@@ -164,6 +170,7 @@ static char   texture[ 8 * 8][ 4] =
       aspect = (GLfloat) size.width / (GLfloat) size.height;
       glOrtho(-2.0 * aspect, 2.0 * aspect, -2.0, 2.0, -10.0, 10.0);
    }
+#endif   
 }
 
 
@@ -172,19 +179,21 @@ static char   texture[ 8 * 8][ 4] =
 - (void) update
 {
    angle[axis] += 2.0;
-   if (angle[axis] > 360.0)
+   if( angle[axis] > 360.0)
       angle[axis] -= 360.0;
 }
 
 // as the rotation is local state, this has to be redone for each frame
 - (void) rotate
 {
-   glRotatef(angle[0], 1.0, 0.0, 0.0);
-   glRotatef(angle[1], 0.0, 1.0, 0.0);
-   glRotatef(angle[2], 0.0, 0.0, 1.0);
+#if 0
+   glRotatef( angle[0], 1.0, 0.0, 0.0);
+   glRotatef( angle[1], 0.0, 1.0, 0.0);
+   glRotatef( angle[2], 0.0, 0.0, 1.0);
+#endif   
 }
 
-
+#if 0
 - (void) beginOpenGLWithContext:(CGContext *) context
 {
    [super beginOpenGLWithContext:context];
@@ -200,21 +209,11 @@ static char   texture[ 8 * 8][ 4] =
    [self rotate];
    [self display];
 }
-
-
-- (void) window:(UIWindow *) window
- willBeginFrame:(struct CGFrameInfo *) info
-        context:(CGContext *) context
-{
-}
+#endif
 
 - (void) window:(UIWindow *) window
-   willEndFrame:(struct CGFrameInfo *) info
-        context:(CGContext *) context
-{
-}
-
-- (void) windowDidEndFrame:(UIWindow *)  window
+    didEndFrame:(struct CGFrameInfo *) info
+graphicsContext:(id <UIGraphicsContext>) context;
 {
    [self update];
 }
@@ -222,26 +221,51 @@ static char   texture[ 8 * 8][ 4] =
 @end
 
 
-int   main( int argc, char *argv[])
-{
-   UIWindow                          *window;
-   UIApplication                     *app;
-   CALayer<UIWindowFrameDelegate>   *layer;
+// int   main( int argc, char *argv[])
+// {
+//    UIWindow                          *window;
+//    UIApplication                     *app;
+//    CALayer<UIWindowFrameDelegate>   *layer;
+// 
+//    app = [UIApplication sharedInstance];
+//    {
+//       layer  = [CAOpenGLLayer layerWithFrame:CGRectMake( 0, 0, 500, 500)];
+//       window = [UIWindow windowWithLayer:layer
+//                          titleUTF8String:NULL];
+// 
+//       assert( window);
+//       [window setFrameRate:UIWindowFrameRateAsync];
+// 
+//       //[window setFrameRateHz:1000/20.0];
+//       //[window setFrameDelegate:layer];
+//    }
+//    return( [app run]);
+// }
 
+int   main()
+{
+   UIWindow        *window;
+   UIApplication   *app;
+   CALayer         *layer;
+   UIView          *view;
+
+   /*
+    * window and app
+    */
    app = [UIApplication sharedInstance];
    {
-      layer  = [RotatingQuadLayer layerWithFrame:CGRectMake( 0, 0, 500, 500)];
+      layer  = [CAOpenGLLayer layerWithFrame:CGRectMake( 0, 0, 300, 300)];
       window = [UIWindow windowWithLayer:layer
-                         titleUTF8String:NULL];
+                        titleUTF8String:NULL];
 
-      assert( window);
+      // static view, no need to refresh
+      [window setFrameRate:UIWindowFrameRateAsync];
 
-      [window setFrameRateHz:1000/20.0];
-      [window setFrameDelegate:layer];
-
+      [app addWindow:window];
    }
    return( [app run]);
 }
+
 
 
 

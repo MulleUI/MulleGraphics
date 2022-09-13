@@ -7,6 +7,7 @@
       { @selector( CAImageLayer), @selector( NanoVG) },      // 2a9d3438;CAImageLayer;092dcb4d;NanoVG
       { @selector( CAImageLayer), MULLE_OBJC_NO_CATEGORYID },      // 2a9d3438;CAImageLayer;;
       { @selector( CALayer), @selector( MulleGraphics) },      // 55df8726;CALayer;d36c3031;MulleGraphics
+      { @selector( CALayer), MULLE_OBJC_NO_CATEGORYID },      // 55df8726;CALayer;;
       { @selector( CAOpenGLLayer), MULLE_OBJC_NO_CATEGORYID },      // bdc0ca3d;CAOpenGLLayer;;
       { @selector( CAShapeLayer), @selector( NanoVG) },      // 1effb374;CAShapeLayer;092dcb4d;NanoVG
       { @selector( CAShapeLayer), MULLE_OBJC_NO_CATEGORYID },      // 1effb374;CAShapeLayer;;

@@ -47,10 +47,10 @@
 @interface CAImageLayer( Cursor) <MulleCursor>
 
 
-- (void) getCursorPosition:(struct MulleIntegerPoint *) p_point;
-- (NSUInteger) characterIndexForPoint:(CGPoint) point;
-- (struct MulleIntegerPoint) cursorPositionForPoint:(CGPoint) mouseLocation;
+- (MulleCursorPosition) cursorPosition;
+- (NSUInteger) characterOffsetForPoint:(CGPoint) point;
+- (MulleCursorPosition) cursorPositionForPoint:(CGPoint) mouseLocation;
 - (CGFloat) offsetNeededToMakeCursorVisible;
-- (struct MulleIntegerPoint) maxCursorPosition;
+- (MulleCursorPosition) maxCursorPosition;
 
 @end

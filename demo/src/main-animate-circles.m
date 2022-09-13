@@ -1,13 +1,13 @@
-#import <MulleUICore/MulleUICore.h>
+#import "import.h"
 
 #import <string.h>
 
 
 @interface CircleLayer : CALayer
 
-@property( observable) CGFloat     scale;
-@property( observable) CGColor  color;
-@property( observable) CGRect      box;
+@property( observable) CGFloat   scale;
+@property( observable) CGColor   color;
+@property( observable) CGRect    box;
 
 @end
 
@@ -79,6 +79,7 @@ void  setupAnimation( UIWindow *window, CircleLayer *layer)
       [layer setBox:CGRectMake( 100, 100, 100, 100)];
    }
    group = [UIView commitAnimations];
+   assert( group);
 
    [[window postLayoutAnimator] addAnimation:group];
 }
@@ -110,23 +111,29 @@ void   setupSceneAndAnimation( UIWindow *window)
 int   main( int argc, char *argv[])
 {
    UIWindow        *window;
-   UIApplication   *app;
+   NSUInteger      styleMask;
+   MulleUIPerf     *perf;
+
    /*
     * window and app
     */
-   app    = [UIApplication sharedInstance];
-   window = [UIWindow windowWithFrame:CGRectMake( 0.0, 0.0, 800.0, 600.0)];
+   styleMask = UIWindowStyleMaskDefault;
+   styleMask = UIWindowsStyleMaskBySetting( styleMask, UIWindowStyleRetained, YES);
+
+   window = [UIWindow windowWithFrame:CGRectMake( 0.0, 0.0, 800.0, 600.0)
+                      titleUTF8String:"Demo"
+                            styleMask:styleMask];
    assert( window);
 
-   [window setBackgroundColor:CGColorMakeRGBA( 1.0, 1.0, 1.0, 1.0)];
+   [window setBackgroundColor:CGColorMakeWithRGBA( 1.0, 1.0, 1.0, 1.0)];
+   [window setFrameRateHz:60.0];
 
    setupSceneAndAnimation( window);
 
-   [window dump];
+   perf = [MulleUIPerf object];
+   [window setFrameDelegate:perf];
 
-   [app addWindow:window];
-
-   return( [app run]);
+   return( UIApplicationRunWindow( window));
 }
 
 

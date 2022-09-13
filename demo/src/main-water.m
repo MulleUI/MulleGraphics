@@ -15,7 +15,7 @@
 
 }
 
-@property( assign) struct CGBitmapSize   bitmapSize;
+@property( assign) struct MulleIntegerSize   bitmapSize;
 
 @end
 
@@ -88,7 +88,7 @@ static uint8_t   palette[][ 4] =
 #define N_PALETTE_COLORS  (sizeof( palette) / 4)
 
 
-- (instancetype) initWithBitmapSize:(struct CGBitmapSize) size
+- (instancetype) initWithBitmapSize:(struct MulleIntegerSize) size
 {
    if( size.width < 2 || size.height < 2)
    {
@@ -252,7 +252,7 @@ static inline uint8_t   effect( uint8_t left, uint8_t middle, uint8_t right, int
 - (void) renderToRGBA:(void *) bytes
            bitmapInfo:(struct CGBitmapInfo) info
 {
-   struct CGBitmapPoint   point;
+   struct MulleIntegerPoint   point;
    uint8_t                *dst;
    uint8_t                *src;
    uint8_t                *dst_sentinel;
@@ -266,7 +266,7 @@ static inline uint8_t   effect( uint8_t left, uint8_t middle, uint8_t right, int
    assert( info.size.height == _bitmapSize.height);
    assert( info.encoding = CGBitmapEncodingRGBABytes);
 
-   dst_sentinel = &((uint8_t *) bytes)[ CGBitmapInfoGetLineByteOffset( info, _bitmapSize.height)];
+   dst_sentinel = CGBitmapInfoGetLineBytes( info, _bitmapSize.height, bytes);
 
    if( CGBitmapEncodingIsFlipped( info.encoding))
    {
@@ -286,7 +286,7 @@ static inline uint8_t   effect( uint8_t left, uint8_t middle, uint8_t right, int
 
    for( y = start_y; y != end_y; y += step)
    {
-      dst      = &((uint8_t *) bytes)[ CGBitmapInfoGetLineByteOffset( info, y)];
+      dst      =  CGBitmapInfoGetLineBytes( info, y, bytes);
       sentinel = &src[ _bitmapSize.width];
       assert( sentinel <= &_cells[ _bitmapSize.width * _bitmapSize.height]);
 
@@ -337,7 +337,7 @@ static inline uint8_t   effect( uint8_t left, uint8_t middle, uint8_t right, int
    if( ! _water)
    {
       canvas = [self canvas];
-      _water = [[Water alloc] initWithBitmapSize:CGSizeGetBitmapSize( canvas.size)];
+      _water = [[Water alloc] initWithBitmapSize:MulleIntegerSizeMakeWithSize( canvas.size)];
    }
 
    // perform the water flow animation. We could run this elsewhere...
@@ -360,7 +360,7 @@ static inline uint8_t   effect( uint8_t left, uint8_t middle, uint8_t right, int
 
    // need a new water effect with a different size
    [_water autorelease];
-   _water = [[Water alloc] initWithBitmapSize:CGSizeGetBitmapSize( canvas.size)];
+   _water = [[Water alloc] initWithBitmapSize:MulleIntegerSizeMakeWithSize( canvas.size)];
 }
 
 @end
@@ -398,7 +398,7 @@ int   main( int argc, char *argv[])
    app    = [UIApplication sharedInstance];
    window = [UIWindow windowWithFrame:CGRectMake( 0.0f, 0.0f, 320.0f, 200.0f)];
 
-   [window setBackgroundColor:CGColorMakeRGBA( 0.0, 0.0, 0.0, 1.0)];
+   [window setBackgroundColor:CGColorMakeWithRGBA( 0.0, 0.0, 0.0, 1.0)];
    [window setFrameRateHz:30.0];
    [app addWindow:window];
 

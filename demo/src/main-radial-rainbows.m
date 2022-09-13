@@ -26,34 +26,34 @@ static void   circleWithHolePath( NVGcontext *vg,
 
 
 //
-// ColorStop color components are kept in HSBA to avoid loss of information,
-// that would be suffered during back and forth conversion (makes the
-// demo unusable!)
+// ColorStop color hsba are kept in HSBA to avoid loss of information,
+// that would be suffered during back and forth conversion (which would make
+// the demo unusable!)
 //
 struct ColorStop
 {
-   CGFloat      components[ 4];
-   CGFloat      radius;
+   CGFloat   hsba[ 4];
+   CGFloat   radius;
 };
 
 
-static inline struct ColorStop   ColorStopMake( CGFloat *components, CGFloat r)
+static inline struct ColorStop   ColorStopMake( CGFloat *hsba, CGFloat r)
 {
    return( (struct ColorStop) {
-                                 .components[ 0] = components[ 0],
-                                 .components[ 1] = components[ 1],
-                                 .components[ 2] = components[ 2],
-                                 .components[ 3] = components[ 3],
+                                 .hsba[ 0] = hsba[ 0],
+                                 .hsba[ 1] = hsba[ 1],
+                                 .hsba[ 2] = hsba[ 2],
+                                 .hsba[ 3] = hsba[ 3],
                                  .radius = r
                               });
 }
 
 static inline CGColor   ColorStopGetColor( struct ColorStop *c)
 {
-   return( CGColorMakeHSBA( c->components[ 0],
-                               c->components[ 1],
-                               c->components[ 2],
-                               c->components[ 3]));
+   return( CGColorMakeWithHSBA( c->hsba[ 0],
+                            c->hsba[ 1],
+                            c->hsba[ 2],
+                            c->hsba[ 3]));
 }
 
 
@@ -62,6 +62,7 @@ static inline CGColor   ColorStopGetColor( struct ColorStop *c)
 {
    struct mulle_structarray  _stops;
 }
+
 
 @property( assign) CGSize   size;
 
@@ -90,6 +91,7 @@ static inline CGColor   ColorStopGetColor( struct ColorStop *c)
    mulle_structarray_done( &_stops);
    [super dealloc];
 }
+
 
 - (NSUInteger) numberOfColorStops
 {
@@ -172,8 +174,7 @@ static void   fillCircleWithHoleAndColorStops( NVGcontext *vg,
    // draw from the outside in. rings on the inside overlap by a pixel to
    // avoid ugliness. Only antialias the outer ring to avoid aliasing pixels
    // in the middle of the ring.
-   rover = mulle_structarray_reverseenumerate( &_stops);
-   while( mulle_structarrayreverseenumerator_next( &rover, (void **) &inner))
+   mulle_structarray_for_reverse( &_stops, inner)
    {
       ++i;
 //      if( (i & 1) != 0)
@@ -197,7 +198,6 @@ static void   fillCircleWithHoleAndColorStops( NVGcontext *vg,
       }
       outer = inner;
    }
-   mulle_structarrayreverseenumerator_done( &rover);
 }
 
 @end
@@ -205,6 +205,7 @@ static void   fillCircleWithHoleAndColorStops( NVGcontext *vg,
 
 @interface RadialGradientCircleAnimation : CAAnimation
 @end
+
 
 @implementation RadialGradientCircleAnimation
 
@@ -232,10 +233,10 @@ normalizedRelativeTime:(double) t
    {
       c = [circle colorStopAtIndex:i];
 
-      c.components[ 0] = c.components[ 0] - COLOR_CHANGE_SPEED * factor;
-      if( c.components[ 0] < 0.0)
-         c.components[ 0] = 1.0 + c.components[ 0];
-      c.components[ 0] = fmodf( c.components[ 0], 1.0);
+      c.hsba[ 0] = c.hsba[ 0] - COLOR_CHANGE_SPEED * factor;
+      if( c.hsba[ 0] < 0.0)
+         c.hsba[ 0] = 1.0 + c.hsba[ 0];
+      c.hsba[ 0] = fmodf( c.hsba[ 0], 1.0);
 
       [circle setColorStop:c
                    atIndex:i];
@@ -245,16 +246,13 @@ normalizedRelativeTime:(double) t
 @end
 
 
-
-
-
 static void   setupCircle( RadialGradientCircle *circle, CGFloat r)
 {
    NSInteger          i;
    CGFloat            brightness;
    CGFloat            hue;
    struct ColorStop   c;
-   CGFloat            components[ 4];
+   CGFloat            hsba[ 4];
 
    for( i = 0; i < N_COLORSTOPS; i++)
    {
@@ -266,11 +264,11 @@ static void   setupCircle( RadialGradientCircle *circle, CGFloat r)
       brightness = 0.5;
 #endif
       hue            = fmodf( ((CGFloat) i / N_COLORSTOPS) * COLOR_CYCLES, 1.0);
-      components[ 0] = hue;
-      components[ 1] = 1.0;
-      components[ 2] = brightness;
-      components[ 3] = 1.0;
-      c              = ColorStopMake( components, i * r + HOLE);
+      hsba[ 0] = hue;
+      hsba[ 1] = 1.0;
+      hsba[ 2] = brightness;
+      hsba[ 3] = 1.0;
+      c              = ColorStopMake( hsba, i * r + HOLE);
       [circle addColorStop:c];
    }
 }

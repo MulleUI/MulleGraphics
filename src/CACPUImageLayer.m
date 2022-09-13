@@ -49,6 +49,7 @@
    [super dealloc];
 }
 
+
 - (void) drawInBytes:(void *) texture
           bitmapInfo:(struct CGBitmapInfo) bitmapInfo
 {
@@ -65,12 +66,12 @@
 {
    CGImage               *image;
    CGRect                canvas;
-   struct CGBitmapSize   bitmapSize;
-   struct CGBitmapSize   imageSize;
+   struct MulleIntegerSize   bitmapSize;
+   struct MulleIntegerSize   imageSize;
 
    // check to see of we need a new image
    canvas     = [self canvas];
-   bitmapSize = CGSizeGetBitmapSize( canvas.size);
+   bitmapSize = MulleIntegerSizeMakeWithSize( canvas.size);
 
    image      = (CGImage *) [self image];
    imageSize  = [image bitmapSize];

@@ -347,7 +347,7 @@ int   main( int argc, char *argv[])
     */
    app    = [UIApplication sharedInstance];
    window = [UIWindow windowWithFrame:CGRectMake( 0.0f, 0.0f, 640.0f, 400.0f)];
-   [window setBackgroundColor:CGColorMakeRGBA( 0.0, 0.0, 0.0, 1.0)];
+   [window setBackgroundColor:CGColorMakeWithRGBA( 0.0, 0.0, 0.0, 1.0)];
    [window setFrameRateHz:120.0];
 
    setupScene( window);

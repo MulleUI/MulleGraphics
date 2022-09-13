@@ -8,7 +8,6 @@
 
 @implementation CAOpenGLLayer
 
-
 - (instancetype) initWithFrame:(CGRect) frame
 {
    [super initWithFrame:frame];
@@ -29,23 +28,26 @@
    return( YES);
 }
 
+
 // default draw implementation
 - (void) drawOpenGLWithContext:(CGContext *) context
 {
    CGRect   canvas;
 
-   glBegin( GL_TRIANGLES );
-      glColor3f( 0.0f, 0.9f, 0.0f ); // green color
-      glVertex3f( -0.9f, -0.9f, 0.0f );
-
-      glColor3f( 0.9f, 0.0f, 0.0f ); // red color
-      glVertex3f( 0.0f, 0.9f, 0.0f );
-
-      glColor3f( 0.0f, 0.0f, 0.9f ); // blue color
-      glVertex3f( 0.9f, -0.9f, 0.0f );
-   glEnd();
-
-   CGContextCheckBackendError( context, "after draw triangle");
+   if( UIGraphicsBackendSupportsDeprecatedOpenGL( [context backend]))
+   {
+      glBegin( GL_TRIANGLES );
+         glColor3f( 0.0f, 0.9f, 0.0f ); // green color
+         glVertex3f( -0.9f, -0.9f, 0.0f );
+ 
+         glColor3f( 0.9f, 0.0f, 0.0f ); // red color
+         glVertex3f( 0.0f, 0.9f, 0.0f );
+ 
+         glColor3f( 0.0f, 0.0f, 0.9f ); // blue color
+         glVertex3f( 0.9f, -0.9f, 0.0f );
+      glEnd();
+      CGContextCheckBackendError( context, "after draw triangle");
+   }
 }
 
 //
@@ -55,35 +57,41 @@
 //
 - (void) beginOpenGLWithContext:(CGContext *) context
 {
-   glViewport( (int) _viewPort.origin.x,
-               (int) _viewPort.origin.y,
-               (int) _viewPort.size.width,
-               (int) _viewPort.size.height);
-   CGContextCheckBackendError( context, "after glViewport");
+   if( UIGraphicsBackendSupportsOpenGLES( [context backend]))
+   {
+      glViewport( (int) _viewPort.origin.x,
+                  (int) _viewPort.origin.y,
+                  (int) _viewPort.size.width,
+                  (int) _viewPort.size.height);
+      CGContextCheckBackendError( context, "after glViewport");
 
-   glEnable( GL_SCISSOR_TEST);
-   CGContextCheckBackendError( context, "after glEnable( GL_SCISSOR_TEST)");
+      glEnable( GL_SCISSOR_TEST);
+      CGContextCheckBackendError( context, "after glEnable( GL_SCISSOR_TEST)");
 
-   glScissor( (int) _scissor.origin.x,
-              (int) _scissor.origin.y,
-              (int) _scissor.size.width,
-              (int) _scissor.size.height);
-   CGContextCheckBackendError( context, "after glScissor");
+      glScissor( (int) _scissor.origin.x,
+                 (int) _scissor.origin.y,
+                 (int) _scissor.size.width,
+                 (int) _scissor.size.height);
+      CGContextCheckBackendError( context, "after glScissor");
 
-   glMatrixMode(GL_PROJECTION);
-   glLoadIdentity();
-   glMatrixMode(GL_MODELVIEW);
-   glLoadIdentity();
-   CGContextCheckBackendError( context, "after glLoadIdentity");
-}
+      glMatrixMode(GL_PROJECTION);
+      glLoadIdentity();
+      glMatrixMode(GL_MODELVIEW);
+      glLoadIdentity();
+      CGContextCheckBackendError( context, "after glLoadIdentity");
+   }
+ }
 
 
 - (void) endOpenGLWithContext:(CGContext *) context
 {
-   glDisable( GL_SCISSOR_TEST); //hmm..
-   CGContextCheckBackendError( context, "after glDisable( GL_SCISSOR_TEST)");
-   glFlush();
-   CGContextCheckBackendError( context, "after glFlush");
+   if( UIGraphicsBackendSupportsOpenGLES( [context backend]))
+   {
+      glDisable( GL_SCISSOR_TEST); //hmm..
+      CGContextCheckBackendError( context, "after glDisable( GL_SCISSOR_TEST)");
+      glFlush();
+      CGContextCheckBackendError( context, "after glFlush");
+   }
 }
 
 
@@ -96,7 +104,6 @@
 
    // flush current draw state, so that it appears beneath the OpenGL
    // drawing
-   CGContextCheckBackendError( context, "-[CAOpenGLLayer drawInContext:] before suspendRender");
    [context suspendRender];
 
    // set up transform for OpenGL (again, because nanovg doesn't use OpenGL

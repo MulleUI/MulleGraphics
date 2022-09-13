@@ -57,7 +57,7 @@ static void  drawStuff( CALayer *layer, CGContext *context)
    nvgBeginPath( vg);
    {
       nvgCircle( vg, CGRectGetMidX( canvas), CGRectGetMidY( canvas), radius);
-      nvgStrokeColor( vg, CGColorMakeRGBA( 1.0, 0.0, 0.0, 1.0));
+      nvgStrokeColor( vg, CGColorMakeWithRGBA( 1.0, 0.0, 0.0, 1.0));
       nvgStrokeWidth( vg, strokeWidth);  // set to 1.0 for scaling effect :)
    }
    nvgStroke( vg);
@@ -78,7 +78,7 @@ int   main( int argc, char *argv[])
    {
       view  = [[[UIView alloc] initWithFrame:CGRectMake( 0, 0, 600, 500)] autorelease];
       [view setMargins:UIEdgeInsetsMake( 50, 100, 50, 100)];
-      [view setBackgroundColor:CGColorMakeRGBA( 0.33, 0.33, 0.33, 1.0)];
+      [view setBackgroundColor:CGColorMakeWithRGBA( 0.33, 0.33, 0.33, 1.0)];
 
       layer = [view layer];
       assert( layer);
@@ -114,7 +114,7 @@ int   main( int argc, char *argv[])
 
       window = [UIWindow windowWithView:view
                         titleUTF8String:NULL];
-      [window setBackgroundColor:CGColorMakeRGBA( 1.0, 1.0, 1.0, 1.0)];
+      [window setBackgroundColor:CGColorMakeWithRGBA( 1.0, 1.0, 1.0, 1.0)];
       [app addWindow:window];
    }
    return( [app run]);

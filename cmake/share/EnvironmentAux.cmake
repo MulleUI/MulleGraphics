@@ -13,3 +13,9 @@ if( NOT __ENVIRONMENT_AUX_CMAKE__)
 
    include( ExecutableAuxObjC OPTIONAL)
 endif()
+
+
+# extension : foundation/objc-cmake
+# directory : project/all
+# template  : .../EnvironmentAux.cmake
+# Suppress this comment with `export MULLE_SDE_GENERATE_FILE_COMMENTS=NO`

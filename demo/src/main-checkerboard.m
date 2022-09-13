@@ -35,7 +35,7 @@ static void   drawStuff( CALayer *layer, CGContext *context)
    if( ! [imageLayer image])
    {
       image = [[[CGImage alloc] initWithRGBABytes:imagedata
-                                       bitmapSize:CGBitmapSizeMake( 8, 8)
+                                       bitmapSize:MulleIntegerSizeMake( 8, 8)
                                        imageFlags:NVG_IMAGE_REPEATX|NVG_IMAGE_REPEATY
                                           context:context] autorelease];
       [imageLayer setImage:image];

@@ -78,7 +78,7 @@ static char  tunnelstonetex_png_data[] =
       abort();
 
    bitmapInfo = [_textureImage bitmapInfo];
-   assert( CGBitmapSizeEqualToSize( CGBitmapInfoGetSize( bitmapInfo), CGBitmapSizeMake( TEX_W, TEX_H)));
+   assert( MulleIntegerSizeEqualToIntegerSize( CGBitmapInfoGetSize( bitmapInfo), MulleIntegerSizeMake( TEX_W, TEX_H)));
 
    rect = CGRectMake( 0, 0, W, H);
 
@@ -106,7 +106,7 @@ static char  tunnelstonetex_png_data[] =
    uint32_t      color;
 
    assert( CGBitmapInfoGetEncoding( bitmapInfo) == CGBitmapEncodingRGBABytes);
-   assert( CGBitmapSizeEqualToSize( CGBitmapInfoGetSize( bitmapInfo), CGBitmapSizeMake( W, H)));
+   assert( MulleIntegerSizeEqualToIntegerSize( CGBitmapInfoGetSize( bitmapInfo), MulleIntegerSizeMake( W, H)));
 
    dst_pixels = texture;
    src_pixels = [_textureImage bytes];
@@ -175,7 +175,7 @@ int   main( int argc, char *argv[])
    //[CGContext setDebugEnabled:YES];
 
    window = [UIWindow windowWithFrame:CGRectMake( 0.0f, 0.0f, 640.0f, 400.0f)];
-   [window setBackgroundColor:CGColorMakeRGBA( 0.0, 0.0, 0.0, 1.0)];
+   [window setBackgroundColor:CGColorMakeWithRGBA( 0.0, 0.0, 0.0, 1.0)];
    {
       contentPlane = [window contentPlane];
 

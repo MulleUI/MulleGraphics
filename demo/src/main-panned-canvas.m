@@ -54,7 +54,7 @@ static UIEvent  *handleEvent( UIWindow *window, UIEvent *event)
    // could be nicer...
    //
    bounds           = [layer bounds];
-   bounds.origin    = [event mouseLocationInView:view];
+   bounds.origin    = [event locationInView:view];
    bounds.origin.x *= contentRect.size.width / bounds.size.width;
    bounds.origin.y *= contentRect.size.height / bounds.size.height;
    [layer setBounds:bounds];
@@ -81,7 +81,7 @@ static void  drawStuff( CALayer *layer, CGContext *context)
    nvgBeginPath( vg);
    {
       nvgCircle( vg, CGRectGetMidX( canvas), CGRectGetMidY( canvas), radius);
-      nvgStrokeColor( vg, CGColorMakeRGBA( 1.0, 0.0, 0.0, 1.0));
+      nvgStrokeColor( vg, CGColorMakeWithRGBA( 1.0, 0.0, 0.0, 1.0));
       nvgStrokeWidth( vg, strokeWidth);
    }
    nvgStroke( vg);
@@ -99,7 +99,7 @@ static void   setupSceneInView( UIView *contentPlane)
    frame = CGSizeCenterInRect( CGSizeMake( 600, 400), [contentPlane contentRect]);
 
    view  = [[[UIView alloc] initWithFrame:frame] autorelease];
-   [view setBackgroundColor:CGColorMakeRGBA( 0.33, 0.33, 0.33, 1.0)];
+   [view setBackgroundColor:CGColorMakeWithRGBA( 0.33, 0.33, 0.33, 1.0)];
    [contentPlane addSubview:view];
 
    layer = [view layer];
@@ -121,7 +121,7 @@ int   main( int argc, char *argv[])
       window = [UIWindow windowWithFrame:CGRectMake( 0.0, 0.0, 800.0, 600.0)];
       assert( window);
 
-      [window setBackgroundColor:CGColorMakeRGBA( 1.0, 1.0, 1.0, 1.0)];
+      [window setBackgroundColor:CGColorMakeWithRGBA( 1.0, 1.0, 1.0, 1.0)];
       [window setEventCallback:handleEvent];
       setupSceneInView( [window contentPlane]);
 

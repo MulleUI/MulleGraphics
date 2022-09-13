@@ -256,7 +256,7 @@ static float cpData[][3] = {
    assert( [group animationObject] != nil);
 
    if( ! animator)
-      animator = [[self window] postLayoutAnimator];
+      animator = [(UIWindow *) [self window] postLayoutAnimator];
    [animator removeAnimationsForAnimationObject:self];
    [animator addAnimation:group];
 }
@@ -313,7 +313,6 @@ static BOOL   layoutRedView( UIView *view)
 
    greenView  = [view subviewWithTag:1];
    blueView   = [view subviewWithTag:2];
-   yellowView = [view subviewWithTag:3];
 
    frame = UIEdgeInsetsInsetRect( rects[ 0], UIEdgeInsetsMake( 0, 50, 50, 0));
    [greenView setFrame:frame
@@ -323,6 +322,7 @@ static BOOL   layoutRedView( UIView *view)
    [blueView setFrame:frame
               animate:YES];
 
+
    frame              = contentRect;
 
    frame.origin.x    += 20.0;
@@ -330,6 +330,11 @@ static BOOL   layoutRedView( UIView *view)
    frame.origin.y     = CGRectGetMidY( contentRect) - 5.0;
    frame.size.height  = 10.0;
 
+   yellowView = [view subviewWithTag:3];
+   [yellowView setFrame:frame];
+
+   frame.origin.y    -= 20.0;
+   yellowView = [view subviewWithTag:4];
    [yellowView setFrame:frame];
 
    return( NO); // default code should not run
@@ -355,20 +360,29 @@ void   setupScene( UIWindow *window)
    [redView setMargins:UIEdgeInsetsMake( 40, 40, 40, 40)];
    [redView setAutoresizingMask:UIViewAutoresizingFlexibleWidth|UIViewAutoresizingFlexibleHeight];
 
-   [redView setBackgroundColor:[UIColor redColor]];
+   [redView setBackgroundColor:[UIColor colorWithUTF8String:"DarkRed"]];
    [contentPlane addSubview:redView];
-
-   greenView = setupTeapotView( window, [UIColor greenColor], 14); // smooth
-   [greenView setTag:1];
-   [redView addSubview:greenView];
-
-   blueView = setupTeapotView( window, [UIColor blueColor], 2);  // coarse
-   [blueView setTag:2];
-   [redView addSubview:blueView];
 
    yellowView = [UIView viewWithFrame:CGRectZero];
    [yellowView setTag:3];
-   [yellowView setBackgroundColor:[UIColor yellowColor]];
+   [yellowView setCornerRadius:3.0];
+   [yellowView setBackgroundColor:[UIColor colorWithUTF8String:"GoldenRod"]];
+   [redView addSubview:yellowView];
+
+   greenView = setupTeapotView( window, [UIColor colorWithUTF8String:"Chartreuse"], 14); // smooth
+   [greenView setTag:1];
+   [greenView setCornerRadius:3.0];
+   [redView addSubview:greenView];
+
+   blueView = setupTeapotView( window, [UIColor colorWithUTF8String:"Navy"], 2);  // coarse
+   [blueView setTag:2];
+   [blueView setCornerRadius:3.0];
+   [redView addSubview:blueView];
+
+   yellowView = [UIView viewWithFrame:CGRectZero];
+   [yellowView setTag:4];
+   [yellowView setCornerRadius:3.0];
+   [yellowView setBackgroundColor:[UIColor colorWithUTF8String:"GoldenRod"]];
 
    [redView addSubview:yellowView];
 }
@@ -378,12 +392,21 @@ int   main( int argc, char *argv[])
 {
    UIWindow       *window;
    UIApplication  *app;
+   NSUInteger     styleMask;
+
    /*
     * window and app
     */
    app    = [UIApplication sharedInstance];
-   window = [UIWindow windowWithFrame:CGRectMake( 0.0f, 0.0f, 640.0f, 400.0f)];
-   [window setBackgroundColor:CGColorMakeRGBA( 0.0, 0.0, 0.0, 1.0)];
+
+   // teapot is old code
+   styleMask = UIWindowStyleMaskDefault;
+   styleMask = UIWindowsStyleMaskBySetting( styleMask, UIWindowOpenGLDeprecated, YES);
+
+   window = [UIWindow windowWithFrame:CGRectMake( 0.0f, 0.0f, 640.0f, 400.0f)
+                      titleUTF8String:"Demo"
+                            styleMask:styleMask];
+   [window setBackgroundColor:CGColorMakeWithRGBA( 0.0, 0.0, 0.0, 1.0)];
 //   [window setFrameRateHz:5.0];
    [app addWindow:window];
 

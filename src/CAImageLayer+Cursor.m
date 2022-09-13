@@ -41,21 +41,20 @@
 
 @implementation CAImageLayer ( Cursor)
 
-- (void) getCursorPosition:(struct MulleIntegerPoint *) p_point
+- (MulleCursorPosition) cursorPosition
 {
-   p_point->x = _image ? 1 : 0;
-   p_point->y = 0;
+   return( MulleIntegerPointMake(_image ? 1 : 0, 0));
 }
 
 
-- (NSUInteger) characterIndexForPoint:(CGPoint) point
+- (NSUInteger) characterOffsetForPoint:(CGPoint) point
 {
    // TODO: HACK!!!
    return( _image ? 1 : 0);
 }
 
 
-- (struct MulleIntegerPoint) cursorPositionForPoint:(CGPoint) mouseLocation
+- (MulleCursorPosition) cursorPositionForPoint:(CGPoint) mouseLocation
 {
    // TODO: HACK!!!
    return( MulleIntegerPointMake( _image ? 1 : 0, 0));
@@ -68,7 +67,7 @@
 }
 
 
-- (struct MulleIntegerPoint) maxCursorPosition
+- (MulleCursorPosition) maxCursorPosition
 {
    return( MulleIntegerPointMake( _image ? 1 : 0, 0));
 }

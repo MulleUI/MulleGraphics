@@ -36,9 +36,9 @@ static void  drawStuff( CALayer *layer, CGContext *context)
       {
          nvgBeginPath( vg);
          if( (x ^ y) & 1)
-            nvgFillColor( vg, CGColorMakeHSL( 0.2 * y / h + 0.8 * x / w, 1.0, 0.8));
+            nvgFillColor( vg, CGColorMakeWithHSL( 0.2 * y / h + 0.8 * x / w, 1.0, 0.8));
          else
-            nvgFillColor( vg, CGColorMakeHSL( 0.8 * y / h + 0.2 * x / w, 0.8, 0.5));
+            nvgFillColor( vg, CGColorMakeWithHSL( 0.8 * y / h + 0.2 * x / w, 0.8, 0.5));
          nvgRect( vg, x * 20.0, y * 20.0, 20.0, 20.0);
          nvgFill( vg);
       }
@@ -120,8 +120,8 @@ void   setupSceneInContentPlane( UIWindowPlane *plane)
                      CGRectUTF8String( bounds));
          fprintf( stderr, "view %ld.%ld: c=[%s] b=[%s]\n\n",
                      column, row,
-                     CGRectUTF8String( [[view layer] canvas]),
-                     CGRectUTF8String( [[view layer] bounds]));
+                     CGRectUTF8String( [view canvas]),
+                     CGRectUTF8String( [view bounds]));
       }
    }
 }
@@ -139,7 +139,7 @@ int   main()
    app = [UIApplication sharedInstance];
 
    window = [UIWindow windowWithFrame:CGRectMake( 0.0, 0.0, 800, 600)];
-   [window setBackgroundColor:CGColorMakeRGBA( 1.0, 1.0, 1.0, 1.0)];
+   [window setBackgroundColor:CGColorMakeWithRGBA( 1.0, 1.0, 1.0, 1.0)];
 
    setupSceneInContentPlane( [window contentPlane]);
 

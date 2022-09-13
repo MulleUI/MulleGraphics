@@ -3,7 +3,7 @@
 #include <stdint.h>
 
 /*
- *  (c) 2021 nat <|ORGANIZATION|>
+ *  (c) 2021 nat Mulle kybernetiK
  *
  *  version:  major, minor, patch
  */

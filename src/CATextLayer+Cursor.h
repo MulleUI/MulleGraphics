@@ -30,17 +30,21 @@ struct MulleCursorUTF8Data
                               row:(NSUInteger) i;
 
 // point is within bounds
-- (struct MulleIntegerPoint) cursorPositionForPoint:(CGPoint) point;
-- (NSUInteger) characterIndexForCursor:(struct MulleIntegerPoint) cursor;
+- (MulleCursorPosition) cursorPositionForPoint:(CGPoint) point;
+- (NSUInteger) characterOffsetForCursorPosition:(MulleCursorPosition) cursor;
 
 // point is in pixels starting from 0,0
-- (CGPoint) pointOverCursorPosition:(struct MulleIntegerPoint) cursor;
-- (CGPoint) pointUnderCursorPosition:(struct MulleIntegerPoint) cursor;
+- (CGPoint) pointAboveCursorPosition:(MulleCursorPosition) cursor;
+- (CGPoint) pointBelowCursorPosition:(MulleCursorPosition) cursor;
+
+// offset in bytes into UTF8 string translated to cursor position
+- (MulleCursorPosition) cursorPositionForCharacterOffset:(NSUInteger) offset;
+- (MulleCursorPosition) cursorPositionForTextOffset:(NSUInteger) offset;
 
 // point is within bounds
 - (void) setCursorPositionToPoint:(CGPoint) point;
 
-- (struct MulleIntegerPoint) maxCursorPosition;
+- (MulleCursorPosition) maxCursorPosition;
 
 /*
  * keyboard support here for now

@@ -6,8 +6,6 @@
 
 #import "import.h"
 
-#import "MulleCursorProtocol.h"
-
 
 @interface CAImageLayer : CALayer
 
@@ -21,6 +19,8 @@ MULLE_CURSOR_PROPERTIES;
 
 // contentMode is not in UIView, because only UIImageView supports it (for now)
 @property CGContentMode   contentMode;
+
+- (id) initWithImage:(NSObject <CGDrawable> *)  image;
 
 @end
 

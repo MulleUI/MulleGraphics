@@ -17,6 +17,7 @@ src/CAImageLayer+Cursor.m
 src/CAImageLayer+NanoVG.m
 src/CAImageLayer.m
 src/CALayer+MulleGraphics.m
+src/CALayer.m
 src/CAOpenGLLayer.m
 src/CAShapeLayer+NanoVG.m
 src/CAShapeLayer.m

@@ -13,7 +13,7 @@
 
 
 /*
- * Selection is a NSRange in the cString. The selection does not
+ * Selection is a NSRange in the textUTF8String. The selection does not
  * interpret UTF8 characters. The ranges must be set correctly
  * already.
  */
@@ -25,5 +25,10 @@
 
 - (void) startSelectionAtPoint:(CGPoint) point;
 - (void) adjustSelectionToPoint:(CGPoint) point;
+
+// select all text and move cursor to end
+- (void) selectAll;
+- (void) deselectAll;
+- (void) deleteSelection;
 
 @end

@@ -9,6 +9,32 @@
 #include <ctype.h>
 
 
+NS_ENUM_TABLE( CATextLayerAlignmentMode, 3) =
+{
+   NS_ENUM_ITEM( CAAlignmentLeft),
+   NS_ENUM_ITEM( CAAlignmentRight),
+   NS_ENUM_ITEM( CAAlignmentCenter)
+};
+
+
+NS_ENUM_TABLE( CATextLayerVerticalAlignmentMode, 6) =
+{
+   NS_ENUM_ITEM( MulleTextVerticalAlignmentMiddle),
+   NS_ENUM_ITEM( MulleTextVerticalAlignmentBaseline),
+   NS_ENUM_ITEM( MulleTextVerticalAlignmentBoundsMiddle),
+   NS_ENUM_ITEM( MulleTextVerticalAlignmentVisualMiddle),
+   NS_ENUM_ITEM( MulleTextVerticalAlignmentTop),
+   NS_ENUM_ITEM( MulleTextVerticalAlignmentBottom)
+};
+
+
+NS_ENUM_TABLE( NSLineBreakMode, 2) = 
+{
+   NS_ENUM_ITEM( NSLineBreakByClipping),
+   NS_ENUM_ITEM( NSLineBreakByWordWrapping)
+};
+
+
 @implementation CATextLayer : CALayer
 
 - (void) _init
@@ -70,12 +96,11 @@
    [self _doneRowGlyphs];
    _mulle_structarray_done( &_rowArray);
 
-   MulleObjCInstanceDeallocateMemory( self, _fontName);
+   MulleObjCInstanceDeallocateMemory( self, _fontNameUTF8String);
    MulleObjCInstanceDeallocateMemory( self, _data.characters);
 
    [super dealloc];
 }
-
 
 
 - (id) copy
@@ -89,15 +114,14 @@
    //
    [self _init];
 
-   copy->_fontName        = NULL;
-   copy->_data.characters = NULL;
+   copy->_fontNameUTF8String = NULL;
+   copy->_data.characters    = NULL;
    MulleObjCObjectSetDuplicatedUTF8String( copy,
-                                          (char **) &copy->_fontName,
-                                          (char *) _fontName);
+                                          (char **) &copy->_fontNameUTF8String,
+                                          (char *) _fontNameUTF8String);
    MulleObjCObjectSetDuplicatedUTF8String( copy,
                                            (char **) &copy->_data.characters,
                                            (char *) _data.characters);
-
    return( copy);
 }
 
@@ -178,7 +202,33 @@
 }
 
 
-- (void) setUTF8Data:(struct mulle_utf8data) data
+- (void) _setTextUTF8Data:(struct mulle_utf8data) data
+{
+   struct mulle_allocator   *allocator;
+
+   allocator = MulleObjCInstanceGetAllocator( self);
+
+   mulle_allocator_free( allocator, _data.characters);
+
+   // don't want two trailing zeroes in incoming data
+   // need one trailing zero though
+   assert( ! data.length || data.characters[ data.length - 1]);
+   assert( ! data.characters[ data.length]);
+
+   _data = data;
+
+   // clear this to be recomputed later
+   _textBounds[ 0] =
+   _textBounds[ 1] =
+   _textBounds[ 2] =
+   _textBounds[ 3] = CGFLOAT_MIN;
+
+   // reset
+   _textRange      = NSMakeRange( NSNotFound, 0);
+}
+
+
+- (void) setTextUTF8Data:(struct mulle_utf8data) data
 {
    struct mulle_allocator  *allocator;
    mulle_utf8_t            *p;
@@ -195,47 +245,33 @@
       if( ! data.characters[ length - 1])
          --length;
 
-   assert( ! length || data.characters[ length - 1]);
-
    p = mulle_allocator_malloc( allocator, length + 1);
    memcpy( p, data.characters, length);
    p[ length] = 0;
 
-   mulle_allocator_free( allocator, _data.characters);
-
-   _data.characters = p;
-   _data.length     = length;
-
-   // clear this to be recomputed later
-   _textBounds[ 0] =
-   _textBounds[ 1] =
-   _textBounds[ 2] =
-   _textBounds[ 3] = CGFLOAT_MIN;
-
-   // reset
-   _textRange      = NSMakeRange( NSNotFound, 0);
+   [self _setTextUTF8Data:mulle_utf8data_make( p, length)];
 }
 
 
-- (struct mulle_utf8data) UTF8Data
+- (struct mulle_utf8data) textUTF8Data
 {
    return( _data);
 }
 
 
-- (char *) cString  // will be a copy if internal data has no trailing zero byte
+- (char *) textUTF8String  // will be a copy, if internal data has no trailing zero byte
 {
-   return( (char *) _data.characters);
+   return( _data.characters ? (char *) _data.characters : "");
 }
 
 
-- (void) setCString:(char *) s
+- (void) setTextUTF8String:(char *) s
 {
    if( ! s)
       s = "";
 
    // include trailing \0 in data
-   [self setUTF8Data:mulle_utf8data_make( (mulle_utf8_t *) s, strlen( s) + 1)];
+   [self setTextUTF8Data:mulle_utf8data_make( (mulle_utf8_t *) s, strlen( s) + 1)];
 }
 
 
@@ -245,28 +281,28 @@ static void   assert_sane_font_name( char *s)
 
    if( s)
    {
-      fprintf( stderr, "name: %s (%p)\n", s, s);
+      //fprintf( stderr, "name: %s (%p)\n", s, s);
       while( (c = *s++))
          assert( isalnum( c));
    }
 }
 
 // fontNameUTF8String ?
-- (void) setFontName:(char *) s
+- (void) setFontNameUTF8String:(char *) s
 {
    assert_sane_font_name( s);
 
-   MulleObjCObjectSetDuplicatedUTF8String( self, &_fontName, s);
+   MulleObjCObjectSetDuplicatedUTF8String( self, &_fontNameUTF8String, s);
 }
 
 
-- (enum CATextLayerVerticalAlignmentMode)  mulleVerticalAlignmentMode
+- (CATextLayerVerticalAlignmentMode)  mulleVerticalAlignmentMode
 {
    return( _verticalAlignmentMode);
 }
 
 
-- (void) mulleSetVerticalAlignmentMode:(enum CATextLayerVerticalAlignmentMode) mode
+- (void) mulleSetVerticalAlignmentMode:(CATextLayerVerticalAlignmentMode) mode
 {
    _verticalAlignmentMode = mode;
 }
@@ -281,16 +317,17 @@ static void   assert_sane_font_name( char *s)
       return( _textRange);
 
    if( mulle_utf8_information( _data.characters, _data.length, &info))
-      return(  NSMakeRange( NSNotFound, 0));
+      return( NSMakeRange( NSNotFound, 0));
 
    _textRange = NSMakeRange( 0, info.utf32len);
    return( _textRange);
 }
 
+
 //
-// use above tzextRange to get the to be displayed data
+// use above textRange to get the to be displayed data
 //
-- (struct mulle_utf8data) UTF8DataInTextRange
+- (struct mulle_utf8data) textUTF8DataInTextRange
 {
    if( _textRange.location == NSNotFound)
       return( _data);
@@ -328,8 +365,6 @@ static NSUInteger  count_newlines( mulle_utf8_t *s)
    return( lf);
 }
 #endif
-
-
 
 
 /* MEMO: Font/Glyph scaling
@@ -416,10 +451,9 @@ static NSUInteger  count_newlines( mulle_utf8_t *s)
 }
 
 
-NSUInteger
-   MulleNVGglyphPositionSearch( NVGglyphPosition *glyphs,
-                                NSUInteger nGlyphs,
-                                CGFloat x)
+NSUInteger   MulleNVGglyphPositionSearch( NVGglyphPosition *glyphs,
+                                          NSUInteger nGlyphs,
+                                          CGFloat x)
 {
    NSInteger          first;
    NSInteger          last;
@@ -453,11 +487,11 @@ NSUInteger
 - (void) updateRowGlyphsAtIndex:(NSUInteger) i
                         context:(NVGcontext *) vg
 {
-   NSUInteger                       nGlyphs;
-   NSUInteger                       newSize;
-   NSUInteger                       diff;
-   NSUInteger                       sGlyphs;
-   NSUInteger                       n;
+   NSUInteger                    nGlyphs;
+   NSUInteger                    newSize;
+   NSUInteger                    diff;
+   NSUInteger                    sGlyphs;
+   NSUInteger                    n;
    struct CATextLayerRowGlyphs   *p;
 
    p       = &_rowGlyphs[ i];
@@ -466,7 +500,7 @@ NSUInteger
    // our assumed size, the buffer should be larger than this, so we can
    // figure out if we get truncated due to small a buffer also we need
    // one extra space for the sentinel node
-   do
+   for(;;)
    {
       sGlyphs = _mulle_structarray_get_size( &p->glyphArray);
       if( sGlyphs <= nGlyphs + 1) // add sentinel node
@@ -483,8 +517,10 @@ NSUInteger
       p->nGlyphs = nvgTextGlyphPositions( vg, 0, 0,
                                               _rows[ i].start, _rows[ i].end,
                                               p->glyphs, sGlyphs);
+      if( p->nGlyphs < sGlyphs - 1) // subtract sentinel node
+         break;
+      nGlyphs = p->nGlyphs;                                              
    }
-   while( p->nGlyphs >= sGlyphs - 1);  // subtract sentinel node
 
    // put in a node at the sentinel position
    if( p->nGlyphs)
@@ -510,9 +546,14 @@ NSUInteger
    NVGcontext               *vg;
    struct mulle_utf8data    data;
 
-   data = [self UTF8DataInTextRange];
+   data = [self textUTF8DataInTextRange];
    vg   = CGContextGetNVGContext( context);
 
+   // so when editing the text, we will likely realloc the data. But 
+   // glyphs contain a pointer to the data. When you change the text 
+   // the glyph->str is stale. We can still use glyph->str for address
+   // calculation though
+   _glyphData = data;
 
    //
    // calculate max visible rows, which is frame.size.height / _lineh , but
@@ -522,10 +563,17 @@ NSUInteger
    {
       max = 2;
       memset( _textBounds, 0, sizeof( _textBounds));
+      memset( _visualBounds, 0, sizeof( _visualBounds));
    }
    else
    {
       max = (NSUInteger) ceil( _frame.size.height / _lineh) + 2;
+
+      nvgTextVisualBounds( vg, 0,
+                               0,
+                               (void *) data.characters,
+                               (void *) &data.characters[ data.length],
+                               _visualBounds);
 
       // calculate this always, as _textBounds can be useful later on as well
       extent  = nvgTextBounds( vg, 0,
@@ -563,14 +611,16 @@ NSUInteger
    // which doesn't work well for middle/bottom...
    //
    if( _lineh == 0.0)
-      _nRows = 0.0;
+      _nRows = 0;
    else
+   {
       _nRows = nvgTextBreakLines( vg, (void *) data.characters,
                                       (void *) &data.characters[ data.length],
                                       width,
                                       _rows,
                                       max);
-
+      assert( _nRows > 0);
+   }
    // produce glyph information for each row
    for( i = 0; i < _nRows; i++)
       [self updateRowGlyphsAtIndex:i
@@ -599,9 +649,22 @@ NSUInteger
       case MulleTextVerticalAlignmentBaseline :
          origin.y = rect.size.height / 2.0;
          break;
+      // 
+      // w=10
+      // 0123456789
+      // xxxx
+      // 10 / 2.0 + (4 - 0) / 2 = 7 
+      // 20 -> 10   rect.size.height - (rect.size.height - _visualBounds[ 3])
+      case MulleTextVerticalAlignmentVisualMiddle :
+         origin.y = (rect.size.height + - _visualBounds[ 1] + -_visualBounds[ 3]) / 2.0;
+         break;
       case MulleTextVerticalAlignmentBoundsMiddle :
          // the _textBounds values are inverted _ascender and descender
          origin.y = (rect.size.height + -_textBounds[ 1] + -_textBounds[ 3]) / 2.0;
+         break;
+
+      default :
+         abort();
       }
    }
    else
@@ -629,6 +692,7 @@ NSUInteger
          origin.y = (rect.size.height - rowsHeight) / 2.0 + _ascender;
          break;
 
+      case MulleTextVerticalAlignmentVisualMiddle   :
       case MulleTextVerticalAlignmentBoundsMiddle   :
       case MulleTextVerticalAlignmentBaseline :
          // if odd rows the baseline of the middle is in the center
@@ -637,6 +701,8 @@ NSUInteger
             origin.y = (rect.size.height - rowsHeight + _lineh) / 2.0;
          else
             origin.y = (rect.size.height - rowsHeight) / 2.0 + _ascender;
+      default :
+         abort();
       }
    }
 
@@ -648,10 +714,12 @@ NSUInteger
                             break;
    case CAAlignmentCenter : origin.x = CGRectGetMidX( rect) - rect.origin.x;
                             break;
+   default :
+      abort();
    }
 
    // If cursor is visible, keep it always visible
-   if( [self isEditable])
+   if( [self isEditing])
       origin.x += [self offsetNeededToMakeCursorVisible];
    return( origin);
 }
@@ -671,7 +739,7 @@ NSUInteger
    char                *name;
    int                 align;
 
-   font   = [context fontWithNameUTF8String:_fontName ? _fontName : "sans"];
+   font   = [context fontWithNameUTF8String:_fontNameUTF8String ? _fontNameUTF8String : "sans"];
    name   = [font nameUTF8String];  // get actual name, which could have different address
    canvas = [self canvas];
    canvas = MulleEdgeInsetsInsetRect( _insets, canvas);
@@ -737,7 +805,7 @@ NSUInteger
    [super drawInContext:context];
 
    // nothing to draw ? then bail
-   data = [self UTF8DataInTextRange];
+   data = [self textUTF8DataInTextRange];
    if( ! data.length)
       return;
 
@@ -776,6 +844,7 @@ NSUInteger
       if( CGColorGetAlpha( textBackgroundColor) < 1.0)
          textBackgroundColor = [self textBackgroundColor];
       nvgTextColor( vg, [self textColor], textBackgroundColor); // TODO: use textColor
+
       nvgText( vg, canvas.origin.x + _origin.x,
                    canvas.origin.y + _origin.y + (i * _lineh),
                    _rows[ i].start,
@@ -784,7 +853,7 @@ NSUInteger
       /*
        * Draw Cursor
        */
-      if( [self isEditable])
+      if( [self isEditing])
          [self drawCursorWithNVGContext:vg
                                     row:i];
    }
@@ -810,11 +879,87 @@ static size_t   mulle_utf8_utf32length( mulle_utf8_t *s, size_t len)
 }
 
 
+mulle_utf8_t  *mulle_utf8_characters_at_utf32_offset( mulle_utf8_t *data, 
+                                                      size_t length, 
+                                                      size_t offset)
+{
+   mulle_utf8_t   *s;
+   mulle_utf8_t   *sentinel;
+
+   s        = data;
+   sentinel = &s[ length];
+
+   for(;;)
+   {
+      if( ! offset)
+         return( s);     
+      if( s >= sentinel)
+         return( NULL); 
+
+      mulle_utf8_next_utf32character( &s);
+   }
+}
+
+
+uintptr_t   mulle_utf8_utf32_offset_at_characters( mulle_utf8_t *data, 
+                                                   size_t length, 
+                                                   mulle_utf8_t *characters)
+{
+   mulle_utf8_t   *s;
+   mulle_utf8_t   *end;
+   mulle_utf8_t   *sentinel;
+   uintptr_t      n;
+
+   s        = data;
+   sentinel = &s[ length];
+   if( characters > sentinel || characters < s)
+      return( NSNotFound); 
+
+   for( n = 0;; n++)
+   {
+      if( s >= characters)
+      {
+         if( s == characters)
+            return( n);
+         return( NSNotFound); 
+      } 
+
+      mulle_utf8_next_utf32character( &s);
+   }
+}
+
+
+// utf32 offset (a la textRange) for offset in bytes into UTF8 string (a la selection)
+- (NSUInteger) textOffsetForCharacterOffset:(NSUInteger) offset
+{
+   uintptr_t      n;
+   mulle_utf8_t   *s;
+
+   s = &_data.characters[ offset];   
+   n = mulle_utf8_utf32_offset_at_characters( _data.characters, _data.length, s);
+   return( n);
+}
+
+
+// offset in bytes into UTF8 string (a la selection) for utf32 offset (a la textRange)
+- (NSUInteger) characterOffsetForTextOffset:(NSUInteger) offset;
+{
+   mulle_utf8_t  *s;
+   
+   s = mulle_utf8_characters_at_utf32_offset( _data.characters, _data.length, offset);
+   if( ! s)
+      return( NSNotFound);
+   return( s - _data.characters);
+}
+
+
+
+
 // point is within bounds
-// we find the range in the cstring 8bit characters we do not
+// we find the range in the textUTF8String 8bit characters we do not
 // interpret UTF8
 //
-- (NSUInteger) characterIndexForPoint:(CGPoint) point
+- (NSUInteger) characterOffsetForPoint:(CGPoint) point
 {
    CGRect                           rect;
    NSInteger                        y;
@@ -836,8 +981,8 @@ static size_t   mulle_utf8_utf32length( mulle_utf8_t *s, size_t len)
          y = _nRows - 1;
 
    p = &_rowGlyphs[ y];
-   // calculate characters up till till this
 
+   // calculate characters up till till this
 
    search  = point.x;
    search -= _origin.x;
@@ -857,34 +1002,11 @@ static size_t   mulle_utf8_utf32length( mulle_utf8_t *s, size_t len)
          x++;
    }
 
-   data = [self UTF8DataInTextRange];
+   data = [self textUTF8DataInTextRange];
    return( p->glyphs[ x].str - (char *) data.characters);
 }
 
 
-char   *CATextLayerAlignmentModeUTF8String( enum CATextLayerAlignmentMode mode)
-{
-   switch( mode)
-   {
-   case CAAlignmentLeft   : return( "CAAlignmentLeft");
-   case CAAlignmentRight  : return( "CAAlignmentRight");
-   case CAAlignmentCenter : return( "CAAlignmentCenter");
-   }
-   return( "???");
-}
 
-
-char   *CATextLayerVerticalAlignmentModeUTF8String( enum CATextLayerVerticalAlignmentMode mode)
-{
-   switch( mode)
-   {
-   case MulleTextVerticalAlignmentMiddle   : return( "MulleTextVerticalAlignmentMiddle");
-   case MulleTextVerticalAlignmentBaseline : return( "MulleTextVerticalAlignmentBaseline");
-   case MulleTextVerticalAlignmentBoundsMiddle   : return( "MulleTextVerticalAlignmentBoundsMiddle");
-   case MulleTextVerticalAlignmentTop      : return( "MulleTextVerticalAlignmentTop");
-   case MulleTextVerticalAlignmentBottom   : return( "MulleTextVerticalAlignmentBottom");
-   }
-   return( "???");
-}
 
 @end

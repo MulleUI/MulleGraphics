@@ -37,7 +37,7 @@
       abort();  // can't happen or ?
 
    rect.origin.x    = canvas.origin.x + _origin.x + p->glyphs[ x].x;
-   rect.origin.y    = canvas.origin.y + _origin.y + (i * _lineh) - _lineh / 2.0;
+   rect.origin.y    = canvas.origin.y + _origin.y + (i * _lineh) - _ascender; // / 2.0;
    rect.size.width  = p->glyphs[ x + selectionRange.length].x - p->glyphs[ x].x;
    rect.size.height = _lineh;
 
@@ -140,7 +140,7 @@
 {
    NSUInteger   i;
 
-   i = [self characterIndexForPoint:point];
+   i = [self characterOffsetForPoint:point];
    if( i == NSNotFound)
       return;
 
@@ -153,7 +153,7 @@
 {
    NSUInteger   i;
 
-   i = [self characterIndexForPoint:point];
+   i = [self characterOffsetForPoint:point];
    if( i == NSNotFound)
       return;
 
@@ -170,5 +170,41 @@
 
 #endif
 }
+
+
+- (void) selectAll
+{
+   NSRange   range;
+
+   range = [self textRange];
+   [self setSelection:range];
+   [self setCursorPosition:MulleCursorPositionMax];
+}
+
+
+- (void) deselectAll
+{
+   [self setSelection:NSMakeRange( 0, 0)];
+}
+
+
+- (void) deleteSelection
+{
+   struct MulleIntegerPoint   cursorPosition;
+
+   mulle_buffer_do_inflexible_filled( buffer, _data.characters, _data.length)
+   {
+      // how to keep the cursor position stable ? move cursor to 
+      // _selection.location then remove text
+      mulle_buffer_remove_in_range( buffer, _selection.location, _selection.length);
+      _data.length = mulle_buffer_get_length( buffer);
+      _data.characters[ _data.length] = 0;
+
+      cursorPosition = [self cursorPositionForCharacterOffset:_selection.location];   
+      [self setCursorPosition:cursorPosition];
+      [self setSelection:NSMakeRange( 0, 0)];
+   }
+}
+
 
 @end

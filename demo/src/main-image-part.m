@@ -1,0 +1,114 @@
+#import "import-private.h"
+
+#include <unistd.h>
+
+
+static void  drawStuff( CALayer *layer, CGContext *context)
+{
+   static CGImage     *image;
+   CGRect             rect;
+   CGRect             patternRect;
+   struct NVGpaint    imgPaint;
+   struct NVGcontext  *vg;
+   CGSize             imageSize;
+
+   vg = CGContextGetNVGContext( context);
+   if( ! image)
+   {
+      image    = [[[CGImage alloc] initWithContentsOfFileCString:"tardbeaver.png"
+                                                     imageFlags:0 //NVG_IMAGE_REPEATX|NVG_IMAGE_REPEATY
+                                                        context:context] autorelease];
+      if( ! image)
+         _exit( 1);
+   }
+
+   imageSize   = [image size];
+   patternRect = CGRectMake( imageSize.width / 4.0,
+                             0,
+                             imageSize.width / 2.0,
+                             imageSize.height / 2.0);
+   rect        = [layer canvas];
+
+   [image drawRect:rect
+          fromRect:patternRect
+           options:NULL
+           context:context];
+}
+
+
+
+static void   setupSceneInWindow( UIWindow *window)
+{
+   CGRect          frame;
+   UIView          *view;
+   UIWindowPlane   *contentPlane;
+
+   contentPlane = [window contentPlane];
+   frame        = [contentPlane contentRect];
+   frame        = UIEdgeInsetsInsetRect( frame, UIEdgeInsetsMake( 10, 10, 10, 10));
+
+   // this works in one-window scenarios well, where there is only one
+   // context.
+   view = [UIView viewWithFrame:frame];
+   [(CALayer *) [view layer] setDrawCallback:drawStuff];
+   [(CALayer *) [view layer] setBackgroundColor:CGColorMakeWithRGBA( 0.33, 0.33, 0.33, 1.0)];
+
+   [contentPlane addSubview:view];
+}
+
+
+
+int   main( int argc, char *argv[])
+{
+   UIWindow        *window;
+   UIApplication   *app;
+
+   app = [UIApplication sharedInstance];
+   {
+      window = [UIWindow windowWithFrame:CGRectMake( 0.0, 0.0, 800.0, 600.0)];
+      [window setBackgroundColor:CGColorMakeWithRGBA( 0.5, 0.5, 0.5, 1.0)];
+      setupSceneInWindow( window);
+
+      [app addWindow:window];
+   }
+   return( [app run]);
+}
+
+
+
+//
+//                           ,╓≤æKª╨╙╙▓█D"╙╙╙*╨¥W▄╓,
+//                      ╓▄ª╙└╧▓        █           ⁿ▓▓ª╦w
+//                  ╓#╜^*█⌐   `╕       █           ╓▌    `╙%w
+//               ╓ΦΓ      █    ╙⌐     ,█,,,Φ      ╓▌         ╙¥▄
+//            ,▄▀ █▄       █µ,╓╝,╓≤╗≡≡ª╨╨╨¥≡∞╗w╓,ª█,  ,       ]▄▀V,
+//          ,Φ└   ║"▀▄     ,▄▀╨"                 "╙¥▓▓       ▄▀  º▄¥,
+//        ,#▌Φ▓▄╓  Φ `█Q▄M╙                           ╙¥▄ ,▄▀ ╙▄⌐`  `Φ
+//       ▄▀   `V,"▀▀¼╓╩└                                 ╙¥▓╗ ,       ╙▄
+//      Φ       `¥═▄▀                            ╒          ▀▄          ▓
+//    .▓         ╓▓]V▄H       ▓                 ,Å            ▀,         ▀
+//    █      ,-ª▓╛  `██▀½      "▄  ,╓╓╓╓;╓▄▄▄▄╗▄█,             ╙▄         ▀
+//   █  `██▄   ▓. - Φ█═.~     ,≤█▄▀-      `   █└"▀▀▀▀▄╓╓╓╓       ▌    ██▄, █
+//  ║⌐  " ▀   ▓╨⌐   }▀`      ,█  `           █      .█▀▄▄███▄     ▌  ` ▀    ▌
+//  ▌        ▐M A   '┴      ▌                ▀        ╙█▌████▌    ╙▄        ║⌐
+// ║⌐        █⌐'║▄ Γr2«    ║▀                 ▄▄▄      ╙▌▄███      █         ▌
+// █]     ,▄▐H  ██████═ª  ╓` ▄█▀▀▀▀█▄        ████     ╓███` `╙╙║█  ▐H        █
+// █ "% ,▄▀ ║░╠K█═╣███^   ╛╓█▀      ▐█         ,╓╓═ª╙└   █      ╙█▄▐▌▓######▌╫
+// █║▄▄▄█▄▄▄║H:  "╙▀███▄╓▄,█▌╓▄,,▄∩  ██p$ΦΦ▀▀▀▀▀ΦΦΦR≡≥▄╓ ║▄       ╙j▌` ▄▀╙╗ `╫
+// █"      ╙▐H-═M ▄███████¥█H "^╙    '█, ,«^``     `     ║▌        ▐M▄▀    "Φ█
+// ║        !█▄▄████≤═^`╓█ █▌╓▀╦▄▀█   ╙█⌐               ╓█▌        ▓ `       █
+//  ▌      ,▄██╫██ ▄█═╜" █▌▐█╣Hj⌐ █    █▌╙¥w,           ██▄       ╓▌        ▐M
+//  ╢"▄▄#▀▀╙╟█Ü███▀`▀█  ║██J█▄▌jH █    ██    ╙▀W▄;    ,██  `╙w,   █▄     ,╓ █
+//   █╙     ▐███▌▀█w ▀█ ╠██████j▌║█▌   ▀██▄       `╙▓██▀w,     ╙╗█'`"▀█▀╙"`║`
+//   ╙▌     Φ████████▄██ ███████████    ═██▀W▄,   ╓█▀└         ╓▀ "    ╙▄ ╓▀
+//    ╙▄     ╙▀███╙█▄▐██▄,╙▀█████▄▀▄▀▄   ,█M╗ ▀▄██▀╙""*ⁿ═─≈-,,▄▌,        ▄▀
+//     `▌╙µ,▄Φ▀x███▄██████████▀V███▀╙└ ,▄#▌████▀`"*«,      .█▀▄▀▄,      ▄╛
+//       ▀Ö█  ;▓████████▄▄█▀▄╙W "V▄██▀▀│▄███▀└ ▀╦     "*═╥▄▀ ║,  ║▀▄  ,▓
+//        ╙W▀ '█████╨▀▀█████████   "▀▀████└      ╙▄   ,▄▀'   `▀▀╣H ▐▀▄▀
+//          ╙▄  ▀▀Γ╓▌  ▄▀ⁿ`╙▀███      ██▌         ╓█R▀▄A█        ▀▀▄▀
+//            ╙W,Φ╙  ║█        ▄╙╙ª%≡╦██≤≤╗╗≡≡╜▀▀   ╣▌   █╕     ,▄▀
+//              `▀▄M█┘        ║▀▌   ╫"    *Φ▄  █       Φ` ▀▌, ▄M╙
+//                 "▀╦,       M ╙▌  ▀       `█W▐▌       wæQ▄▀╙
+//                     ╙▀W╥,╓╣   ╙█║        ╫M  █    ,╓▄╝╙`
+//                          ╙╙▀%▄▄▄▌,≤▄_▄≡,▐▓▓▄▄#ª▀"`
+
