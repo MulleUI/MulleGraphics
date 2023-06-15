@@ -74,12 +74,12 @@ void   setupSceneInContentPlane( UIWindowPlane *plane)
          frame = CGRectInset( frames[ row][ column], 5, 5);
 
          view  = [UIView viewWithFrame:frame];
-         [view setDrawCallback:drawStuff];
+         [view setDrawCallback:(CALayerDrawCallback_t *) drawStuff];
          [view setBorderWidth:1.0];
          [view setBorderColor:CGColorMakeWithHexColor( 0x00FF00FF)];
          [plane addSubview:view];
 
-         layer = [view layer];
+         layer = (CALayer *) [view layer];
          // on its own just reduces or enlarges the checkerboard to be
          // drawn, nothing will scale.
          canvas = [layer canvas];
@@ -120,7 +120,7 @@ void   setupSceneInContentPlane( UIWindowPlane *plane)
                      CGRectUTF8String( bounds));
          fprintf( stderr, "view %ld.%ld: c=[%s] b=[%s]\n\n",
                      column, row,
-                     CGRectUTF8String( [view canvas]),
+                     CGRectUTF8String( [view contentRect]),
                      CGRectUTF8String( [view bounds]));
       }
    }

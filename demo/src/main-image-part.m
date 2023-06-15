@@ -3,8 +3,9 @@
 #include <unistd.h>
 
 
-static void  drawStuff( CALayer *layer, CGContext *context)
+static void   drawStuff( CALayer *layer, void *_context)
 {
+   CGContext          *context = _context;
    static CGImage     *image;
    CGRect             rect;
    CGRect             patternRect;

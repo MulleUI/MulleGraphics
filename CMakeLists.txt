@@ -2,6 +2,9 @@ cmake_minimum_required( VERSION 3.15)
 
 project( MulleGraphics C)
 
+# for mulle-color
+set( RESOLVE_INSTALLABLE_HEADER_SYMLINKS ON)
+
 #
 # Turn a "Library" into an "Executable"
 # * touch src/main.m
@@ -22,59 +25,39 @@ include( Environment)
 
 include( Files)
 
-if( "${MULLE_PROJECT_TYPE}" STREQUAL "Executable")
+include( IDESupport OPTIONAL)
 
-   ### Executable
+### Library
 
-   include( Dependencies)
-   include( Executable)
-   include( InstallExecutable)
-
-   # only for Executable
-   include( Motd OPTIONAL)
-
-
-elseif( "${MULLE_PROJECT_TYPE}" STREQUAL "Framework")
-
-   ### Framework
-
-   if( LINK_PHASE)
-      include( Dependencies)
+if( HEADERS_PHASE)
+   install( FILES ${INSTALL_PUBLIC_HEADERS}  DESTINATION "include/${PROJECT_NAME}")
+   install( FILES ${INSTALL_PRIVATE_HEADERS} DESTINATION "include/${PROJECT_NAME}")
+   install( FILES ${INSTALL_CMAKE_INCLUDES}  DESTINATION "include/${PROJECT_NAME}/cmake")
+   # hopefully temporary fix for Objective-C
+   if( EXISTS "src/reflect/objc-loader.inc")
+      install( FILES src/reflect/objc-loader.inc DESTINATION "include/${PROJECT_NAME}")
    endif()
 
-   include( Framework)
-   include( InstallFramework)
-
-elseif( "${MULLE_PROJECT_TYPE}" STREQUAL "Library")
-
-   ### Library
-
-   if( HEADERS_PHASE)
-      install( FILES ${INSTALL_PUBLIC_HEADERS}  DESTINATION "include/${PROJECT_NAME}")
-      install( FILES ${INSTALL_PRIVATE_HEADERS} DESTINATION "include/${PROJECT_NAME}/private")
-      install( FILES ${CMAKE_INCLUDES}          DESTINATION "include/${PROJECT_NAME}/cmake")
-      # hopefully temporary fix for Objective-C
-      if( EXISTS "src/reflect/objc-loader.inc")
-         install( FILES src/reflect/objc-loader.inc DESTINATION "include/${PROJECT_NAME}")
-      endif()
-
-      # short cut out
-      if( NOT COMPILE_PHASE AND NOT LINK_PHASE)
-         return()
-      endif()
+   # short cut out
+   if( NOT COMPILE_PHASE AND NOT LINK_PHASE)
+      return()
    endif()
-
-   if( LINK_PHASE)
-      include( Dependencies OPTIONAL)
-   endif()
-
-   include( Library)
-   include( InstallLibrary)
-
-else()
-
-   message( ERROR "Unknown project type \"${MULLE_PROJECT_TYPE}\"")
-
 endif()
+
+if( LINK_PHASE)
+   include( Dependencies OPTIONAL)
+endif()
+
+include( Library)
+
+# use LIBRARY_COMPILE_TARGET for compiler options
+target_compile_definitions( "${LIBRARY_COMPILE_TARGET}" PUBLIC)
+target_compile_options( "${LIBRARY_COMPILE_TARGET}" PUBLIC -Wall)
+# use LIBRARY_LINK_TARGET for linker options
+if( LINK_PHASE)
+   target_link_options( "${LIBRARY_LINK_TARGET}" PUBLIC)
+endif()
+
+include( InstallLibrary)
 
 include( FinalOutput OPTIONAL)

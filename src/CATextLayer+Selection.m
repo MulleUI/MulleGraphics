@@ -15,7 +15,6 @@
                                  row:(NSUInteger) i
 {
    NSInteger                     x;
-   float                         xyxy[ 4];
    CGRect                        canvas;
    struct CATextLayerRowGlyphs   *p;
    NSRange                       selectionRange;

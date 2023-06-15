@@ -1,0 +1,8 @@
+## Add
+
+Use [mulle-sde](//github.com/mulle-sde) to add MulleGraphics to your project:
+
+``` console
+mulle-sde dependency add --c --github <|GITHUB_USER|> MulleGraphics
+```
+

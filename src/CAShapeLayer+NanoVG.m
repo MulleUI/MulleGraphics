@@ -45,7 +45,7 @@
          }
 
          nvgBeginPath( vg);
-         nvgAddCGPath( vg, _path);
+         mvgAddCGPath( vg, _path);
 
          if( fill)
          {

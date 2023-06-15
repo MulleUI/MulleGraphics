@@ -119,7 +119,7 @@ typedef void  CALayerDrawCallback_t( CALayer *layer, void *ctxt);
 @property( assign) NSUInteger          frameTracking;
 
 
-// non-observable why ?
+// hidden is non-observable why ?
 @property BOOL                         hidden;
 @property char                         *debugNameUTF8String;  // useful for debugging
 

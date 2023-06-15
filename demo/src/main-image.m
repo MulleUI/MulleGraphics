@@ -14,8 +14,9 @@ static char    *filenames[ 2] =
 // we need to be rendering to create CGImages. "Real" code that uses
 // CAImageLayer will likely use UIImages.
 //
-static void  drawStuff( CALayer *layer, CGContext *context)
+static void  drawStuff( CALayer *layer, void *_context)
 {
+   CGContext       *context = _context;
    CGImage         *image;
    CAImageLayer    *imageLayer = (CAImageLayer *) layer;
    CGFrameInfo     *info;

@@ -356,7 +356,7 @@ void   setupScene( UIWindow *window)
    frame        = CGRectInset( rect, 40, 40);
 
    redView = [UIView viewWithFrame:frame];
-   [redView setWillLayoutSubviews:layoutRedView];
+   [redView setWillLayoutSubviewsCallback:layoutRedView];
    [redView setMargins:UIEdgeInsetsMake( 40, 40, 40, 40)];
    [redView setAutoresizingMask:UIViewAutoresizingFlexibleWidth|UIViewAutoresizingFlexibleHeight];
 

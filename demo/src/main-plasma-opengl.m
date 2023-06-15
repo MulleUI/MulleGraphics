@@ -25,7 +25,7 @@
  *
  * Plasma is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURP   OSE.  See the
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
@@ -117,15 +117,23 @@ static inline float fabstrunc(float f){
 
    // Make texture
    glGenTextures(1, &tex);
+   CGContextCheckBackendError( NULL, "after glGenTextures");
    glBindTexture(GL_TEXTURE_2D, tex);
+   CGContextCheckBackendError( NULL, "after glBindTexture");
    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP);
    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP);
-   glTexImage2D(GL_TEXTURE_2D, 0, 3, TEXSIZE, TEXSIZE, 0,
+   CGContextCheckBackendError( NULL, "after glTexParameteri");
+
+   // doesn't work with OpenGLES it seems
+   glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, TEXSIZE, TEXSIZE, 0,
       GL_RGB, GL_FLOAT, plasmamap);
+   CGContextCheckBackendError( NULL, "after glTexImage2D");
    glEnable(GL_TEXTURE_2D);
+   CGContextCheckBackendError( NULL, "after GL_TEXTURE_2D");
    glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_DECAL);
+   CGContextCheckBackendError( NULL, "after glTexEnvf");
 }
 
 
@@ -169,7 +177,7 @@ static inline float fabstrunc(float f){
 {
    [super beginOpenGLWithContext:context];
 
-   #warning TODO: create UIGLView to handle resizes and first time inits
+   // #warning TODO: create UIGLView to handle resizes and first time inits
    if( ! readyToDraw)
    {
       [self initPlasma];
@@ -301,6 +309,17 @@ static inline float fabstrunc(float f){
 @end
 
 
+@interface PlasmaView( Forwarding)
+
+@property( assign) int   plasmasize;
+@property( assign) int   zoom;
+@property( assign) int   focus;
+@property( assign) int   speed;
+@property( assign) int   resolution;
+
+@end
+
+
 @implementation UIView (AnimateFrame)
 @end
 
@@ -346,7 +365,9 @@ int   main( int argc, char *argv[])
     * window and app
     */
    app    = [UIApplication sharedInstance];
-   window = [UIWindow windowWithFrame:CGRectMake( 0.0f, 0.0f, 640.0f, 400.0f)];
+   window = [UIWindow windowWithFrame:CGRectMake( 0.0f, 0.0f, 640.0f, 400.0f)
+                      titleUTF8String:"Demo"
+                            styleMask:UIWindowOpenGLDeprecated];
    [window setBackgroundColor:CGColorMakeWithRGBA( 0.0, 0.0, 0.0, 1.0)];
    [window setFrameRateHz:120.0];
 

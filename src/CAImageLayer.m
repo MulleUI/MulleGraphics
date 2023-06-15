@@ -53,8 +53,6 @@
 
 - (void) drawInContext:(CGContext *) context
 {
-   int                 imageID;
-   NVGpaint            imgPaint;
    CGSize              imageSize;
    CGRect              canvas;
    CGRect              rect;

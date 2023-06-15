@@ -23,7 +23,7 @@
 //   |                    |
 //   '--------------------'
 //
-static UIEvent  *handleEvent( UIWindow *window, UIEvent *event)
+static UIMouseMotionEvent  *handleMouseMotionEvent( UIWindow *window, UIMouseMotionEvent *event)
 {
    CALayer         *layer;
    CGRect          bounds;
@@ -47,7 +47,7 @@ static UIEvent  *handleEvent( UIWindow *window, UIEvent *event)
                                       range:NSMakeRange( 0, 1)];
    assert( n == 1);
    view  = views[ 0];
-   layer = [view layer];
+   layer = (CALayer *) [view layer];
 
    //
    // there we are, now use the mouse motion event to move the bounds
@@ -63,8 +63,9 @@ static UIEvent  *handleEvent( UIWindow *window, UIEvent *event)
 }
 
 
-static void  drawStuff( CALayer *layer, CGContext *context)
+static void  drawStuff( CALayer *layer, void *_context)
 {
+   CGContext           *context = _context;
    CGFloat             canvasExtent;
    CGFloat             radius;
    CGFloat             strokeWidth;
@@ -102,7 +103,7 @@ static void   setupSceneInView( UIView *contentPlane)
    [view setBackgroundColor:CGColorMakeWithRGBA( 0.33, 0.33, 0.33, 1.0)];
    [contentPlane addSubview:view];
 
-   layer = [view layer];
+   layer = (CALayer *) [view layer];
    [layer setDrawCallback:drawStuff];
 
    // The canvas is a square where we draw the circle unto.
@@ -122,7 +123,7 @@ int   main( int argc, char *argv[])
       assert( window);
 
       [window setBackgroundColor:CGColorMakeWithRGBA( 1.0, 1.0, 1.0, 1.0)];
-      [window setEventCallback:handleEvent];
+      [window setMouseMotionEventCallback:handleMouseMotionEvent];
       setupSceneInView( [window contentPlane]);
 
       [app addWindow:window];

@@ -18,8 +18,6 @@
 
 - (id) init
 {
-   struct mulle_allocator   *allocator;
-
    self = [super init];
    if( ! self)
       return( self);
@@ -49,10 +47,15 @@
 }
 
 
-- (void) dealloc
+- (void) finalize
 {
    [self removeAllAnimations];
+   [super finalize];
+}
 
+
+- (void) dealloc
+{
    MulleObjCObjectSetDuplicatedUTF8String( self, &_debugNameUTF8String, NULL);
 
    [super dealloc];
@@ -95,6 +98,8 @@ static inline CGRect   getBounds( CALayer *self)
    return( bounds);
 }
 
+
+#pragma clang diagnostic ignored "-Wunused-property-ivar"
 
 - (CGRect) bounds
 {

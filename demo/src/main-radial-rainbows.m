@@ -311,7 +311,7 @@ int   main( int argc, char *argv[])
    {
       window = [UIWindow windowWithFrame:CGRectMake( 0.0, 0.0, 800.0, 600.0)];
       assert( window);
-
+      [window setBackgroundColor:CGColorMakeBlack()];
       [window setFrameRateHz:HZ];
 
       setupScene( window);

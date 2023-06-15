@@ -34,10 +34,3 @@
 //    remove for platform: `mulle-sde dependency mark MulleCA no-platform-<uname>`
 //        (use `mulle-sourcetree-to-c --unames` to list known values)
 #import <MulleCA/MulleCA.h>   // MulleCA
-
-#ifdef __has_include
-# if __has_include( "_MulleGraphics-include.h")
-#  include "_MulleGraphics-include.h"
-# endif
-#endif
-

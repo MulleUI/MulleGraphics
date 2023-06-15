@@ -62,6 +62,10 @@ NS_ENUM_TABLE( NSLineBreakMode, 2) =
    _selectionColor      = CGColorMakeWithHexColor( 0x7FFF7F7F);
    _textRange           = NSMakeRange( NSNotFound, 0);
 
+   // because Fonts are crap and don't adhere to size requests properly, it's
+   // usually better to overdraw than to clip.
+   _masksToBounds       = NO;
+
    [self _init];
 
    return( self);
@@ -168,6 +172,9 @@ NS_ENUM_TABLE( NSLineBreakMode, 2) =
 - (CGRect) textBoundsWithContext:(CGContext *) context
 {
    CGRect   bounds;
+
+   // can't do this if canvas height is not set correctly 
+   assert( [self canvas].size.height > 0.0);
 
    if( _textBounds[ 0] == CGFLOAT_MIN)
       [self updateGeometryWithContext:context];
@@ -310,7 +317,6 @@ static void   assert_sane_font_name( char *s)
 
 - (NSRange) textRange
 {
-   NSRange                        range;
    struct mulle_utf_information   info;
 
    if( _textRange.location != NSNotFound)
@@ -404,17 +410,16 @@ static NSUInteger  count_newlines( mulle_utf8_t *s)
  */
 - (void) resizeRowsTo:(NSUInteger) max
 {
-   NSUInteger   n;
-   NSUInteger   diff;
    NSUInteger   size;
+   NSUInteger   diff;
 
    assert( max >= 1);
 
-   size  = _mulle_structarray_get_size( &_rowArray);
+   size = _mulle_structarray_get_size( &_rowArray);
    if( max > size)
    {
       diff = max - size;
-      _mulle_structarray_advance( &_rowArray, max);
+      _mulle_structarray_advance( &_rowArray, diff);
    }
 
    _rows  = _mulle_structarray_get( &_rowArray, 0);
@@ -491,7 +496,6 @@ NSUInteger   MulleNVGglyphPositionSearch( NVGglyphPosition *glyphs,
    NSUInteger                    newSize;
    NSUInteger                    diff;
    NSUInteger                    sGlyphs;
-   NSUInteger                    n;
    struct CATextLayerRowGlyphs   *p;
 
    p       = &_rowGlyphs[ i];
@@ -728,16 +732,13 @@ NSUInteger   MulleNVGglyphPositionSearch( NVGglyphPosition *glyphs,
 - (BOOL) updateGeometryWithContext:(CGContext *) context
 {
    struct NVGcontext   *vg;
-   float               lineh;
    CGFloat             fontPixelSize;
-   CGFloat             rowsHeight;
-   CGFloat             baseline;
    CGFont              *font;
-   CGPoint             cursor;
-   CGPoint             offset;
    CGRect              canvas;
    char                *name;
    int                 align;
+   float               fontBounds[ 6];
+   CGFloat             actualFontHeight;
 
    font   = [context fontWithNameUTF8String:_fontNameUTF8String ? _fontNameUTF8String : "sans"];
    name   = [font nameUTF8String];  // get actual name, which could have different address
@@ -746,15 +747,26 @@ NSUInteger   MulleNVGglyphPositionSearch( NVGglyphPosition *glyphs,
 
    vg = CGContextGetNVGContext( context);
 
+   nvgFontFace( vg, name);
+
    fontPixelSize = [self fontPixelSize];
    if( fontPixelSize == 0.0)
-      fontPixelSize = (int) canvas.size.height;
+   {
+      // figure out actual space used by font for a string, that should
+      // cover the highest and the lowest glyph in a "reasonable" font
+      
+      nvgTextAlign( vg, NVG_ALIGN_LEFT | NVG_ALIGN_TOP);
+      nvgFontSize( vg, 32); // calculate size for 32 
+      nvgTextVisualBounds( vg, 0, 0, "|_;y´", NULL, fontBounds);
+      actualFontHeight = fontBounds[ 3 ] - fontBounds[ 1];
+      fontPixelSize    = (int) (canvas.size.height * 32.0 / actualFontHeight);
+   }
 
-   nvgFontFace( vg, name);
    nvgFontSize( vg, fontPixelSize);
 
    // I see no difference with different alignment options, for the metrics
    // likely because these are font (size) properties (duh!)
+   // These values are wishful thinking though, the actual glyph can extend this
    nvgTextMetrics( vg, &_ascender, &_descender, &_lineh);
 
    switch( _alignmentMode)
@@ -793,11 +805,7 @@ NSUInteger   MulleNVGglyphPositionSearch( NVGglyphPosition *glyphs,
 {
    struct NVGcontext       *vg;
    CGColor                 textBackgroundColor;
-   CGFloat                 fontPixelSize;
-   CGPoint                 cursor;
-   CGPoint                 offset;
    CGRect                  canvas;
-   NSRange                 selectionRange;
    NSRange                 textRange;
    NSUInteger              i;
    struct mulle_utf8data   data;
@@ -822,12 +830,12 @@ NSUInteger   MulleNVGglyphPositionSearch( NVGglyphPosition *glyphs,
       textRange = NSMakeRange( _rows[ i].start - (char *) data.characters,
                                _rows[ i].end - _rows[ i].start);
 
-      // Draw the first line only
-      // don't render outside of myself
-      nvgIntersectScissor( vg, canvas.origin.x,
-                               canvas.origin.y,
-                               canvas.size.width,
-                               canvas.size.height);
+//      // Draw the first line only
+//      // don't render outside of myself
+//      nvgIntersectScissor( vg, canvas.origin.x,
+//                               canvas.origin.y,
+//                               canvas.size.width,
+//                               canvas.size.height);
    //   // nvgFillColor( vg, nvgRGBA(127,127,255,255));
 
       /*
@@ -860,23 +868,21 @@ NSUInteger   MulleNVGglyphPositionSearch( NVGglyphPosition *glyphs,
 }
 
 
-static size_t   mulle_utf8_utf32length( mulle_utf8_t *s, size_t len)
-{
-   mulle_utf8_t   *start;
-   mulle_utf8_t   *sentinel;
-   size_t          n;
-
-   start    = s;
-   sentinel = &s[ len];
-
-   n = 0;
-   while( s < sentinel)
-   {
-      mulle_utf8_next_utf32character( &s);
-      ++n;
-   }
-   return( n);
-}
+//static size_t   mulle_utf8_utf32length( mulle_utf8_t *s, size_t len)
+//{
+//   mulle_utf8_t   *sentinel;
+//   size_t          n;
+//
+//   sentinel = &s[ len];
+//
+//   n = 0;
+//   while( s < sentinel)
+//   {
+//      mulle_utf8_next_utf32character( &s);
+//      ++n;
+//   }
+//   return( n);
+//}
 
 
 mulle_utf8_t  *mulle_utf8_characters_at_utf32_offset( mulle_utf8_t *data, 
@@ -906,7 +912,6 @@ uintptr_t   mulle_utf8_utf32_offset_at_characters( mulle_utf8_t *data,
                                                    mulle_utf8_t *characters)
 {
    mulle_utf8_t   *s;
-   mulle_utf8_t   *end;
    mulle_utf8_t   *sentinel;
    uintptr_t      n;
 
@@ -961,11 +966,10 @@ uintptr_t   mulle_utf8_utf32_offset_at_characters( mulle_utf8_t *data,
 //
 - (NSUInteger) characterOffsetForPoint:(CGPoint) point
 {
-   CGRect                           rect;
    NSInteger                        y;
    NSUInteger                       x;
    CGFloat                          search;
-   struct CATextLayerRowGlyphs   *p;
+   struct CATextLayerRowGlyphs      *p;
    struct mulle_utf8data            data;
 
    if( ! _nRows)

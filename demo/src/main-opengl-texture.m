@@ -19,19 +19,24 @@
  */
 @interface RotatingQuadLayer : CAOpenGLLayer < UIWindowFrameDelegate>
 {
-   GLuint    textureName;
-   GLfloat   angle[3];
-   GLint     axis;
+   GLuint           textureName;
+   CAAngleDegrees   angle[3];
+   GLint            axis;
 }
 @end
 
 
 @implementation RotatingQuadLayer
 
-#define R  { 0x7F, 0x3F, 0x00, 0xFF }
-#define G  { 0x00, 0x7F, 0x3F, 0xFF }
-#define B  { 0x3F, 0x00, 0x7F, 0xFF }
-#define Y  { 0x5F, 0x5F, 0x00, 0xFF }
+#define R  { 0xFF, 0x00, 0x00, 0xFF }
+#define G  { 0x00, 0xFF, 0x00, 0xFF }
+#define B  { 0x00, 0x00, 0xFF, 0xFF }
+#define Y  { 0xFF, 0xFF, 0x00, 0xFF }
+
+//#define R  { 0x7F, 0x3F, 0x00, 0xFF }
+//#define G  { 0x00, 0x7F, 0x3F, 0xFF }
+//#define B  { 0x3F, 0x00, 0x7F, 0xFF }
+//#define Y  { 0x5F, 0x5F, 0x00, 0xFF }
 
 static char   texture[ 8 * 8][ 4] =
 {
@@ -50,6 +55,7 @@ static char   texture[ 8 * 8][ 4] =
 - (instancetype) initWithFrame:(CGRect) frame
 {
    [super initWithFrame:frame];
+   [self setBackgroundColor:CGColorMakeBlack()];
    axis = 2;
    return( self);
 }
@@ -59,9 +65,8 @@ static char   texture[ 8 * 8][ 4] =
 //
 - (void) initTexture
 {
-#if 0        
-   glClearColor( 0.0, 0.0, 0.0, 0.0);
-
+#if 1
+   glEnable( GL_TEXTURE_2D);
    glGenTextures( 1, &textureName);
    glBindTexture( GL_TEXTURE_2D, textureName);
 
@@ -81,81 +86,44 @@ static char   texture[ 8 * 8][ 4] =
                                 GL_RGBA,           // Format
                                 GL_UNSIGNED_BYTE,  // Data type of the texels
                                 texture);
-
-   glEnable( GL_TEXTURE_2D);
 #endif   
 }
 
 
 - (void) display
 {
-#if 0        
-   static GLint faces[][4] = {{4,5,6,7},
-                              {1,2,6,5},
-                              {0,1,5,4},
-                              {0,3,2,1},
-                              {0,4,7,3},
-                              {2,3,7,6}
-                             };
-
-// Vertices
-   static GLfloat vertices[][3] = {{-1.0,-1.0,-1.0},
-                                   { 1.0,-1.0,-1.0},
-                                   { 1.0, 1.0,-1.0},
-                                   {-1.0, 1.0,-1.0},
+   static GLfloat vertices[][3] = {
                                    {-1.0,-1.0, 1.0},
                                    { 1.0,-1.0, 1.0},
                                    { 1.0, 1.0, 1.0},
-                                   {-1.0, 1.0, 1.0}};
-
-// don't clear the framebuffer anymore!
-//   glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-//   glUseProgram( 0);
-//   glDisable( GL_DEPTH_TEST); //hmm..
-//	glStencilMask(0xffffffff);
-//   glStencilOp(GL_KEEP, GL_KEEP, GL_KEEP);
-//	glStencilFunc(GL_ALWAYS, 0, 0xffffffff);
+                                   {-1.0, 1.0, 1.0}
+                                   };
 
    glBindTexture( GL_TEXTURE_2D, textureName);
 
-   // Draw the cube
+   // Draw the quad
 
-   for(int f = 0; f < 6; f++)
-   {
-      glBegin(GL_POLYGON);
+   glBegin(GL_POLYGON);
 
-      int v;
+   glTexCoord2f(0.0, 0.0);  // Map to the bottom left texel
+   glVertex3fv(vertices[0]);
 
-      v = faces[f][0];
+   glTexCoord2f(0.0, 1.0);  // Map to the bottom right texel
+   glVertex3fv(vertices[1]);
 
-      glTexCoord2f(0.0, 0.0);  // Map to the bottom left texel
-      glVertex3fv(vertices[v]);
+   glTexCoord2f(1.0, 1.0);  // Map to the top right texel
+   glVertex3fv(vertices[2]);
 
-      v = faces[f][1];
+   glTexCoord2f(1.0, 0.0);  // Map to the top left texel
+   glVertex3fv(vertices[3]);
 
-      glTexCoord2f(0.0, 1.0);  // Map to the bottom right texel
-      glVertex3fv(vertices[v]);
-
-      v = faces[f][2];
-
-      glTexCoord2f(1.0, 1.0);  // Map to the top right texel
-      glVertex3fv(vertices[v]);
-
-      v = faces[f][3];
-
-      glTexCoord2f(1.0, 0.0);  // Map to the top left texel
-      glVertex3fv(vertices[v]);
-
-      glEnd();
-   }
-   // glEnable( GL_DEPTH_TEST); //hmm..
-#endif   
+   glEnd();
 }
 
 
-- (void) reshape
+- (void) viewPortDidChange:(CGContext *) context
 {
-#if 0
+#if 1
    GLfloat  aspect;
    CGSize   size;
 
@@ -180,20 +148,19 @@ static char   texture[ 8 * 8][ 4] =
 {
    angle[axis] += 2.0;
    if( angle[axis] > 360.0)
-      angle[axis] -= 360.0;
+      angle[ axis] -= 360.0;
 }
+
 
 // as the rotation is local state, this has to be redone for each frame
 - (void) rotate
 {
-#if 0
-   glRotatef( angle[0], 1.0, 0.0, 0.0);
-   glRotatef( angle[1], 0.0, 1.0, 0.0);
-   glRotatef( angle[2], 0.0, 0.0, 1.0);
-#endif   
+   glRotatef( angle[ 0], 1.0, 0.0, 0.0);
+   glRotatef( angle[ 1], 0.0, 1.0, 0.0);
+   glRotatef( angle[ axis], 0.0, 0.0, 1.0);
 }
 
-#if 0
+
 - (void) beginOpenGLWithContext:(CGContext *) context
 {
    [super beginOpenGLWithContext:context];
@@ -205,11 +172,10 @@ static char   texture[ 8 * 8][ 4] =
 
 - (void) drawOpenGLWithContext:(CGContext *) context
 {
-   [self reshape];
    [self rotate];
    [self display];
 }
-#endif
+
 
 - (void) window:(UIWindow *) window
     didEndFrame:(struct CGFrameInfo *) info
@@ -244,22 +210,29 @@ graphicsContext:(id <UIGraphicsContext>) context;
 
 int   main()
 {
-   UIWindow        *window;
-   UIApplication   *app;
-   CALayer         *layer;
-   UIView          *view;
+   UIWindow            *window;
+   UIApplication       *app;
+   RotatingQuadLayer   *layer;
+   UIView              *view;
+   NSUInteger          styleMask;
 
    /*
     * window and app
     */
    app = [UIApplication sharedInstance];
    {
-      layer  = [CAOpenGLLayer layerWithFrame:CGRectMake( 0, 0, 300, 300)];
-      window = [UIWindow windowWithLayer:layer
-                        titleUTF8String:NULL];
+      layer  = [RotatingQuadLayer layerWithFrame:CGRectMake( 0, 0, 300, 300)];
 
+      // teapot is old code
+      styleMask = UIWindowStyleMaskDefault;
+      styleMask = UIWindowsStyleMaskBySetting( styleMask, UIWindowOpenGLDeprecated, YES);
+
+      window = [UIWindow windowWithLayer:layer
+                         titleUTF8String:"Demo"
+                              styleMask:styleMask];
+      [window setFrameDelegate:layer];
       // static view, no need to refresh
-      [window setFrameRate:UIWindowFrameRateAsync];
+      [window setFrameRateHz:60.0];
 
       [app addWindow:window];
    }

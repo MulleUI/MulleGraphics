@@ -9,6 +9,7 @@
  *
  *      mulle-sde environment set MULLE_MATCH_TO_C_RUN DISABLE
  */
+#import "CAAnimation+CGColor.h"
 #import "CACPUImageLayer.h"
 #import "CAGradientLayer.h"
 #import "CAImageLayer+Cursor.h"
@@ -20,5 +21,7 @@
 #import "CATextLayer+Cursor.h"
 #import "CATextLayer+Selection.h"
 #import "CATextLayer.h"
+#import "CGColor+MulleObjC.h"
+#import "CGColor+UTF8String.h"
 #import "MulleEdgeInsets+UTF8String.h"
 #import "MulleObjCLoader+MulleGraphics.h"

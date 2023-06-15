@@ -5,6 +5,8 @@
 
 #import "import-private.h"
 
+#import "CATextLayer+Selection.h"
+
 
 
 @implementation CATextLayer ( Cursor)
@@ -188,7 +190,7 @@ scrolling:
 
    // nothing to draw ? then bail
    data = [self textUTF8DataInTextRange];
-   return( glyph->str - (char *) _glyphData.characters);
+   return( glyph->str - (char *) data.characters);
 }
 
 
@@ -214,7 +216,6 @@ scrolling:
 - (CGPoint) pointBelowCursorPosition:(MulleCursorPosition) cursorPosition
 {
    struct CATextLayerRowGlyphs   *p;
-   CGFloat                       h;
 
    if( MulleCursorPositionIsMax( cursorPosition))
       cursorPosition = [self maxCursorPosition];
@@ -234,7 +235,6 @@ scrolling:
 - (MulleCursorPosition) cursorPositionForPoint:(CGPoint) point
 {
    CGFloat                       search;
-   CGRect                        rect;
    NSInteger                     x;
    NSInteger                     y;
    struct CATextLayerRowGlyphs   *p;
@@ -280,8 +280,6 @@ scrolling:
 
 - (void) setCursorPosition:(MulleCursorPosition) cursorPosition
 {
-   NSInteger   x, y;
-
    if( MulleCursorPositionIsNull( cursorPosition))
    {
       assert( 0);
@@ -298,8 +296,8 @@ scrolling:
 
 - (MulleCursorPosition) maxCursorPosition
 {
-   NSUInteger     x;
-   NSUInteger     y;
+   NSUInteger   x;
+   NSUInteger   y;
 
    if( ! _nRows)
       return( MulleCursorPositionMax);
@@ -349,11 +347,11 @@ scrolling:
       mulle_utf32_bufferconvert_to_utf8( &c,
                                          1,
                                          buffer,
-                                         mulle_buffer_add_bytes);      
+                                         (mulle_utf_add_bytes_function_t) mulle_buffer_add_bytes);      
       mulle_buffer_add_string( buffer, &s[ pos]);
    }
 
-   [self _setTextUTF8String:result];
+   [self setTextUTF8String:result];
 
    // naive!! need to consider line breaks
    cursorPosition.x++;
@@ -426,7 +424,6 @@ scrolling:
 
 - (void) cursorLeft
 {
-   char                  *s;
    MulleCursorPosition   cursorPosition;
 
    cursorPosition = [self cursorPosition];
@@ -443,7 +440,6 @@ scrolling:
 
 - (void) cursorRight
 {
-   char                  *s;
    MulleCursorPosition   cursorPosition;
    MulleCursorPosition   maxPosition;
 

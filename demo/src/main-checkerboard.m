@@ -23,12 +23,13 @@ static uint8_t   imagedata[ 8][ 8][ 4] =
 //
 // Create a little checkerboard pattern, which repeats itself.
 //
-// We need an active context create a CGImage. During rendering we get an
+// We need an active context to create a CGImage. During rendering we get an
 // active context, so that's perfect. We can't create a CGImage in "main"
 // though.
 //
-static void   drawStuff( CALayer *layer, CGContext *context)
+static void   drawStuff( CALayer *layer, void *_context)
 {
+   CGContext     *context = _context;
    CAImageLayer  *imageLayer = (CAImageLayer *) layer;
    CGImage       *image;
 

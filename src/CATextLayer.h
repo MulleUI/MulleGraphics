@@ -32,7 +32,7 @@ static inline char   *CATextLayerAlignmentModeUTF8String( CATextLayerAlignmentMo
 
 typedef NS_ENUM( NSUInteger, CATextLayerVerticalAlignmentMode)
 {
-   MulleTextVerticalAlignmentMiddle = 0,  // default
+   MulleTextVerticalAlignmentMiddle = 0,        // default
    MulleTextVerticalAlignmentBaseline,
    MulleTextVerticalAlignmentBoundsMiddle,      // only for single line
    MulleTextVerticalAlignmentVisualMiddle,
@@ -193,8 +193,10 @@ NSUInteger   MulleNVGglyphPositionSearch( NVGglyphPosition *glyphs,
 // this is can be called anytime
 - (CGRect) textBoundsWithContext:(CGContext *) context;
 
-@property( assign, setter=mulleSetVerticalAlignmentMode:) \
-   CATextLayerVerticalAlignmentMode   mulleVerticalAlignmentMode;
+// not a property, don't think this needs to be animated (?)
+- (void) mulleSetVerticalAlignmentMode:(CATextLayerVerticalAlignmentMode) mode;
+- (CATextLayerVerticalAlignmentMode) mulleVerticalAlignmentMode;
+
 
 - (NSUInteger) characterOffsetForPoint:(CGPoint) point;
 

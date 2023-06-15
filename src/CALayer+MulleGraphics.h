@@ -52,6 +52,10 @@
 // Ensure that the drawing context remains unchanged except for
 // fillColor and strokeColor.
 //
+
+// default impl. says NO, if alpha time background color alpha is transparent
+- (BOOL) drawsBackgroundWithAlpha:(CGFloat) alpha;
+
 - (void) drawBackgroundInContext:(CGContext *) context;
 - (void) drawBorderInContext:(CGContext *) context;
 

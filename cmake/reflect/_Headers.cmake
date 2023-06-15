@@ -12,6 +12,7 @@ endif()
 
 set( INCLUDE_DIRS
 src
+src/generic
 src/reflect
 )
 
@@ -27,7 +28,7 @@ src/reflect/_MulleGraphics-include-private.h
 # contents selected with patternfile ??-header--private-generic-headers
 #
 set( PRIVATE_GENERIC_HEADERS
-src/import-private.h
+src/generic/import-private.h
 )
 
 #
@@ -44,13 +45,14 @@ src/reflect/_MulleGraphics-provide.h
 # contents selected with patternfile ??-header--public-generic-headers
 #
 set( PUBLIC_GENERIC_HEADERS
-src/import.h
+src/generic/import.h
 )
 
 #
 # contents selected with patternfile ??-header--public-headers
 #
 set( PUBLIC_HEADERS
+src/CAAnimation+CGColor.h
 src/CACPUImageLayer.h
 src/CAGradientLayer.h
 src/CAImageLayer+Cursor.h
@@ -62,6 +64,8 @@ src/CAShapeLayer.h
 src/CATextLayer+Cursor.h
 src/CATextLayer+Selection.h
 src/CATextLayer.h
+src/CGColor+MulleObjC.h
+src/CGColor+UTF8String.h
 src/MulleEdgeInsets+UTF8String.h
 src/MulleGraphics.h
 src/MulleObjCLoader+MulleGraphics.h

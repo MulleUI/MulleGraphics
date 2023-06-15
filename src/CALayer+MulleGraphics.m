@@ -66,12 +66,19 @@
 }
 
 
+- (BOOL) drawsBackgroundWithAlpha:(CGFloat) alpha
+{
+   return( ! CGAlphaIsTransparent( CGColorGetAlpha( _backgroundColor) * alpha));
+}
+
+
 - (void) drawBackgroundInContext:(CGContext *) context
 {
    [self fillBackgroundInContext:context
                            color:_backgroundColor
                            paint:nil];
 }
+
 
 - (void) drawInContext:(CGContext *) context
 {
@@ -88,7 +95,6 @@
 - (void) drawBorderInContext:(CGContext *) context
 {
    NVGcontext  *vg;
-   CGRect      frame;
    CGFloat     halfBorderWidth;
    CGPoint     tl;
    CGPoint     br;
@@ -198,7 +204,6 @@
 {
    CGAffineTransform   localTransform;
    CGFloat             alpha;
-   CGPoint             scale;
    CGRect              bounds;
    NVGcontext          *vg;
 
@@ -236,7 +241,7 @@
                       alpha:alpha];
 
    // TODO: should we use context alpha here ?
-   if( ! CGAlphaIsTransparent( CGColorGetAlpha( _backgroundColor) * alpha))
+   if( [self drawsBackgroundWithAlpha:alpha])
       [self drawBackgroundInContext:context];
 
    // bounds are dynamically calculated, if there is nothing to snip from

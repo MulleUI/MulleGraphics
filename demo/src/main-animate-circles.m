@@ -28,8 +28,9 @@
 @end
 
 
-static void   drawStuff( CALayer *aLayer, CGContext *context)
+static void   drawStuff( CALayer *aLayer, void *_context)
 {
+   CGContext           *context = _context;
    CircleLayer         *layer = (CircleLayer *) aLayer;
    CGFloat             radius;
    CGRect              box;
@@ -113,7 +114,9 @@ int   main( int argc, char *argv[])
    UIWindow        *window;
    NSUInteger      styleMask;
    MulleUIPerf     *perf;
-
+   UIApplication   *app;
+   
+   app = [UIApplication sharedInstance];
    /*
     * window and app
     */

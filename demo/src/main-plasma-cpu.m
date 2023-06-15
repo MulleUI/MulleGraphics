@@ -109,8 +109,9 @@ static inline NSUInteger   plasma_function( NSUInteger x, NSUInteger y)
 @end
 
 
-static void   drawGrid( CALayer *layer, CGContext *context)
+static void   drawGrid( CALayer *layer, void *_context)
 {
+   CGContext    *context = _context;
    CGRect       canvas;
    CGFloat      xf, yf;
    CGFloat      xstep, ystep;

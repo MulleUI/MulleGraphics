@@ -33,8 +33,9 @@
 //   ***********'-----------'************
 //                    2
 
-static void  drawStuff( CALayer *layer, CGContext *context)
+static void  drawStuff( CALayer *layer, void *_context)
 {
+   CGContext           *context = _context;
    struct NVGcontext   *vg;
    CGFloat             radius;
    CGRect              canvas;
@@ -76,11 +77,13 @@ int   main( int argc, char *argv[])
 
    app = [UIApplication sharedInstance];
    {
-      view  = [[[UIView alloc] initWithFrame:CGRectMake( 0, 0, 600, 500)] autorelease];
+      frame = CGRectMake( 0, 0, 600, 500);
+      
+      view  = [UIView viewWithFrame:frame];
       [view setMargins:UIEdgeInsetsMake( 50, 100, 50, 100)];
       [view setBackgroundColor:CGColorMakeWithRGBA( 0.33, 0.33, 0.33, 1.0)];
 
-      layer = [view layer];
+      layer = (CALayer *) [view layer];
       assert( layer);
 
       [layer setDrawCallback:drawStuff];

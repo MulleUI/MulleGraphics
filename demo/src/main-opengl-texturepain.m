@@ -74,6 +74,7 @@ static void   checkGLError( const char* str)
    [super dealloc];
 }
 
+
 - (void) drawOpenGLWithContext:(CGContext *) context
 {
    struct CGBitmapInfo   bitmapInfo;
@@ -156,7 +157,7 @@ int   main( int argc, char *argv[])
       layer  = [TriangleLayer layerWithFrame:CGRectMake( 0, 0, 640, 400)];
       window = [UIWindow windowWithLayer:layer
                          titleUTF8String:NULL];
-      [window setFrameRateHz:30.0];
+      [window setFrameRateHz:1.0];
       [app addWindow:window];
    }
    return( [app run]);

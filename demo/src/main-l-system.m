@@ -94,7 +94,7 @@ static char   *lindenmayer( char *s)
 
 // this is a custom function that draws turtle commands
 - (void) drawNextCommand:(int) k
-               inContext:(id <UIGraphicsContext>) context
+               inContext:(CGContext *) context
 {
    CGFloat   radius;
    CGPoint   oldCenter;
@@ -111,7 +111,7 @@ static char   *lindenmayer( char *s)
       [context strokeLineFromPoint:oldCenter
                            toPoint:center
                              width:1.0
-                             color:CGColorMakeBlack()];
+                          hexColor:0x000000FF];
    }
    else
       if( k == '+')
@@ -139,18 +139,17 @@ static char   *lindenmayer( char *s)
   b = CGFloatMakeRandomMinMax( 0 / 255.0, 50 / 255.0);
   a = CGFloatMakeRandomMinMax( 50 / 255.0, 100 / 255.0);
 
-  color = CGColorMakeWithRGBA( r, g, b, a);
   [context fillCircleAtPoint:center
                       radius:radius
-                       color:color];
+                    hexColor:CGHexColorMakeWithRGBA( r, g, b, a)];
   [context strokeCircleAtPoint:center
                         radius:radius
                          width:1.0
-                         color:CGColorMakeBlack()];
+                      hexColor:0x000000FF];
 }
 
 
-- (void) drawInContext:(id <UIGraphicsContext>) context
+- (void) drawInContext:(CGContext *) context
 {
   [self drawNextCommand:string[ index]
               inContext:context];
@@ -166,7 +165,9 @@ int   main( int argc, char *argv[])
    UIWindow        *window;
    LSystemLayer    *layer;
    UIWindowPlane   *contentPlane;
+   UIApplication   *app;
 
+   app = [UIApplication sharedInstance];
    /*
     * window and app
     */
@@ -182,6 +183,8 @@ int   main( int argc, char *argv[])
       [window setBackgroundColor:CGColorMakeWhite()];
       [window setFrameRateHz:60.0];
    }
-   return( UIApplicationRunWindow( window));
+   [app addWindow:window];
+
+   return( [app run]);   
 }
 

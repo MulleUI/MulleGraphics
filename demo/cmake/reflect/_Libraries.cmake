@@ -15,9 +15,12 @@ endif()
 # Generated from sourcetree: 9A7D25D7-D5E0-4C1D-B8DB-0E8F2530264A;Xi;no-all-load,no-build,no-cmake-inherit,no-delete,no-dependency,no-fs,no-header,no-import,no-share,no-update;
 # Disable with : `mulle-sourcetree mark Xi `
 # Disable for this platform: `mulle-sourcetree mark Xi no-cmake-platform-${MULLE_UNAME}`
+# Disable for a sdk: `mulle-sourcetree mark Xi no-cmake-sdk-<name>`
 #
 if( NOT XI_LIBRARY)
-   find_library( XI_LIBRARY NAMES Xi)
+   find_library( XI_LIBRARY NAMES
+      Xi
+   )
    message( STATUS "XI_LIBRARY is ${XI_LIBRARY}")
    #
    # The order looks ascending, but due to the way this file is read
@@ -28,11 +31,7 @@ if( NOT XI_LIBRARY)
       # Add XI_LIBRARY to OS_SPECIFIC_LIBRARIES list.
       # Disable with: `mulle-sourcetree mark Xi no-cmake-add`
       #
-      set( OS_SPECIFIC_LIBRARIES
-         ${OS_SPECIFIC_LIBRARIES}
-         ${XI_LIBRARY}
-         CACHE INTERNAL "need to cache this"
-      )
+      list( APPEND OS_SPECIFIC_LIBRARIES ${XI_LIBRARY})
       # intentionally left blank
    else()
       # Disable with: `mulle-sourcetree mark Xi no-require-link`
