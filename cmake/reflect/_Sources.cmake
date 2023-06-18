@@ -11,7 +11,8 @@ endif()
 # contents selected with patternfile ??-source--sources
 #
 set( SOURCES
-src/CAAnimation+CGColor.m
+src/CABasicAnimation+CGColor.m
+src/CABasicAnimation+CGGradient.m
 src/CACPUImageLayer.m
 src/CAGradientLayer.m
 src/CAImageLayer+Cursor.m

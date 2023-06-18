@@ -1,7 +1,7 @@
 //
 // Copyright (c) 2023 Nat!, Mulle kybernetiK
 //
-#import "CAAnimation+CGColor.h"
+#import "CABasicAnimation+CGColor.h"
 
 #import "import.h"
 
@@ -9,42 +9,84 @@
 
 
 
-// Interpolating non-additive is nicer, as we can keep values as internally
+// Interpolating non-additive is nicer, as we can keep values internally
 // as HSBA
 //
 
-static inline double   mulle_clamp_0_1( double x)
-{
-   return( (x < 0.0) ? 0.0 : (x > 1.0 ? 1.0 : x));
-}
-
-
-static inline double   mulle_fmod_1( double x)
-{
-   return( x == 1.0 ? x : fmod( x, 1.0));
-}
-
 @implementation CABasicAnimation( CGColor)
+
+
+CGColor   CGColorMakeWithInterpolateHSBAComponents( float hsba_start[ 4],
+                                                    float hsba_end[ 4],
+                                                    double x)
+{
+   float   hsba[ 4];
+
+   assert( x >= 0 && x <= 1.0);
+
+   hsba[ 0] = CAInterpolate( hsba_start[ 0], hsba_end[ 0], x);
+   hsba[ 1] = CAInterpolate( hsba_start[ 1], hsba_end[ 1], x);
+   hsba[ 2] = CAInterpolate( hsba_start[ 2], hsba_end[ 2], x);
+   hsba[ 3] = CAInterpolate( hsba_start[ 3], hsba_end[ 3], x);
+
+   return( CGColorMakeWithHSBA( hsba[ 0], hsba[ 1], hsba[ 2], hsba[ 3]));
+}
+
+
+CGColor   CGColorInterpolate( CGColor start, CGColor end, double x)
+{
+   float   startHSBA[ 4];
+   float   endHSBA[ 4];
+
+   CGColorGetHSBAComponents( start, startHSBA);
+   CGColorGetHSBAComponents( end, endHSBA);
+   return( CGColorMakeWithInterpolateHSBAComponents( startHSBA, endHSBA, x));
+}
+
+
+CGColorDiff   CGColorInterpolateAdditive( CGColor start, CGColor end, double x)
+{
+   float         startHSBA[ 4];
+   float         endHSBA[ 4];
+   CGColorDiff   diff;
+
+   CGColorGetHSBAComponents( start, startHSBA);
+   CGColorGetHSBAComponents( end, endHSBA);
+
+   diff.v[ 0] = CAInterpolateAdditive( startHSBA[ 0], endHSBA[ 0], x);
+   diff.v[ 1] = CAInterpolateAdditive( startHSBA[ 1], endHSBA[ 1], x);
+   diff.v[ 2] = CAInterpolateAdditive( startHSBA[ 2], endHSBA[ 2], x);
+   diff.v[ 3] = CAInterpolateAdditive( startHSBA[ 3], endHSBA[ 3], x);
+
+   return( diff);
+}
+
+
+CGColor   CGColorAddDiff( CGColor color, CGColorDiff diff)
+{
+   float   hsba[ 4];
+
+   CGColorGetHSBAComponents( color, hsba);
+
+   hsba[ 0] += diff.v[ 0];
+   hsba[ 1] += diff.v[ 1];
+   hsba[ 2] += diff.v[ 2];
+   hsba[ 3] += diff.v[ 3];
+
+   return( CGColorMakeWithHSBAComponents( hsba));
+}
+
 
 
 static void   CABasicAnimationSetInterpolatedColor( CABasicAnimation *self,
                                                     id object,
                                                     double x)
 {
-   struct CAAnimationFloat4   value;
-   CGColor                    color;
+   CGColor   color;
 
-   value.v[ 0] = CAInterpolate( self->_start.float4Value.v[ 0], self->_end.float4Value.v[ 0], x);
-   value.v[ 1] = CAInterpolate( self->_start.float4Value.v[ 1], self->_end.float4Value.v[ 1], x);
-   value.v[ 2] = CAInterpolate( self->_start.float4Value.v[ 2], self->_end.float4Value.v[ 2], x);
-   value.v[ 3] = CAInterpolate( self->_start.float4Value.v[ 3], self->_end.float4Value.v[ 3], x);
-
-   value.v[ 0] = mulle_fmod_1( value.v[ 0]);
-   value.v[ 1] = mulle_clamp_0_1( value.v[ 1]);
-   value.v[ 2] = mulle_clamp_0_1( value.v[ 2]);
-   value.v[ 3] = mulle_clamp_0_1( value.v[ 3]);
-
-   color = CGColorMakeWithHSBA( value.v[ 0], value.v[ 1], value.v[ 2], value.v[ 3]);
+   color = CGColorMakeWithInterpolateHSBAComponents( self->_start.float4Value.v,
+                                                     self->_end.float4Value.v,
+                                                     x);
    {
       mulle_metaabi_union_void_return( CGColor)   param;
 
@@ -60,10 +102,11 @@ static void   CABasicAnimationSetInterpolatedColorAdditive( CABasicAnimation *se
                                                             id object,
                                                             double x)
 {
-   CGColor                    newColor;
-   float                      hsva[ 4];
-   CGColor                    color;
-   struct CAAnimationFloat4   diff;
+   CGColor       newColor;
+   CGColor       color;
+   CGColorDiff   diff;
+   CGColorDiff   step;
+   CGColorDiff   previous;
 
    diff.v[ 0] = CAInterpolateAdditive( self->_start.float4Value.v[ 0], self->_end.float4Value.v[ 0], x);
    diff.v[ 1] = CAInterpolateAdditive( self->_start.float4Value.v[ 1], self->_end.float4Value.v[ 1], x);
@@ -77,14 +120,9 @@ static void   CABasicAnimationSetInterpolatedColorAdditive( CABasicAnimation *se
       color = param.r;
    }
 
-   CGColorGetHSVAComponents( color, hsva);
-
-   hsva[ 0] = fmod( hsva[ 0] - self->_previous.float4Value.v[ 0] + diff.v[ 0], 1.0);    // hue can wrap for sure
-   hsva[ 1] = fmod( hsva[ 1] - self->_previous.float4Value.v[ 1] + diff.v[ 1], 1.0);    // saturation clamp ?
-   hsva[ 2] = fmod( hsva[ 2] - self->_previous.float4Value.v[ 2] + diff.v[ 2], 1.0);    // value clamp ?
-   hsva[ 3] = fmod( hsva[ 3] - self->_previous.float4Value.v[ 3] + diff.v[ 3], 1.0);
-
-   newColor = CGColorMakeWithHSVAComponents( hsva);
+   previous = CGColorDiffMakeWithComponents( self->_previous.float4Value.v);
+   step     = CGColorDiffSubtract( diff, previous);
+   newColor = CGColorAddDiff( color, step);
 
    self->_previous.float4Value.v[ 0] = diff.v[ 0];
    self->_previous.float4Value.v[ 1] = diff.v[ 1];
@@ -152,9 +190,9 @@ static BOOL   matchCGColor( char *s, NSUInteger len)
    // skip leading '{'
    static char  *encodeName = @encode( CGColor);
 
-   char  *p;
-   char  *q;
-   char  *p_sentinel;
+   char   *p;
+   char   *q;
+   char   *p_sentinel;
    char   c;
    char   d;
 
@@ -211,13 +249,12 @@ static struct CABasicAnimationTypeDefinition  CGColorAnimationType =
 {
    struct CAAnimationValueRange  range;
 
-   range.start = CGAnimationValueMakeWithCGColor( start);
-   range.end   = CGAnimationValueMakeWithCGColor( end);
+   range.start = CAAnimationValueMakeWithCGColor( start);
+   range.end   = CAAnimationValueMakeWithCGColor( end);
    return( [self initWithProperty:property
                         valueType:CAAnimationValueCGColor
                        valueRange:&range
                           options:options]);
 }
-
 
 @end
