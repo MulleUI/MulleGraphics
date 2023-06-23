@@ -10,13 +10,13 @@
 #import "import.h"
 
 
-// TODO: change this to a struct that's identical
-//       to NanoVG paint minus the image handle
-@class MullePaint;
 
-
+//
+// this class is probably soon obsolete, as we make backgroundColor a
+// CGPaint ?
+//
 @interface CAGradientLayer : CALayer
 
-@property( retain) MullePaint   *paint;
+@property( observable, copy) CGGradient   *paint;
 
 @end

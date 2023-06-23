@@ -61,8 +61,7 @@
 
 // only use this method in drawBackgroundInContext
 - (void) fillBackgroundInContext:(CGContext *) context
-                           color:(CGColor) color
-                           paint:(MullePaint *) paint;
+                           paint:(CGPaint *) paint;
 
 // Returns canvas.size. Subclasses may want to compute actual used space
 // and return it. Used for layouting by UIView

@@ -13,7 +13,6 @@
 - (void) drawBackgroundInContext:(CGContext *) context
 {
    [self fillBackgroundInContext:context
-                           color:_backgroundColor
                            paint:_paint];
 }
 

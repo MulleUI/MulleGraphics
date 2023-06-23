@@ -7,8 +7,7 @@
 @implementation CALayer ( MulleGraphics)
 
 - (void) fillBackgroundInContext:(CGContext *) context
-                           color:(CGColor) color
-                           paint:(MullePaint *) paint
+                           paint:(CGPaint *) paint
 {
    NVGcontext        *vg;
    CGPoint           tl;
@@ -49,18 +48,9 @@
       rect  = MulleEdgeInsetsInsetRect( insets, rect);
       nvgShapeAntiAlias( vg, 0);
    }
+
    // fill
-   nvgBeginPath( vg);
-   nvgRoundedRect( vg, rect.origin.x,
-                       rect.origin.y,
-                       rect.size.width,
-                       rect.size.height,
-                       _cornerRadius);
-   if( paint)
-      nvgFillPaint(vg, [paint nvgPaint]);
-   else
-      nvgFillColor(vg, color);
-   nvgFill( vg);
+   mvgFillRoundedRectWithPaint( vg, rect, _cornerRadius, paint);
 
    nvgShapeAntiAlias( vg, 1);
 }
@@ -75,8 +65,7 @@
 - (void) drawBackgroundInContext:(CGContext *) context
 {
    [self fillBackgroundInContext:context
-                           color:_backgroundColor
-                           paint:nil];
+                           paint:[CGPaint paintWithColor:_backgroundColor]];
 }
 
 

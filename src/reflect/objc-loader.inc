@@ -2,7 +2,6 @@
       { @selector( MulleObjCLoader), @selector( MulleCG) },      // 47a9beb6;MulleObjCLoader;d422218a;MulleCG
       { @selector( MulleObjCLoader), @selector( MulleUIBase) },      // 47a9beb6;MulleObjCLoader;3ebba954;MulleUIBase
       { @selector( CABasicAnimation), @selector( CGColor) },      // 1462ac1b;CABasicAnimation;94e785ef;CGColor
-      { @selector( CABasicAnimation), @selector( CGGradient) },      // 1462ac1b;CABasicAnimation;37670335;CGGradient
       { @selector( CACPUImageLayer), MULLE_OBJC_NO_CATEGORYID },      // 3d4aedfb;CACPUImageLayer;;
       { @selector( CAGradientLayer), MULLE_OBJC_NO_CATEGORYID },      // cf9da5a2;CAGradientLayer;;
       { @selector( CAImageLayer), @selector( Cursor) },      // 2a9d3438;CAImageLayer;58a502f5;Cursor
@@ -17,3 +16,5 @@
       { @selector( CATextLayer), @selector( Selection) },      // de65b073;CATextLayer;dea34b5b;Selection
       { @selector( CATextLayer), MULLE_OBJC_NO_CATEGORYID },      // de65b073;CATextLayer;;
       { @selector( CGGradient), @selector( CAInterpolatableValue) },      // 37670335;CGGradient;dfc7766f;CAInterpolatableValue
+      { @selector( CGImage), @selector( CABasicAnimation) },      // 6ec55940;CGImage;1462ac1b;CABasicAnimation
+      { @selector( CGImagePaint), @selector( CAInterpolatableValue) },      // 3e23b783;CGImagePaint;dfc7766f;CAInterpolatableValue

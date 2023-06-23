@@ -7,7 +7,7 @@
 // to map it to the frame. You can see that this leaves borders to the left
 // and to the right.
 //
-// A severe disadvantage of this (with nanovg) is, that the strokewidth has
+// A severe disadvantage of this (with nanovg) is, that the strokeWidth has
 // to be scaled down to the ratio between canvas and frame, otherwise you get
 // a real big circle.
 //
@@ -55,13 +55,11 @@ static void  drawStuff( CALayer *layer, void *_context)
    radius       = (canvasExtent - strokeWidth) / 2.0;
 
    vg = CGContextGetNVGContext( context);
-   nvgBeginPath( vg);
-   {
-      nvgCircle( vg, CGRectGetMidX( canvas), CGRectGetMidY( canvas), radius);
-      nvgStrokeColor( vg, CGColorMakeWithRGBA( 1.0, 0.0, 0.0, 1.0));
-      nvgStrokeWidth( vg, strokeWidth);  // set to 1.0 for scaling effect :)
-   }
-   nvgStroke( vg);
+   mvgStrokeCircleWithColor( vg,
+                             CGRectGetCenterPoint( canvas),
+                             radius,
+                             strokeWidth,
+                             CGColorMakeRed());
 }
 
 

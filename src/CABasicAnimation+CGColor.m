@@ -8,6 +8,8 @@
 #import "CGColor+MulleObjC.h"
 
 
+//#define ANIMATION_DEBUG
+
 
 // Interpolating non-additive is nicer, as we can keep values internally
 // as HSBA
@@ -16,7 +18,7 @@
 @implementation CABasicAnimation( CGColor)
 
 
-CGColor   CGColorMakeWithInterpolateHSBAComponents( float hsba_start[ 4],
+CGColor   CGColorMakeWithInterpolatedHSBAComponents( float hsba_start[ 4],
                                                     float hsba_end[ 4],
                                                     double x)
 {
@@ -30,35 +32,6 @@ CGColor   CGColorMakeWithInterpolateHSBAComponents( float hsba_start[ 4],
    hsba[ 3] = CAInterpolate( hsba_start[ 3], hsba_end[ 3], x);
 
    return( CGColorMakeWithHSBA( hsba[ 0], hsba[ 1], hsba[ 2], hsba[ 3]));
-}
-
-
-CGColor   CGColorInterpolate( CGColor start, CGColor end, double x)
-{
-   float   startHSBA[ 4];
-   float   endHSBA[ 4];
-
-   CGColorGetHSBAComponents( start, startHSBA);
-   CGColorGetHSBAComponents( end, endHSBA);
-   return( CGColorMakeWithInterpolateHSBAComponents( startHSBA, endHSBA, x));
-}
-
-
-CGColorDiff   CGColorInterpolateAdditive( CGColor start, CGColor end, double x)
-{
-   float         startHSBA[ 4];
-   float         endHSBA[ 4];
-   CGColorDiff   diff;
-
-   CGColorGetHSBAComponents( start, startHSBA);
-   CGColorGetHSBAComponents( end, endHSBA);
-
-   diff.v[ 0] = CAInterpolateAdditive( startHSBA[ 0], endHSBA[ 0], x);
-   diff.v[ 1] = CAInterpolateAdditive( startHSBA[ 1], endHSBA[ 1], x);
-   diff.v[ 2] = CAInterpolateAdditive( startHSBA[ 2], endHSBA[ 2], x);
-   diff.v[ 3] = CAInterpolateAdditive( startHSBA[ 3], endHSBA[ 3], x);
-
-   return( diff);
 }
 
 
@@ -77,14 +50,13 @@ CGColor   CGColorAddDiff( CGColor color, CGColorDiff diff)
 }
 
 
-
 static void   CABasicAnimationSetInterpolatedColor( CABasicAnimation *self,
                                                     id object,
                                                     double x)
 {
    CGColor   color;
 
-   color = CGColorMakeWithInterpolateHSBAComponents( self->_start.float4Value.v,
+   color = CGColorMakeWithInterpolatedHSBAComponents( self->_start.float4Value.v,
                                                      self->_end.float4Value.v,
                                                      x);
    {
@@ -247,10 +219,19 @@ static struct CABasicAnimationTypeDefinition  CGColorAnimationType =
           endColorValue:(CGColor) end
                 options:(struct CABasicAnimationOptions *) options
 {
-   struct CAAnimationValueRange  range;
+   struct CAAnimationValueRange   range;
+
+   // here we make a few changes: if the saturation of one color is basically
+   // none we set its hue to the hue of the other (or a scale ?)
+   // also since the hue can wrap around, we may use a higher or lower 
+   // value to shorten the distance
 
    range.start = CAAnimationValueMakeWithCGColor( start);
    range.end   = CAAnimationValueMakeWithCGColor( end);
+
+   CAAnimationFloat4ModifyHSBAColors( &range.start.float4Value,
+                                      &range.end.float4Value);
+
    return( [self initWithProperty:property
                         valueType:CAAnimationValueCGColor
                        valueRange:&range

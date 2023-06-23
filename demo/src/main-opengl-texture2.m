@@ -8,24 +8,6 @@ static char  tunnelstonetex_png_data[] =
 
 #define s_tunnelstonetex_png_data  (sizeof( tunnelstonetex_png_data) - 1)
 
-#define R  { 0xFF, 0x00, 0x00, 0xFF }
-#define G  { 0x00, 0xFF, 0x00, 0xFF }
-#define B  { 0x00, 0xFF, 0xFF, 0xFF }
-#define Y  { 0xFF, 0xFF, 0x00, 0xFF }
-
-static char   texture[ 8 * 8][ 4] =
-{
-   R, R, R, R,   Y, Y, Y, Y,
-   R, R, R, R,   Y, Y, Y, Y,
-   R, R, R, R,   Y, Y, Y, Y,
-   R, R, R, R,   Y, Y, Y, Y,
-
-   B, B, B, B,   G, G, G, G,
-   B, B, B, B,   G, G, G, G,
-   B, B, B, B,   G, G, G, G,
-   B, B, B, B,   G, G, G, G
-};
-
 
 static void   checkGLError( const char* str)
 {
@@ -41,7 +23,7 @@ static void   checkGLError( const char* str)
 
 
 
-@interface TriangleLayer : CAOpenGLLayer
+@interface OpenGLTexturedQuadLayer : CAOpenGLLayer
 {
    UIBitmapImage   *_textureImage;
    GLuint           _glTextureID;
@@ -49,7 +31,7 @@ static void   checkGLError( const char* str)
 @end
 
 
-@implementation TriangleLayer
+@implementation OpenGLTexturedQuadLayer
 
 - (instancetype) initWithFrame:(CGRect) frame
 {
@@ -83,6 +65,7 @@ static void   checkGLError( const char* str)
    glEnable(GL_DEPTH_TEST);
    glShadeModel(GL_FLAT);
    checkGLError( "incoming");
+
    if( ! _glTextureID)
    {
       bitmapInfo = [_textureImage bitmapInfo];
@@ -96,7 +79,6 @@ static void   checkGLError( const char* str)
       glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
       glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP);
       glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP);
-#if 0
       glTexImage2D( GL_TEXTURE_2D, 0,        // mimmap level
                                    GL_RGBA,  // openGL format
                                    (GLsizei) bitmapInfo.size.width,
@@ -105,16 +87,6 @@ static void   checkGLError( const char* str)
                                    GL_RGBA,  // incoming bitmap format
                                    GL_UNSIGNED_BYTE,
                                    [_textureImage bytes]);
-#else
-      glTexImage2D( GL_TEXTURE_2D, 0,        // mimmap level
-                                   GL_RGBA,  // openGL format
-                                   (GLsizei) 8,
-                                   (GLsizei) 8,
-                                   0,       // border (0 or 1)
-                                   GL_RGBA,  // incoming bitmap format
-                                   GL_UNSIGNED_BYTE,
-                                   texture);
-#endif
       checkGLError( "upload");
    //      glBindTexture(GL_TEXTURE_2D, 0);
 
@@ -154,7 +126,7 @@ int   main( int argc, char *argv[])
 
    app = [UIApplication sharedInstance];
    {
-      layer  = [TriangleLayer layerWithFrame:CGRectMake( 0, 0, 640, 400)];
+      layer  = [OpenGLTexturedQuadLayer layerWithFrame:CGRectMake( 0, 0, 640, 400)];
       window = [UIWindow windowWithLayer:layer
                          titleUTF8String:NULL];
       [window setFrameRateHz:1.0];

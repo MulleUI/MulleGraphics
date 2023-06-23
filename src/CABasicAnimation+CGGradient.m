@@ -36,10 +36,7 @@
 
 #import "import-private.h"
 
-#import "CABasicAnimation+CGColor.h"
 
-
-@implementation CGGradient( CAInterpolatableValue)
 
 union CGColorOrColorDiff
 {
@@ -50,33 +47,75 @@ union CGColorOrColorDiff
 #define CGColorOrColorDiffZero    ((CGColorOrColorDiff) { 0 })
 
 
+CGColor   CGColorInterpolate( CGColor start, CGColor end, double x)
+{
+   struct CAAnimationFloat4   startHSBA;
+   struct CAAnimationFloat4   endHSBA;
+
+   MULLE_C_ASSERT( sizeof( float) == sizeof( CGFloat));
+
+   CGColorGetHSBAComponents( start, startHSBA.v);
+   CGColorGetHSBAComponents( end, endHSBA.v);
+
+   CAAnimationFloat4ModifyHSBAColors( &startHSBA, &endHSBA);
+   return( CGColorMakeWithInterpolatedHSBAComponents( startHSBA.v, endHSBA.v, x));
+}
+
+
+CGColorDiff   CGColorInterpolateAdditive( CGColor start, CGColor end, double x)
+{
+   struct CAAnimationFloat4   startHSBA;
+   struct CAAnimationFloat4   endHSBA;
+   CGColorDiff                diff;
+
+   CGColorGetHSBAComponents( start, startHSBA.v);
+   CGColorGetHSBAComponents( end, endHSBA.v);
+
+   CAAnimationFloat4ModifyHSBAColors( &startHSBA,
+                                      &endHSBA);
+
+   diff.v[ 0] = CAInterpolateAdditive( startHSBA.v[ 0], endHSBA.v[ 0], x);
+   diff.v[ 1] = CAInterpolateAdditive( startHSBA.v[ 1], endHSBA.v[ 1], x);
+   diff.v[ 2] = CAInterpolateAdditive( startHSBA.v[ 2], endHSBA.v[ 2], x);
+   diff.v[ 3] = CAInterpolateAdditive( startHSBA.v[ 3], endHSBA.v[ 3], x);
+
+   return( diff);
+}
+
+
+@implementation CGGradient( CAInterpolatableValue)
+
+
 // standard interpolation self is start: start + (end - start) * x;
 - (id) interpolateTo:(id) end
               factor:(double) x
             additive:(BOOL) additive
 {
-   NSUInteger                 startCount;
-   NSUInteger                 endCount;
-   NSUInteger                 count;
    BOOL                       i_inside;
    BOOL                       j_inside;
-   NSInteger                  i;
-   NSInteger                  j;
-   NSUInteger                 k;
-   NSUInteger                 n;
-   union CGColorOrColorDiff   *start_colors;
-   union CGColorOrColorDiff   *end_colors;
-   union CGColorOrColorDiff   *dst_colors;
+   CAAngleRadians             angle;
+   CAAngleRadians             endAngle;
+   CAAngleRadians             startAngle;
    CGColor                    *interpolated_colors;
-   CGColor                    start_color;
    CGColor                    end_color;
-   float                      *start_locations;
+   CGColor                    start_color;
+   CGGradient                 *gradient;
+   float                      *dst_locations;
    float                      *end_locations;
    float                      *interpolated_locations;
-   float                      *dst_locations;
-   float                      start_location;
+   float                      *start_locations;
    float                      end_location;
-   CGGradient                 *gradient;
+   float                      start_location;
+   NSInteger                  i;
+   NSInteger                  j;
+   NSUInteger                 count;
+   NSUInteger                 endCount;
+   NSUInteger                 k;
+   NSUInteger                 n;
+   NSUInteger                 startCount;
+   union CGColorOrColorDiff   *dst_colors;
+   union CGColorOrColorDiff   *end_colors;
+   union CGColorOrColorDiff   *start_colors;
 
    MULLE_C_ASSERT( sizeof( union CGColorOrColorDiff) == sizeof( CGColor));
 
@@ -138,9 +177,16 @@ union CGColorOrColorDiff
             j++;
          }
 
-         gradient = [CGGradient gradientWithColors:interpolated_colors
-                                         locations:interpolated_locations
-                                             count:count];
+
+         startAngle = [self angle];
+         endAngle   = [end angle];
+         angle      = additive
+                      ? CAInterpolateAdditive( startAngle, endAngle, x)
+                      : CAInterpolate( startAngle, endAngle, x);
+         gradient   = [CGGradient gradientWithColors:interpolated_colors
+                                           locations:interpolated_locations
+                                               count:count
+                                               angle:angle];
       }
    }
    return( gradient);
@@ -152,28 +198,31 @@ union CGColorOrColorDiff
 - (id) interpolatedValueWithDiff:(id) diff
                     previousDiff:(id) previous
 {
-   NSUInteger                 previousCount;
-   NSUInteger                 diffCount;
-   NSUInteger                 count;
    BOOL                       i_inside;
    BOOL                       j_inside;
-   NSInteger                  i;
-   NSInteger                  j;
-   NSUInteger                 k;
-   NSUInteger                 n;
-   union CGColorOrColorDiff   *previous_colordiffs;
-   union CGColorOrColorDiff   *colordiffs;
-   union CGColorOrColorDiff   *colors;
+   CAAngleRadians             angle;
+   CAAngleRadians             diffAngle;
+   CAAngleRadians             previousAngle;
    CGColor                    *interpolated_colors;
-   CGColorDiff                previous_colordiff;
    CGColorDiff                colordiff;
-   float                      *previous_locationdiffs;
+   CGColorDiff                previous_colordiff;
+   CGGradient                 *gradient;
+   float                      *interpolated_locations;
    float                      *locationdiffs;
    float                      *locations;
-   float                      *interpolated_locations;
-   float                      previous_locationdiff;
+   float                      *previous_locationdiffs;
    float                      locationdiff;
-   CGGradient                 *gradient;
+   float                      previous_locationdiff;
+   NSInteger                  i;
+   NSInteger                  j;
+   NSUInteger                 count;
+   NSUInteger                 diffCount;
+   NSUInteger                 k;
+   NSUInteger                 n;
+   NSUInteger                 previousCount;
+   union CGColorOrColorDiff   *colordiffs;
+   union CGColorOrColorDiff   *colors;
+   union CGColorOrColorDiff   *previous_colordiffs;
 
    diffCount     = [diff numberOfColors];
    previousCount = [previous numberOfColors];
@@ -227,10 +276,14 @@ union CGColorOrColorDiff
             j++;
          }
 
+         previousAngle = [previous angle];
+         diffAngle     = [diff angle];
+         angle         = [self angle] - previousAngle + diffAngle;
          // create new gradient
          gradient  = [CGGradient gradientWithColors:interpolated_colors
                                           locations:interpolated_locations
-                                              count:count];
+                                              count:count
+                                              angle:angle];
       }
    }
    return( gradient);
@@ -239,17 +292,3 @@ union CGColorOrColorDiff
 @end
 
 
-@implementation CABasicAnimation ( CGGradient)
-
-- (id) initWithProperty:(struct _mulle_objc_property *) property
-     startGradientValue:(CGGradient *) start
-       endGradientValue:(CGGradient *) end
-                options:(struct CABasicAnimationOptions *) options
-{
-   return( [self initWithProperty:property
-                 startObjectValue:start
-                   endObjectValue:end
-                          options:options]);
-}
-
-@end

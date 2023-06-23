@@ -33,34 +33,21 @@
 //  POSSIBILITY OF SUCH DAMAGE.
 //
 // prefer a local CABasicAnimation over one in import.h
-#ifdef __has_include
-# if __has_include( "CABasicAnimation.h")
-#  import "CABasicAnimation.h"
-# endif
-#endif
+#import "CABasicAnimation+CGColor.h"
 
 // we want "import.h" always anyway
 #import "import.h"
 
-
-#define CAAnimationValueCGGradient  11
-
-static inline union CAAnimationValue
-   CAAnimationValueMakeWithCGGradient( CGGradient *gradient)
-{
-   return( CAAnimationValueMakeWithObject( gradient));
-}
 
 
 @interface CGGradient( CAInterpolatableValue) < CAInterpolatableValue>
 @end
 
 
-@interface CABasicAnimation( CGGradient)
+// sic! unused by CABasicAnimation+CGColor
+MULLE_CG_EXTERN_GLOBAL
+CGColor   CGColorInterpolate( CGColor start, CGColor end, double x);
 
-- (id) initWithProperty:(struct _mulle_objc_property *) property
-     startGradientValue:(CGGradient *) start
-       endGradientValue:(CGGradient *) end
-                options:(struct CABasicAnimationOptions *) options;
+MULLE_CG_EXTERN_GLOBAL
+CGColorDiff   CGColorInterpolateAdditive( CGColor start, CGColor end, double x);
 
-@end

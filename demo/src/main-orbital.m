@@ -152,7 +152,7 @@
    canvas    = [self canvas];
    fillColor = CGColorMakeWithRGBA( 0, 0, 0, _trail ? 0.1 : 1.0);
    vg        = CGContextGetNVGContext( context);
-   mvgFillRect( vg, canvas, fillColor);
+   mvgFillRectWithColor( vg, canvas, fillColor);
 
    nvgLineCap( vg, NVG_ROUND);
    for( orb in _orbs)

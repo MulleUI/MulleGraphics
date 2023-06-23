@@ -54,6 +54,7 @@ src/generic/import.h
 set( PUBLIC_HEADERS
 src/CABasicAnimation+CGColor.h
 src/CABasicAnimation+CGGradient.h
+src/CABasicAnimation+CGImage.h
 src/CACPUImageLayer.h
 src/CAGradientLayer.h
 src/CAImageLayer+Cursor.h

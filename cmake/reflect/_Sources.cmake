@@ -13,6 +13,7 @@ endif()
 set( SOURCES
 src/CABasicAnimation+CGColor.m
 src/CABasicAnimation+CGGradient.m
+src/CABasicAnimation+CGImage.m
 src/CACPUImageLayer.m
 src/CAGradientLayer.m
 src/CAImageLayer+Cursor.m

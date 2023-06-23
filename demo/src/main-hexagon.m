@@ -141,17 +141,17 @@ static void   drawBoxWithDropShadow( CGContext *context,
                                      CGFloat shadowBlur)
 {
    struct NVGcontext    *vg;
-   struct MulleShadow   shadow;
+   struct CGShadow   shadow;
    CGColor              innerColor;
 
    innerColor       = color;
    innerColor.a     = 0.15;
-   shadow           = MulleShadowMake( CGPointMake( 0, 0), shadowBlur, innerColor);
+   shadow           = CGShadowMake( CGPointMake( 0, 0), shadowBlur, innerColor);
    shadow.hole      = NO;
 
    vg = CGContextGetNVGContext( context);
    mvgFillRoundedShadow( vg, rect, cornerRadius, &shadow);
-   mvgFillRoundedRect( vg, rect, cornerRadius, color);
+   mvgFillRoundedRectWithColor( vg, rect, cornerRadius, color);
 }
 
 
@@ -247,7 +247,7 @@ static void   drawBoxWithDropShadow( CGContext *context,
       fillColor = CGColorMakeWithRGBA( 0, 0, 0, self->_tick == 1
                                                 ? 1.0
                                                 : opts.repaintAlpha);
-      mvgFillRect( vg, canvas, fillColor);
+      mvgFillRectWithColor( vg, canvas, fillColor);
 
       nvgGlobalCompositeOperation( vg, NVG_LIGHTER);
       nvgTranslate( vg, canvas.size.width / 2.0, canvas.size.height / 2.0);

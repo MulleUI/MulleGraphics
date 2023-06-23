@@ -54,7 +54,7 @@ struct ribbons_options
    struct NVGcontext  *vg;
 
    vg  = CGContextGetNVGContext( context);
-   mvgStrokeLine( vg, self->_origin, [self->_neighbor origin], self->_color);
+   mvgStrokeLineWithColor( vg, self->_origin, [self->_neighbor origin], 1.0, self->_color);
 }
 
 
@@ -136,7 +136,7 @@ struct ribbons_options
    canvas = [self canvas];
 
    fillColor = CGColorMakeWithRGBA( 0, 0, 0, 10.0 / 255.0);
-   mvgFillRect( vg, canvas, fillColor);
+   mvgFillRectWithColor( vg, canvas, fillColor);
 
    if( opts.maxTicks && _ticks > opts.maxTicks)
       return;

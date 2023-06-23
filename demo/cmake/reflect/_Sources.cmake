@@ -12,6 +12,8 @@ endif()
 #
 set( SOURCES
 src/main-animate-circles.m
+src/main-animate-gradient.m
+src/main-animate-image.m
 src/main-canvas-bounds-frame.m
 src/main-catextlayer.m
 src/main-checkerboard.m
@@ -21,8 +23,8 @@ src/main-image-part.m
 src/main-l-system.m
 src/main-opengllayer.m
 src/main-opengl-mix.m
+src/main-opengl-texture2.m
 src/main-opengl-texture.m
-src/main-opengl-texturepain.m
 src/main-orbital.m
 src/main-panned-canvas.m
 src/main-plasma-cpu.m

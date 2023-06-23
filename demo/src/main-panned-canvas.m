@@ -23,7 +23,8 @@
 //   |                    |
 //   '--------------------'
 //
-static UIMouseMotionEvent  *handleMouseMotionEvent( UIWindow *window, UIMouseMotionEvent *event)
+static UIMouseMotionEvent  *handleMouseMotionEvent( UIWindow *window,
+                                                    UIMouseMotionEvent *event)
 {
    CALayer         *layer;
    CGRect          bounds;
@@ -47,8 +48,10 @@ static UIMouseMotionEvent  *handleMouseMotionEvent( UIWindow *window, UIMouseMot
                                       range:NSMakeRange( 0, 1)];
    assert( n == 1);
    view  = views[ 0];
-   layer = (CALayer *) [view layer];
+   assert( view);
 
+   layer = (CALayer *) [view layer];
+   assert( layer);
    //
    // there we are, now use the mouse motion event to move the bounds
    // could be nicer...
@@ -58,6 +61,7 @@ static UIMouseMotionEvent  *handleMouseMotionEvent( UIWindow *window, UIMouseMot
    bounds.origin.x *= contentRect.size.width / bounds.size.width;
    bounds.origin.y *= contentRect.size.height / bounds.size.height;
    [layer setBounds:bounds];
+   [view setNeedsDisplay];
 
    return( event);  // don't consume event, even if motion
 }
@@ -73,19 +77,20 @@ static void  drawStuff( CALayer *layer, void *_context)
    struct NVGcontext   *vg;
 
    canvas       = [layer canvas];
-   canvasExtent = CGFloatMinimum( CGRectGetWidth( canvas),
-                                  CGRectGetHeight( canvas));
+   canvasExtent = CGSizeGetMinimum( canvas.size);
    strokeWidth  = 3.0;
    radius       = (canvasExtent - strokeWidth) / 2.0;
 
    vg = CGContextGetNVGContext( context);
-   nvgBeginPath( vg);
-   {
-      nvgCircle( vg, CGRectGetMidX( canvas), CGRectGetMidY( canvas), radius);
-      nvgStrokeColor( vg, CGColorMakeWithRGBA( 1.0, 0.0, 0.0, 1.0));
-      nvgStrokeWidth( vg, strokeWidth);
-   }
-   nvgStroke( vg);
+   mvgStrokeCircleWithColor( vg, CGRectGetCenterPoint( canvas), radius, strokeWidth, CGColorMakeRed());
+
+   [context useDefaultFont];
+   nvgTextColor( vg, CGColorMakeWhite(), CGColorMakeGray());
+   mvgTextInRect( vg, "Move mouse to pan",
+                      NULL,
+                      CGRectMake( 10, 10, 400, 32),
+                      CGContentModeScaleAspectFit,
+                      MVGTextAlignVisually);
 }
 
 

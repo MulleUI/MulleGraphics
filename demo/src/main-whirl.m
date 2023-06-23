@@ -74,7 +74,7 @@ struct whirls_options
    struct NVGcontext  *vg;
 
    vg  = CGContextGetNVGContext( context);
-   mvgStrokeLine( vg, self->_lastOrigin, self->_origin, self->_color);
+   mvgStrokeLineWithColor( vg, self->_lastOrigin, self->_origin, 1.0f, self->_color);
 }
 
 
