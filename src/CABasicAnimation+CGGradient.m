@@ -61,10 +61,14 @@
    float                      *start_locations;
    float                      end_location;
    float                      start_location;
-   NSInteger                  i;
-   NSInteger                  j;
+   float                      i_f;
+   float                      j_f;
+   float                      i_step_f;
+   float                      j_step_f;   
    NSUInteger                 count;
    NSUInteger                 endCount;
+   NSUInteger                 i;
+   NSUInteger                 j;
    NSUInteger                 k;
    NSUInteger                 n;
    NSUInteger                 startCount;
@@ -76,17 +80,11 @@
 
    startCount = [self numberOfColors];
    endCount   = [end numberOfColors];
-   count      = (NSUInteger) round( CAInterpolate( startCount, endCount, x));
-   i          = CAArrayIndexForInterpolation( startCount,
-                                              count,
-                                              CAAnimationStickyArrayCenter);
-   j          = CAArrayIndexForInterpolation( endCount,
-                                              count,
-                                              CAAnimationStickyArrayCenter);
+   count      = startCount > endCount ? startCount : endCount;
 
-   // lets get at least two colors if available
-   if( count < 2 && (startCount >= 2 || endCount >= 2))
-      count = 2;
+   // interpolate from nil to nil, must not happen (just don't run an
+   // animation for that)
+   assert( count);
 
    n = startCount + endCount + count;
    mulle_flexarray_do( colors_buf, union CGColorOrColorDiff, 12, n)
@@ -109,42 +107,34 @@
          [self getLocations:start_locations];
          [end getLocations:end_locations];
 
+         i_f     = 0.0f; 
+         j_f     = 0.0f;
+         i_step_f = (double) startCount / count;
+         j_step_f = (double) endCount / count;
+
          for( k = 0; k < count; k++)
          {
-            i_inside          = (i >= 0 && i < startCount);
-            if( i_inside)
+            i = (NSUInteger) roundf( i_f);
+            j = (NSUInteger) roundf( j_f);
+
+            if( startCount)
             {
-               start_color    = (start_colors++)->color;
-               start_location = *start_locations++;
+               start_color    = start_colors[ i].color;
+               start_location = start_locations[ i];
             }
             else
             {
-               start_location = (i < 0) ? 0.0f : 1.0f;
-               if( startCount)
-               {
-                  p           = (CGColor *) &colors_buf[ 0];  
-                  start_color = (k <= count / 2.0) ? *p : p[ startCount -1];
-               }
-               else
-                  start_color = CGColorMakeTransparent();
+               start_color = CGColorMakeTransparent();
             }
 
-            j_inside          = (j >= 0 && j < endCount);
-            if( j_inside)   
+            if( endCount)   
             {
-               end_color      = (end_colors++)->color;
-               end_location   = *end_locations++;
+               end_color    = end_colors[ j].color;
+               end_location = end_locations[ j];
             }
             else
             {
-               end_location   = (j < 0) ? 0.0f : 1.0f;
-               if( endCount)
-               {
-                  p           = (CGColor *) &colors_buf[ startCount];  // &end_colors[ 0]
-                  end_color   = (k <= count / 2.0) ? *p : p[ endCount -1];
-               }
-               else
-                  end_color   = CGColorMakeTransparent();
+               end_color = CGColorMakeTransparent();
             }
 
             if( additive)
@@ -159,10 +149,10 @@
                dst_colors++;
                *dst_locations++  = CAInterpolate( start_location, end_location, x);
             }
-            i++;
-            j++;
-         }
 
+            i_f += i_step_f;
+            j_f += j_step_f;
+         }
 
          startAngle = [self angle];
          endAngle   = [end angle];
