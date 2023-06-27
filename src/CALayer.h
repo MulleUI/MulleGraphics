@@ -5,7 +5,7 @@
 @class CAAnimation;
 @class CAAnimationStorage;
 @class CALayer;
-
+@class CGPaint;
 
 
 //
@@ -86,8 +86,8 @@ typedef void  CALayerDrawCallback_t( CALayer *layer, void *ctxt);
 @property( observable) CGFloat         cornerRadius;
 @property( observable) CGFloat         borderWidth;
 @property( observable) CGFloat         opacity;
-@property( observable) CGColor         borderColor;
-@property( observable) CGColor         backgroundColor;
+@property( observable, copy) CGPaint   *borderPaint;
+@property( observable, copy) CGPaint   *backgroundPaint;
 @property( observable) CGPoint         pixelCenter;
 @property( observable) BOOL            masksToBounds;
 
@@ -136,6 +136,10 @@ typedef void  CALayerDrawCallback_t( CALayer *layer, void *ctxt);
 
 // returns 0 by default, only used for convenience window creation
 - (NSUInteger) windowStyleMaskBits;
+
+
+- (void) setBorderColor:(CGColor) color;
+- (void) setBackgroundColor:(CGColor) color;
 
 @end
 

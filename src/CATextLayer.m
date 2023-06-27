@@ -848,9 +848,7 @@ NSUInteger   MulleNVGglyphPositionSearch( NVGglyphPosition *glyphs,
        * Draw Text
        * Bug: textBackgroundColor should be selection color if selected
        */
-      textBackgroundColor = [self backgroundColor];
-      if( CGColorGetAlpha( textBackgroundColor) < 1.0)
-         textBackgroundColor = [self textBackgroundColor];
+      textBackgroundColor = [self textBackgroundColor];
       nvgTextColor( vg, [self textColor], textBackgroundColor); // TODO: use textColor
 
       nvgText( vg, canvas.origin.x + _origin.x,

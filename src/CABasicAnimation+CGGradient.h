@@ -43,11 +43,3 @@
 @interface CGGradient( CAInterpolatableValue) < CAInterpolatableValue>
 @end
 
-
-// sic! unused by CABasicAnimation+CGColor
-MULLE_CG_EXTERN_GLOBAL
-CGColor   CGColorInterpolate( CGColor start, CGColor end, double x);
-
-MULLE_CG_EXTERN_GLOBAL
-CGColorDiff   CGColorInterpolateAdditive( CGColor start, CGColor end, double x);
-

@@ -20,6 +20,7 @@ src/main-checkerboard.m
 src/main-hexagon.m
 src/main-image.m
 src/main-image-part.m
+src/main-layer-border-background.m
 src/main-l-system.m
 src/main-opengllayer.m
 src/main-opengl-mix.m

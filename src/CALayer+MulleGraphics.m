@@ -58,14 +58,14 @@
 
 - (BOOL) drawsBackgroundWithAlpha:(CGFloat) alpha
 {
-   return( ! CGAlphaIsTransparent( CGColorGetAlpha( _backgroundColor) * alpha));
+   return( ! CGAlphaIsTransparent( [_backgroundPaint alpha] * alpha));
 }
 
 
 - (void) drawBackgroundInContext:(CGContext *) context
 {
    [self fillBackgroundInContext:context
-                           paint:[CGPaint paintWithColor:_backgroundColor]];
+                           paint:_backgroundPaint];
 }
 
 
@@ -87,6 +87,7 @@
    CGFloat     halfBorderWidth;
    CGPoint     tl;
    CGPoint     br;
+   CGRect      rect;
 
    //
    // the strokeWidth isn't scaled in nvg, so we do this now ourselves
@@ -114,15 +115,8 @@
    // the _cornerRadius is computed for a stroke of width 1 (or 0 ?)
    // the strokeWidth is just scaling it out
    //
-   nvgBeginPath( vg);
-   nvgRoundedRect( vg, tl.x,
-                       tl.y,
-                       br.x - tl.x,
-                       br.y - tl.y,
-                       _cornerRadius);
-   nvgStrokeWidth( vg, (int) _borderWidth);
-   nvgStrokeColor( vg, _borderColor);
-   nvgStroke( vg);
+   rect = CGRectMake( tl.x, tl.y, br.x - tl.x, br.y - tl.y);
+   mvgStrokeRoundedRectWithPaint( vg, rect, _cornerRadius, _borderWidth, _borderPaint);
 
 //      nvgMoveTo( vg, tl.x, tl.y);
 //      nvgLineTo( vg, br.x, tl.y);
@@ -264,7 +258,7 @@
    //
    // we want to draw the border on top
    //
-   if( ! CGAlphaIsTransparent( CGColorGetAlpha( _borderColor) * alpha))
+   if( ! CGAlphaIsTransparent( [_borderPaint alpha] * alpha))
    {
       // "just" setup the context again, to recover the "frame" transform
       vg = [self setupContext:context
@@ -280,5 +274,6 @@
 {
    return( [self canvas].size);
 }
+
 
 @end

@@ -37,52 +37,6 @@
 #import "import-private.h"
 
 
-
-union CGColorOrColorDiff
-{
-   CGColor       color;
-   CGColorDiff   diff;
-};
-
-#define CGColorOrColorDiffZero    ((CGColorOrColorDiff) { 0 })
-
-
-CGColor   CGColorInterpolate( CGColor start, CGColor end, double x)
-{
-   struct CAAnimationFloat4   startHSBA;
-   struct CAAnimationFloat4   endHSBA;
-
-   MULLE_C_ASSERT( sizeof( float) == sizeof( CGFloat));
-
-   CGColorGetHSBAComponents( start, startHSBA.v);
-   CGColorGetHSBAComponents( end, endHSBA.v);
-
-   CAAnimationFloat4ModifyHSBAColors( &startHSBA, &endHSBA);
-   return( CGColorMakeWithInterpolatedHSBAComponents( startHSBA.v, endHSBA.v, x));
-}
-
-
-CGColorDiff   CGColorInterpolateAdditive( CGColor start, CGColor end, double x)
-{
-   struct CAAnimationFloat4   startHSBA;
-   struct CAAnimationFloat4   endHSBA;
-   CGColorDiff                diff;
-
-   CGColorGetHSBAComponents( start, startHSBA.v);
-   CGColorGetHSBAComponents( end, endHSBA.v);
-
-   CAAnimationFloat4ModifyHSBAColors( &startHSBA,
-                                      &endHSBA);
-
-   diff.v[ 0] = CAInterpolateAdditive( startHSBA.v[ 0], endHSBA.v[ 0], x);
-   diff.v[ 1] = CAInterpolateAdditive( startHSBA.v[ 1], endHSBA.v[ 1], x);
-   diff.v[ 2] = CAInterpolateAdditive( startHSBA.v[ 2], endHSBA.v[ 2], x);
-   diff.v[ 3] = CAInterpolateAdditive( startHSBA.v[ 3], endHSBA.v[ 3], x);
-
-   return( diff);
-}
-
-
 @implementation CGGradient( CAInterpolatableValue)
 
 
@@ -99,6 +53,7 @@ CGColorDiff   CGColorInterpolateAdditive( CGColor start, CGColor end, double x)
    CGColor                    *interpolated_colors;
    CGColor                    end_color;
    CGColor                    start_color;
+   CGColor                    *p;
    CGGradient                 *gradient;
    float                      *dst_locations;
    float                      *end_locations;
@@ -129,6 +84,10 @@ CGColorDiff   CGColorInterpolateAdditive( CGColor start, CGColor end, double x)
                                               count,
                                               CAAnimationStickyArrayCenter);
 
+   // lets get at least two colors if available
+   if( count < 2 && (startCount >= 2 || endCount >= 2))
+      count = 2;
+
    n = startCount + endCount + count;
    mulle_flexarray_do( colors_buf, union CGColorOrColorDiff, 12, n)
    {
@@ -152,14 +111,41 @@ CGColorDiff   CGColorInterpolateAdditive( CGColor start, CGColor end, double x)
 
          for( k = 0; k < count; k++)
          {
-            i_inside       = (i >= 0 && i < startCount);
-            j_inside       = (j >= 0 && j < endCount);
+            i_inside          = (i >= 0 && i < startCount);
+            if( i_inside)
+            {
+               start_color    = (start_colors++)->color;
+               start_location = *start_locations++;
+            }
+            else
+            {
+               start_location = (i < 0) ? 0.0f : 1.0f;
+               if( startCount)
+               {
+                  p           = (CGColor *) &colors_buf[ 0];  
+                  start_color = (k <= count / 2.0) ? *p : p[ startCount -1];
+               }
+               else
+                  start_color = CGColorMakeTransparent();
+            }
 
-            start_color    = i_inside ? (start_colors++)->color : CGColorMakeBlack();
-            start_location = i_inside ? *start_locations++      : (i < 0) ? 0.0f : 1.0f;
-
-            end_color      = j_inside ? (end_colors++)->color   : CGColorMakeBlack();
-            end_location   = j_inside ? *end_locations++        : (j < 0) ? 0.0f : 1.0f;
+            j_inside          = (j >= 0 && j < endCount);
+            if( j_inside)   
+            {
+               end_color      = (end_colors++)->color;
+               end_location   = *end_locations++;
+            }
+            else
+            {
+               end_location   = (j < 0) ? 0.0f : 1.0f;
+               if( endCount)
+               {
+                  p           = (CGColor *) &colors_buf[ startCount];  // &end_colors[ 0]
+                  end_color   = (k <= count / 2.0) ? *p : p[ endCount -1];
+               }
+               else
+                  end_color   = CGColorMakeTransparent();
+            }
 
             if( additive)
             {
@@ -171,7 +157,7 @@ CGColorDiff   CGColorInterpolateAdditive( CGColor start, CGColor end, double x)
             {
                dst_colors->color = CGColorInterpolate( start_color, end_color, x);
                dst_colors++;
-               *dst_locations++ = CAInterpolate( start_location, end_location, x);
+               *dst_locations++  = CAInterpolate( start_location, end_location, x);
             }
             i++;
             j++;

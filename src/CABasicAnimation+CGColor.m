@@ -17,39 +17,6 @@
 
 @implementation CABasicAnimation( CGColor)
 
-
-CGColor   CGColorMakeWithInterpolatedHSBAComponents( float hsba_start[ 4],
-                                                    float hsba_end[ 4],
-                                                    double x)
-{
-   float   hsba[ 4];
-
-   assert( x >= 0 && x <= 1.0);
-
-   hsba[ 0] = CAInterpolate( hsba_start[ 0], hsba_end[ 0], x);
-   hsba[ 1] = CAInterpolate( hsba_start[ 1], hsba_end[ 1], x);
-   hsba[ 2] = CAInterpolate( hsba_start[ 2], hsba_end[ 2], x);
-   hsba[ 3] = CAInterpolate( hsba_start[ 3], hsba_end[ 3], x);
-
-   return( CGColorMakeWithHSBA( hsba[ 0], hsba[ 1], hsba[ 2], hsba[ 3]));
-}
-
-
-CGColor   CGColorAddDiff( CGColor color, CGColorDiff diff)
-{
-   float   hsba[ 4];
-
-   CGColorGetHSBAComponents( color, hsba);
-
-   hsba[ 0] += diff.v[ 0];
-   hsba[ 1] += diff.v[ 1];
-   hsba[ 2] += diff.v[ 2];
-   hsba[ 3] += diff.v[ 3];
-
-   return( CGColorMakeWithHSBAComponents( hsba));
-}
-
-
 static void   CABasicAnimationSetInterpolatedColor( CABasicAnimation *self,
                                                     id object,
                                                     double x)
@@ -229,8 +196,8 @@ static struct CABasicAnimationTypeDefinition  CGColorAnimationType =
    range.start = CAAnimationValueMakeWithCGColor( start);
    range.end   = CAAnimationValueMakeWithCGColor( end);
 
-   CAAnimationFloat4ModifyHSBAColors( &range.start.float4Value,
-                                      &range.end.float4Value);
+   CGHSBAComponentsPrepareForInterpolation( range.start.float4Value.v,
+                                            range.end.float4Value.v);
 
    return( [self initWithProperty:property
                         valueType:CAAnimationValueCGColor

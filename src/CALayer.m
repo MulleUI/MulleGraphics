@@ -28,7 +28,7 @@
 
    // by default only track bounds
    _frameTracking     = CALayerBoundsSizeTracksFrameSize;
-   _opacity           = 1.0;
+   _opacity           = 1.0; // not just background!
    _alpha             = 1.0;
    _transform         = CGAffineTransformMakeIdentity();
    _masksToBounds     = YES;
@@ -69,7 +69,10 @@
    clone = [super copy];
 
    memset( &clone->_animationStorage, 0, sizeof( _animationStorage));
+
    clone->_debugNameUTF8String = NULL;
+   clone->_backgroundPaint     = [clone->_backgroundPaint copy];
+   clone->_borderPaint         = [clone->_borderPaint copy];
 
    return( clone);
 }
@@ -93,8 +96,8 @@ static inline CGRect   getBounds( CALayer *self)
 
    bounds.origin = self->_bounds.origin;
    bounds.size   = self->_bounds.size.width == INFINITY
-                     ? self->_frame.size
-                     : self->_bounds.size;
+                   ? self->_frame.size
+                   : self->_bounds.size;
    return( bounds);
 }
 
@@ -126,8 +129,8 @@ static inline CGRect   getCanvas( CALayer *self)
 
    canvas.origin = self->_canvas.origin;
    canvas.size   = self->_canvas.size.width == INFINITY
-                     ? self->_frame.size
-                     : self->_canvas.size;
+                   ? self->_frame.size
+                   : self->_canvas.size;
    return( canvas);
 }
 
@@ -185,6 +188,18 @@ static inline CGRect   getCanvas( CALayer *self)
 - (NSUInteger) windowStyleMaskBits
 {
    return( 0);
+}
+
+
+- (void) setBorderColor:(CGColor) color
+{
+   [self setBorderPaint:[CGPaint paintWithColor:color]];
+}
+
+
+- (void) setBackgroundColor:(CGColor) color
+{
+   [self setBackgroundPaint:[CGPaint paintWithColor:color]];
 }
 
 @end
