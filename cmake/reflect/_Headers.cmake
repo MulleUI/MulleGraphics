@@ -52,6 +52,7 @@ src/generic/import.h
 # contents selected with patternfile ??-header--public-headers
 #
 set( PUBLIC_HEADERS
+src/CAAnimation+CGPaint.h
 src/CABasicAnimation+CGColor.h
 src/CABasicAnimation+CGGradient.h
 src/CABasicAnimation+CGImage.h
@@ -62,6 +63,7 @@ src/CAImageLayer.h
 src/CALayer+MulleGraphics.h
 src/CALayer.h
 src/CAOpenGLLayer.h
+src/CAShadowLayer.h
 src/CAShapeLayer.h
 src/CATextLayer+Cursor.h
 src/CATextLayer+Selection.h

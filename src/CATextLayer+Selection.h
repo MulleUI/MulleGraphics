@@ -19,7 +19,8 @@
  */
 @interface CATextLayer( Selection)
 
-- (void) drawSelectionWithNVGContext:(NVGcontext *) vg
+// NO: no selection was drawn
+- (BOOL) drawSelectionWithNVGContext:(NVGcontext *) vg
                            textRange:(NSRange) textRange
                                  row:(NSUInteger) i;
 

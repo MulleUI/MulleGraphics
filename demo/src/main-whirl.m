@@ -63,32 +63,33 @@ struct whirls_options
    self->_origin.x   = x;
    self->_origin.y   = y;
    self->_lastOrigin = self->_origin;
-   self->_color      = CGColorMakeWithHSLA( CAAngleDegreesToUnity( hue), 1.0, 0.5, 0.0);
+   self->_color      = CGColorMakeWithHSLA( fabs( CADegreesToRotation( hue)), 1.0, 0.5, 0.0);
 
    return( self);
 }
 
 
-- (void) drawInContext:(CGContext *) context
+- (BOOL) drawInContext:(CGContext *) context
 {
    struct NVGcontext  *vg;
 
    vg  = CGContextGetNVGContext( context);
    mvgStrokeLineWithColor( vg, self->_lastOrigin, self->_origin, 1.0f, self->_color);
+   return( YES);
 }
 
 
 - (void) updateWithZoff:(CGFloat) zoff
 {
-   CGFloat   angle;
+   CGFloat   radians;
 
-   angle = M_PI_f * 6 * getNoise( self->_origin.x / opts.base  * 1.75,
-                                  self->_origin.y / opts.base  * 1.75,
-                                  zoff);
+   radians = M_PI_f * 6 * getNoise( self->_origin.x / opts.base  * 1.75,
+                                    self->_origin.y / opts.base  * 1.75,
+                                    zoff);
 
    self->_lastOrigin = self->_origin;
-   self->_origin.x  += cosf(angle) * opts.step;
-   self->_origin.y  += sinf(angle) * opts.step;
+   self->_origin.x  += cosf( radians) * opts.step;
+   self->_origin.y  += sinf( radians) * opts.step;
 
    if( self->_color.a < 1)
       self->_color.a += 0.003;
@@ -152,7 +153,7 @@ struct whirls_options
 }
 
 
-- (void) drawInContext:(CGContext *) context
+- (BOOL) drawInContext:(CGContext *) context
 {
    CGColor      fillColor;
    CGRect       canvas;
@@ -173,6 +174,7 @@ struct whirls_options
 
    _hueBase += 0.1;
    _zoff    += opts.zInc;
+   return( YES);
 }
 
 
@@ -206,12 +208,12 @@ int   main( int argc, char *argv[])
       [window setBackgroundColor:CGColorMakeWithHexColor( opts.backgroundColor)]; // this avoids the window contents being cleared
       [window setOpaque:YES]; // this avoids the window contents being cleared
 
-      contentPlane = [window contentPlane];
+      contentPlane = [window contentView];
       contentRect  = [contentPlane contentRect];
       frame        = contentRect;
       layer        = [WhirlLayer layerWithFrame:frame];
       view         = [UIView viewWithLayer:layer];
-      [view setAutoresizingMask:UIViewAutoresizingFlexible];
+      [view setAutoresizingMask:UIViewAutoresizingScaleToFill];
       [contentPlane addSubview:view];
 
       [app addWindow:window];

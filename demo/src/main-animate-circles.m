@@ -28,7 +28,7 @@
 @end
 
 
-static void   drawStuff( CALayer *aLayer, void *_context)
+static BOOL   drawStuff( CALayer *aLayer, void *_context)
 {
    CGContext           *context = _context;
    CircleLayer         *layer = (CircleLayer *) aLayer;
@@ -59,6 +59,8 @@ static void   drawStuff( CALayer *aLayer, void *_context)
       nvgStrokeWidth( vg, 3.5);
    }
    nvgStroke( vg);
+
+   return( YES);
 }
 
 
@@ -93,7 +95,7 @@ void   setupSceneAndAnimation( UIWindow *window)
    UIEdgeInsets   insets;
    CircleLayer    *layer;
 
-   frame  = [[window contentPlane] contentRect];
+   frame  = [[window contentView] contentRect];
    insets = UIEdgeInsetsMake( 8, 8, 8, 8);
    frame  = UIEdgeInsetsInsetRect( frame, insets);
 
@@ -102,7 +104,7 @@ void   setupSceneAndAnimation( UIWindow *window)
    [layer setDrawCallback:drawStuff];
 
    view  = [UIView viewWithLayer:layer];
-   [[window contentPlane] addSubview:view];
+   [[window contentView] addSubview:view];
 
    // UIView -> CAAnimation
    setupAnimation( window, layer);

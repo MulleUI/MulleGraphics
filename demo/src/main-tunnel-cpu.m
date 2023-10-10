@@ -177,10 +177,10 @@ int   main( int argc, char *argv[])
    window = [UIWindow windowWithFrame:CGRectMake( 0.0f, 0.0f, 640.0f, 400.0f)];
    [window setBackgroundColor:CGColorMakeWithRGBA( 0.0, 0.0, 0.0, 1.0)];
    {
-      contentPlane = [window contentPlane];
+      contentPlane = [window contentView];
 
       tunnelView  = [TunnelView viewWithFrame:CGRectZero];
-      [tunnelView setAutoresizingMask:UIViewAutoresizingFlexibleWidth|UIViewAutoresizingFlexibleHeight];
+      [tunnelView setAutoresizingMask:UIViewAutoresizingScaleToFill];
       [tunnelView setBackgroundColor:[UIColor darkGrayColor]];
       [tunnelView setBorderColor:[UIColor whiteColor]];
       [tunnelView setBorderWidth:6.0];

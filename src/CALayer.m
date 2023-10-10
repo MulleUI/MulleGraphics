@@ -9,14 +9,13 @@
 
 @implementation CALayer
 
-
 + (instancetype) layerWithFrame:(CGRect) frame
 {
    return( [[[self alloc] initWithFrame:frame] autorelease]);
 }
 
 
-- (id) init
+- (instancetype) init
 {
    self = [super init];
    if( ! self)
@@ -27,14 +26,27 @@
    _clipRect.size.width = INFINITY; // means no clipRect
 
    // by default only track bounds
-   _frameTracking     = CALayerBoundsSizeTracksFrameSize;
-   _opacity           = 1.0; // not just background!
-   _alpha             = 1.0;
-   _transform         = CGAffineTransformMakeIdentity();
-   _masksToBounds     = YES;
+   _frameTracking       = CALayerBoundsSizeTracksFrameSize;
+   _opacity             = 1.0; // not just background!
+   _alpha               = 1.0;
+   _transform           = CGAffineTransformMakeIdentity();
+   _masksToBounds       = YES;
 
     //_pixelCenter     = CGPointMake( 0.5, 0.5);
    return( self);
+}
+
+
+- (void) setCornerRadius:(CGFloat) r
+{
+   _cornerInsets = MulleCornerInsetsMakeWithCornerRadius( r);
+}
+
+
+- (CGFloat) cornerRadius
+{
+   return( fmaxf( fmaxf( _cornerInsets.topLeft, _cornerInsets.topRight),
+                  fmaxf( _cornerInsets.bottomLeft, _cornerInsets.bottomRight)));
 }
 
 
@@ -71,9 +83,7 @@
    memset( &clone->_animationStorage, 0, sizeof( _animationStorage));
 
    clone->_debugNameUTF8String = NULL;
-   clone->_backgroundPaint     = [clone->_backgroundPaint copy];
-   clone->_borderPaint         = [clone->_borderPaint copy];
-
+   
    return( clone);
 }
 
@@ -182,12 +192,6 @@ static inline CGRect   getCanvas( CALayer *self)
    result  = mulle_malloc( len);
    sprintf( result, format, s, buf, _debugNameUTF8String);
    return( MulleObjCAutoreleaseAllocation( result, NULL));
-}
-
-
-- (NSUInteger) windowStyleMaskBits
-{
-   return( 0);
 }
 
 

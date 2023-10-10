@@ -227,16 +227,16 @@ int   main( int argc, char *argv[])
    window = [UIWindow windowWithFrame:CGRectMake( 0.0f, 0.0f, 640.0f, 400.0f)];
    [window setBackgroundColor:CGColorMakeWithRGBA( 0.0, 0.0, 0.0, 1.0)];
    {
-      contentPlane = [window contentPlane];
+      contentPlane = [window contentView];
 
       plasmaView = setupPlasmaView( window, [UIColor darkGrayColor]);
       [plasmaView setMargins:UIEdgeInsetsMake( 40, 40, 40, 40)];
-      [plasmaView setAutoresizingMask:UIViewAutoresizingFlexibleWidth|UIViewAutoresizingFlexibleHeight];
+      [plasmaView setAutoresizingMask:UIViewAutoresizingScaleToFill];
       [contentPlane addSubview:plasmaView];
 
       plasmaView = setupPlasmaView( window, [UIColor darkGrayColor]);
       [plasmaView setMargins:UIEdgeInsetsMake( 120, 120, 120, 220)];
-      [plasmaView setAutoresizingMask:UIViewAutoresizingFlexibleWidth|UIViewAutoresizingFlexibleHeight];
+      [plasmaView setAutoresizingMask:UIViewAutoresizingScaleToFill];
       [contentPlane addSubview:plasmaView];
    }
 

@@ -3,7 +3,7 @@
 #include <unistd.h>
 
 
-static void   drawStuff( CALayer *layer, void *_context)
+static BOOL   drawStuff( CALayer *layer, void *_context)
 {
    CGContext          *context = _context;
    static CGImage     *image;
@@ -17,10 +17,13 @@ static void   drawStuff( CALayer *layer, void *_context)
    if( ! image)
    {
       image    = [[[CGImage alloc] initWithContentsOfFileCString:"tardbeaver.png"
-                                                     imageFlags:0 //NVG_IMAGE_REPEATX|NVG_IMAGE_REPEATY
+                                                   textureFlags:0 //NVG_IMAGE_REPEATX|NVG_IMAGE_REPEATY
                                                         context:context] autorelease];
       if( ! image)
+      {
+         fprintf( stderr, "could not load tardbeaver.png\n");
          _exit( 1);
+      }
    }
 
    imageSize   = [image size];
@@ -34,19 +37,20 @@ static void   drawStuff( CALayer *layer, void *_context)
           fromRect:patternRect
            options:NULL
            context:context];
+   return( YES);
 }
 
 
 
 static void   setupSceneInWindow( UIWindow *window)
 {
-   CGRect          frame;
-   UIView          *view;
-   UIWindowPlane   *contentPlane;
+   CGRect   frame;
+   UIView   *view;
+   UIView   *contentView;
 
-   contentPlane = [window contentPlane];
-   frame        = [contentPlane contentRect];
-   frame        = UIEdgeInsetsInsetRect( frame, UIEdgeInsetsMake( 10, 10, 10, 10));
+   contentView = [window contentView];
+   frame       = [contentView contentRect];
+   frame       = UIEdgeInsetsInsetRect( frame, UIEdgeInsetsMake( 10, 10, 10, 10));
 
    // this works in one-window scenarios well, where there is only one
    // context.
@@ -54,7 +58,7 @@ static void   setupSceneInWindow( UIWindow *window)
    [(CALayer *) [view layer] setDrawCallback:drawStuff];
    [(CALayer *) [view layer] setBackgroundColor:CGColorMakeWithRGBA( 0.33, 0.33, 0.33, 1.0)];
 
-   [contentPlane addSubview:view];
+   [contentView addSubview:view];
 }
 
 

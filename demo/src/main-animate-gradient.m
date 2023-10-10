@@ -26,7 +26,7 @@
 
    _paint       = [[CGGradient alloc] initWithStartColor:START_COLOR
                                                 endColor:END_COLOR
-                                                   angle:-M_PI_f];  
+                                                rotation:0.5];
    _strokeWidth = 100.0;
 
    return( self);
@@ -43,16 +43,17 @@
    return( radius);   
 }
 
-- (void) drawInContext:(CGContext *) context
+- (BOOL) drawInContext:(CGContext *) context
 {
    struct NVGcontext   *vg;
 
    vg = CGContextGetNVGContext( context);
    mvgSave( vg);
    {
-      mvgStrokeCircleWithPaint( vg, CGRectGetCenterPoint( [self canvas]), [self radius], _strokeWidth, [self paint]);
+      mvgStrokeCircleWithPaint( vg, CACircleMake( CGRectGetCenterPoint( [self canvas]), [self radius]), _strokeWidth, [self paint]);
    }
    mvgRestore( vg);
+   return( YES);
 }
 
 
@@ -74,7 +75,7 @@
 
 @implementation RadialCircleLayer 
 
-- (void) drawInContext:(CGContext *) context
+- (BOOL) drawInContext:(CGContext *) context
 {
    struct NVGcontext   *vg;
 
@@ -82,12 +83,13 @@
    mvgSave( vg);
    {
       mvgStrokeCircleWithGradient( vg, 
-                                   CGRectGetCenterPoint( [self canvas]), 
-                                   [self radius], 
+                                   CACircleMake( CGRectGetCenterPoint( [self canvas]),
+                                                 [self radius]),
                                    _strokeWidth, 
                                    (CGGradient *) [self paint]);
    }
    mvgRestore( vg);
+   return( YES);
 }
 
 @end 
@@ -129,7 +131,7 @@ void   setupSceneAndAnimation( UIWindow *window)
    CGGradient           *gradient2;
    UIWindowPlane        *contentPlane;
 
-   contentPlane = [window contentPlane];
+   contentPlane = [window contentView];
 
    frame  = [contentPlane contentRect];
 
@@ -151,8 +153,7 @@ void   setupSceneAndAnimation( UIWindow *window)
 
    // UIView -> CAAnimation
    gradient = [CGGradient gradientWithStartColor:START_COLOR
-                                        endColor:END_COLOR
-                                          angle:+M_PI_f];
+                                        endColor:END_COLOR];
    setupAnimation( window, layer, gradient, NO);
    gradient2 = [CGGradient gradientWithStartColor:END_COLOR
                                          endColor:START_COLOR];

@@ -191,7 +191,7 @@ static inline float fabstrunc(float f){
 }
 
 
-- (void) drawOpenGLWithContext:(CGContext *) context
+- (void) drawOpenGLInContext:(CGContext *) context
 {
    int     i, j;
    float   rgb[3];
@@ -339,21 +339,21 @@ static PlasmaView   *setupPlasmaView( UIWindow *window, CGColor color)
 
 void   setupScene( UIWindow *window)
 {
-   PlasmaView      *plasmaView;
-   UIWindowPlane   *contentPlane;
+   PlasmaView   *plasmaView;
+   UIView       *contentView;
 
-   contentPlane = [window contentPlane];
+   contentView = [window contentView];
 
    plasmaView = setupPlasmaView( window, [UIColor whiteColor]);
    [plasmaView setMargins:UIEdgeInsetsMake( 40, 40, 40, 40)];
-   [plasmaView setAutoresizingMask:UIViewAutoresizingFlexibleWidth|UIViewAutoresizingFlexibleHeight];
-   [contentPlane addSubview:plasmaView];
+   [plasmaView setAutoresizingMask:UIViewAutoresizingScaleToFill];
+   [contentView addSubview:plasmaView];
 
    plasmaView = setupPlasmaView( window, [UIColor blackColor]);
    [plasmaView setMargins:UIEdgeInsetsMake( 120, 120, 120, 220)];
-   [plasmaView setAutoresizingMask:UIViewAutoresizingFlexibleWidth|UIViewAutoresizingFlexibleHeight];
+   [plasmaView setAutoresizingMask:UIViewAutoresizingScaleToFill];
    [plasmaView setZoom:5];  // gets forwarded to mainLayer
-   [contentPlane addSubview:plasmaView];
+   [contentView addSubview:plasmaView];
 }
 
 
@@ -367,7 +367,7 @@ int   main( int argc, char *argv[])
    app    = [UIApplication sharedInstance];
    window = [UIWindow windowWithFrame:CGRectMake( 0.0f, 0.0f, 640.0f, 400.0f)
                       titleUTF8String:"Demo"
-                            styleMask:UIWindowOpenGLDeprecated];
+                            styleMask:UIWindowStyleMaskDefault|UIWindowOpenGLDeprecated];
    [window setBackgroundColor:CGColorMakeWithRGBA( 0.0, 0.0, 0.0, 1.0)];
    [window setFrameRateHz:120.0];
 

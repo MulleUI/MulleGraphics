@@ -45,19 +45,17 @@ static void  drawStuff( CALayer *layer, void *_context)
    CGFloat             frameExtent;
 
    canvas       = [layer canvas];
-   canvasExtent = CGFloatMinimum( CGRectGetWidth( canvas),
-                                  CGRectGetHeight( canvas));
+   canvasExtent = CGRectGetMinimumSize( canvas);
    frame        = [layer frame];
-   frameExtent  = CGFloatMinimum( CGRectGetWidth( frame),
-                                  CGRectGetHeight( frame));
+   frameExtent  = CGRectGetMinimumSize( frame);
    strokeWidth  = canvasExtent / frameExtent;
 
    radius       = (canvasExtent - strokeWidth) / 2.0;
 
    vg = CGContextGetNVGContext( context);
    mvgStrokeCircleWithColor( vg,
-                             CGRectGetCenterPoint( canvas),
-                             radius,
+                             CACircleMake( CGRectGetCenterPoint( canvas),
+                                           radius),
                              strokeWidth,
                              CGColorMakeRed());
 }
@@ -115,7 +113,7 @@ int   main( int argc, char *argv[])
 
       window = [UIWindow windowWithView:view
                         titleUTF8String:NULL];
-      [window setBackgroundColor:CGColorMakeWithRGBA( 1.0, 1.0, 1.0, 1.0)];
+      [window setBackgroundColor:CGColorMakeWhite()];
       [app addWindow:window];
    }
    return( [app run]);

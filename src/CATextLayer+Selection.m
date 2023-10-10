@@ -10,7 +10,7 @@
 
 @implementation CATextLayer ( Selection)
 
-- (void) drawSelectionWithNVGContext:(NVGcontext *) vg
+- (BOOL) drawSelectionWithNVGContext:(NVGcontext *) vg
                            textRange:(NSRange) textRange
                                  row:(NSUInteger) i
 {
@@ -22,7 +22,7 @@
 
    selectionRange = NSIntersectionRange( textRange, _selection);
    if( ! selectionRange.length)
-      return;
+      return( NO);
 
    canvas = [self canvas];
 
@@ -36,14 +36,15 @@
       abort();  // can't happen or ?
 
    rect.origin.x    = canvas.origin.x + _origin.x + p->glyphs[ x].x;
-   rect.origin.y    = canvas.origin.y + _origin.y + (i * _lineh) - _ascender; // / 2.0;
+   rect.origin.y    = canvas.origin.y + _origin.y + (i * _metrics.lineHeight) - _metrics.ascender; // / 2.0;
    rect.size.width  = p->glyphs[ x + selectionRange.length].x - p->glyphs[ x].x;
-   rect.size.height = _lineh;
+   rect.size.height = _metrics.lineHeight;
 
-   nvgFillColor( vg, _selectionColor);
-   nvgBeginPath( vg);
-   nvgRect( vg, rect.origin.x, rect.origin.y, rect.size.width, rect.size.height);
-   nvgFill( vg);
+   if( rect.size.width < 0.1)
+      return( NO);
+
+   mvgFillRectWithPaint( vg, rect, _selectionPaint);
+
 
    // Der nvgTextBounds code ist zum einen langsamer, zum anderen (wegen)
    // Kerning ? ist die Selektion auch nicht sonderlich stabil.
@@ -127,6 +128,7 @@
       }
    }
 #endif
+   return( YES);
 }
 
 

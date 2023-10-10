@@ -45,34 +45,34 @@
               factor:(double) x
             additive:(BOOL) additive
 {
-   CAAngleRadians   startAngle;
-   CAAngleRadians   endAngle;
-   CAAngleRadians   dstAngle;
-   CGFloat          startBlend;
-   CGFloat          endBlend;
-   CGFloat          dstBlend;
-   CGImagePaint     *imagePaint;
+   CGFloat        startRotation;
+   CGFloat        endRotation;
+   CGFloat        dstRotation;
+   CGFloat        startBlend;
+   CGFloat        endBlend;
+   CGFloat        dstBlend;
+   CGImagePaint   *imagePaint;
 
-   startBlend = _blend;
-   endBlend   = ((CGImagePaint *) end)->_blend;
-   startAngle = _angle;
-   endAngle   = ((CGImagePaint *) end)->_angle;
+   startBlend    = _blend;
+   endBlend      = ((CGImagePaint *) end)->_blend;
+   startRotation = _rotation;
+   endRotation   = ((CGImagePaint *) end)->_rotation;
 
    if( additive)
    {
-      dstBlend = CAInterpolateAdditive( startBlend, endBlend, x);
-      dstAngle = CAInterpolateAdditive( startAngle, endAngle, x);
+      dstBlend    = CAInterpolateAdditive( startBlend, endBlend, x);
+      dstRotation = CAInterpolateAdditive( startRotation, endRotation, x);
    }
    else
    {
-      dstBlend = CAInterpolate( startBlend, endBlend, x);
-      dstAngle = CAInterpolate( startAngle, endAngle, x);
+      dstBlend    = CAInterpolate( startBlend, endBlend, x);
+      dstRotation = CAInterpolate( startRotation, endRotation, x);
    }
 
    imagePaint = [CGImagePaint imagePaintWithImage:_image
                                        otherImage:_otherImage
                                             blend:dstBlend
-                                            angle:dstAngle];
+                                         rotation:dstRotation];
    return( imagePaint);
 }
 
@@ -82,26 +82,26 @@
 - (id) interpolatedValueWithDiff:(id) diff
                     previousDiff:(id) previous
 {
-   CAAngleRadians   previousAngle;
-   CAAngleRadians   diffAngle;
-   CAAngleRadians   angle;
+   CGFloat          previousRotation;
+   CGFloat          diffRotation;
+   CGFloat          rotation;
    CGFloat          previousBlend;
    CGFloat          diffBlend;
    CGFloat          blend;
    CGImagePaint     *imagePaint;
 
-   previousBlend = ((CGImagePaint *) previous)->_blend;
-   diffBlend     = ((CGImagePaint *) diff)->_blend;
-   blend         = _blend - previousBlend + diffBlend;
+   previousBlend    = ((CGImagePaint *) previous)->_blend;
+   diffBlend        = ((CGImagePaint *) diff)->_blend;
+   blend            = _blend - previousBlend + diffBlend;
 
-   previousAngle = ((CGImagePaint *) previous)->_angle;
-   diffAngle     = ((CGImagePaint *) diff)->_angle;
-   angle         = _angle - previousAngle + diffAngle;
+   previousRotation = ((CGImagePaint *) previous)->_rotation;
+   diffRotation     = ((CGImagePaint *) diff)->_rotation;
+   rotation         = _rotation - previousRotation + diffRotation;
          // create new gradient
-   imagePaint    = [CGImagePaint imagePaintWithImage:_image
-                                          otherImage:_otherImage
-                                               blend:blend
-                                               angle:angle];
+   imagePaint       = [CGImagePaint imagePaintWithImage:_image
+                                             otherImage:_otherImage
+                                                  blend:blend
+                                               rotation:rotation];
    return( imagePaint);
 }
 
@@ -109,11 +109,11 @@
 
 
 
-@implementation CGImage( CABasicAnimation)
+@implementation CABasicAnimation( CGImage)
 
 + (CABasicAnimation *) animationWithProperty:(struct _mulle_objc_property *) property
-                            startObjectValue:(id) startImage
-                              endObjectValue:(id) endImage
+                                startCGImage:(CGImage *) startImage
+                                  endCGImage:(CGImage *) endImage
                                      options:(struct CABasicAnimationOptions *) options
 {
    CGImagePaint   *startPaint;
@@ -122,15 +122,15 @@
    startPaint = [CGImagePaint imagePaintWithImage:startImage
                                        otherImage:endImage
                                             blend:0.0f
-                                            angle:[startImage angle]];
+                                         rotation:[startImage rotation]];
    endPaint   = [CGImagePaint imagePaintWithImage:startImage
                                        otherImage:endImage
                                             blend:1.0f
-                                            angle:[endImage angle]];
-   return( [[[CABasicAnimation alloc] initWithProperty:property
-                                      startObjectValue:startPaint
-                                        endObjectValue:endPaint
-                                               options:options] autorelease]);
+                                         rotation:[endImage rotation]];
+   return( [[[self alloc] initWithProperty:property
+                          startObjectValue:startPaint
+                            endObjectValue:endPaint
+                                   options:options] autorelease]);
 }
 
 @end

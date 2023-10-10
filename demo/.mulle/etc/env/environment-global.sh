@@ -13,6 +13,12 @@ export MULLE_MATCH_TO_CMAKE_RESOURCES_FILE="NONE"
 #
 #
 #
-export MULLE_SOURCETREE_CONFIG_NAMES_MULLE_GLFW="wayland"
+
+
+
+#
+#
+#
+export MULLE_SDE_CLEAN_DEFAULT="MulleGraphics"
 
 

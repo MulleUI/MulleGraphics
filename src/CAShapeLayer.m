@@ -21,4 +21,16 @@
    [super dealloc];
 }
 
+
+- (void) setStrokeColor:(CGColor) color
+{
+   [self setStrokePaint:[CGPaint paintWithColor:color]];
+}
+
+
+- (void) setFillColor:(CGColor) color;
+{
+   [self setFillPaint:[CGPaint paintWithColor:color]];
+}
+
 @end

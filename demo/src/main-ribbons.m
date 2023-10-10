@@ -18,12 +18,11 @@ struct ribbons_options
 
 @interface Ribbon : NSObject
 
-@property( assign) CGPoint  origin;
-@property( assign) Ribbon   *neighbor;
-@property( assign) CGPoint  d;
-@property( assign) CGFloat  a;
-@property( assign) CGFloat  hue;
-@property( assign) CGColor  color;
+@property( assign) CGPoint         origin;
+@property( assign) Ribbon          *neighbor;
+@property( assign) CGPoint         d;
+@property( assign) CGFloat         hue;
+@property( assign) CGColor         color;
 
 @end
 
@@ -39,22 +38,23 @@ struct ribbons_options
 
    self->_origin.x = x;
    self->_origin.y = y;
-   self->_a        = a;
+
    self->_d.x      = cos(a);
    self->_d.y      = sin(a);
    self->_hue      = fmod( CGFloatMakeRandomMinMax(0, 100) + base, 360.0);
-   self->_color    = CGColorMakeWithHSBA( CAAngleDegreesToUnity( self->_hue), 1.0, 2.0, 0.01);
+   self->_color    = CGColorMakeWithHSBA( CADegreesToRotation( self->_hue), 1.0, 2.0, 0.01);
 
    return( self);
 }
 
 
-- (void) drawInContext:(CGContext *) context
+- (BOOL) drawInContext:(CGContext *) context
 {
    struct NVGcontext  *vg;
 
    vg  = CGContextGetNVGContext( context);
    mvgStrokeLineWithColor( vg, self->_origin, [self->_neighbor origin], 1.0, self->_color);
+   return( YES);
 }
 
 
@@ -124,7 +124,7 @@ struct ribbons_options
 }
 
 
-- (void) drawInContext:(CGContext *) context
+- (BOOL) drawInContext:(CGContext *) context
 {
    CGColor      fillColor;
    CGRect       canvas;
@@ -139,7 +139,7 @@ struct ribbons_options
    mvgFillRectWithColor( vg, canvas, fillColor);
 
    if( opts.maxTicks && _ticks > opts.maxTicks)
-      return;
+      return( YES);
 
    nvgStrokeWidth( vg, 3.5);
 
@@ -152,6 +152,7 @@ struct ribbons_options
       }
    }
    ++_ticks;
+   return( YES);
 }
 
 @end
@@ -184,12 +185,12 @@ int   main( int argc, char *argv[])
       [window setBackgroundColor:CGColorMakeBlack()]; // this avoids the window contents being cleared
       [window setOpaque:YES]; // this avoids the window contents being cleared
 
-      contentPlane = [window contentPlane];
+      contentPlane = [window contentView];
       contentRect  = [contentPlane contentRect];
       frame        = contentRect;
       layer        = [RibbonLayer layerWithFrame:frame];
       view         = [UIView viewWithLayer:layer];
-      [view setAutoresizingMask:UIViewAutoresizingFlexible];
+      [view setAutoresizingMask:UIViewAutoresizingScaleToFill];
       [contentPlane addSubview:view];
 
       [app addWindow:window];

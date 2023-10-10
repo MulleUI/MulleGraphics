@@ -30,7 +30,7 @@ typedef void   CAOpenGLLayerViewPortCallback_t( CAOpenGLLayer *layer, CGContext 
 
 // actual openGL drawing. if you are doing texture mapping the background
 // needs to be cleared, otherwise the stencil buffer
-- (void) drawOpenGLWithContext:(CGContext *) context;
+- (void) drawOpenGLInContext:(CGContext *) context;
 // this flushes
 - (void) endOpenGLWithContext:(CGContext *) context;
 

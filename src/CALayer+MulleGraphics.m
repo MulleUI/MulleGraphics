@@ -50,7 +50,7 @@
    }
 
    // fill
-   mvgFillRoundedRectWithPaint( vg, rect, _cornerRadius, paint);
+   mvgFillRoundedRectVaryingWithPaint( vg, rect, _cornerInsets, paint);
 
    nvgShapeAntiAlias( vg, 1);
 }
@@ -69,10 +69,9 @@
 }
 
 
-- (void) drawInContext:(CGContext *) context
+- (BOOL) drawInContext:(CGContext *) context
 {
-   if( _drawCallback)
-      (*_drawCallback)( self, context);
+   return( CALayerExecuteDrawCallback( self, context));
 }
 
 
@@ -116,7 +115,8 @@
    // the strokeWidth is just scaling it out
    //
    rect = CGRectMake( tl.x, tl.y, br.x - tl.x, br.y - tl.y);
-   mvgStrokeRoundedRectWithPaint( vg, rect, _cornerRadius, _borderWidth, _borderPaint);
+
+   mvgStrokeRoundedRectVaryingWithPaint( vg, rect, _cornerInsets, _borderWidth, _borderPaint);
 
 //      nvgMoveTo( vg, tl.x, tl.y);
 //      nvgLineTo( vg, br.x, tl.y);
@@ -124,7 +124,7 @@
 //      nvgLineTo( vg, tl.x, br.y);
 //      nvgLineTo( vg, tl.x, tl.y);
 
-   nvgStrokeWidth( vg, 1.0);  // need to reset to
+   nvgStrokeWidth( vg, 1.0);  // need to reset
 }
 
 
@@ -270,7 +270,7 @@
 
 
 - (CGSize) sizeThatFits:(CGSize) size
-                context:(CGContext *) context
+                context:(id <UILayoutContext>) context
 {
    return( [self canvas].size);
 }

@@ -15,7 +15,11 @@ src/main-animate-circles.m
 src/main-animate-gradient.m
 src/main-animate-image.m
 src/main-canvas-bounds-frame.m
+src/main-cashadowlayer.m
+src/main-cashapelayer.m
+src/main-catextlayer-cleartype.m
 src/main-catextlayer.m
+src/main-catextlayer-size.m
 src/main-checkerboard.m
 src/main-hexagon.m
 src/main-image.m
@@ -34,6 +38,6 @@ src/main-radial-rainbows.m
 src/main-ribbons.m
 src/main-scaled-canvas.m
 src/main-tunnel-cpu.m
-src/main-water.m
+src/main-water-cpu.m
 src/main-whirl.m
 )

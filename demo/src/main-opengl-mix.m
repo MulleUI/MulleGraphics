@@ -133,22 +133,22 @@ static float cpData[][3] = {
 
     [super beginOpenGLWithContext:context];
 
-    glEnable(GL_DEPTH_TEST);
-    glDepthFunc(GL_LESS);
+    glEnable( GL_DEPTH_TEST);
+    glDepthFunc( GL_LESS);
 
-    glLightfv(GL_LIGHT0, GL_POSITION, position);
-    glLightModelfv(GL_LIGHT_MODEL_LOCAL_VIEWER, local_view);
+    glLightfv( GL_LIGHT0, GL_POSITION, position);
+    glLightModelfv( GL_LIGHT_MODEL_LOCAL_VIEWER, local_view);
 
-    glFrontFace(GL_CW);
-    glEnable(GL_LIGHTING);
-    glEnable(GL_LIGHT0);
-    glEnable(GL_AUTO_NORMAL);
-    glEnable(GL_NORMALIZE);
+    glFrontFace( GL_CW);
+    glEnable( GL_LIGHTING);
+    glEnable( GL_LIGHT0);
+    glEnable( GL_AUTO_NORMAL);
+    glEnable( GL_NORMALIZE);
 
-    glMaterialfv(GL_FRONT, GL_AMBIENT, ambient);
-    glMaterialfv(GL_FRONT, GL_DIFFUSE, diffuse);
-    glMaterialfv(GL_FRONT, GL_SPECULAR, specular);
-    glMaterialf(GL_FRONT, GL_SHININESS, 0.6*128.0);
+    glMaterialfv( GL_FRONT, GL_AMBIENT, ambient);
+    glMaterialfv( GL_FRONT, GL_DIFFUSE, diffuse);
+    glMaterialfv( GL_FRONT, GL_SPECULAR, specular);
+    glMaterialf(  GL_FRONT, GL_SHININESS, 0.6*128.0);
 
 //    glClearColor(0.0, 0.0, 0.0, 0.0);
 //    glColor3f(1.0, 1.0, 1.0);
@@ -157,7 +157,7 @@ static float cpData[][3] = {
 }
 
 
-- (void) drawOpenGLWithContext:(CGContext *) context
+- (void) drawOpenGLInContext:(CGContext *) context
 {
    glMatrixMode(GL_PROJECTION);
    glLoadIdentity();
@@ -283,9 +283,9 @@ static UIView   *setupTeapotView( UIWindow *window, CGColor color, int grid)
    [view setBorderWidth:6.0];
 
    options = CABasicAnimationOptionsMakeCurve( mulle_relativetimerange_make( 0, 3.0),
+                                               CAAnimationCurveLinear,
                                                INFINITY,
-                                               0,
-                                               CAAnimationCurveLinear);
+                                               NO);
 
    layer     = (OpenGLTeapotLayer *) [view layer];
    animation = [[[CABasicAnimation alloc] initWithProperty:MulleObjCInstanceSearchProperty( layer, @selector( rotation))
@@ -351,14 +351,14 @@ void   setupScene( UIWindow *window)
    CGRect   rect;
    CGRect   frame;
 
-   contentPlane = [window contentPlane];
+   contentPlane = [window contentView];
    rect         = [contentPlane contentRect];
    frame        = CGRectInset( rect, 40, 40);
 
    redView = [UIView viewWithFrame:frame];
    [redView setWillLayoutSubviewsCallback:layoutRedView];
    [redView setMargins:UIEdgeInsetsMake( 40, 40, 40, 40)];
-   [redView setAutoresizingMask:UIViewAutoresizingFlexibleWidth|UIViewAutoresizingFlexibleHeight];
+   [redView setAutoresizingMask:UIViewAutoresizingScaleToFill];
 
    [redView setBackgroundColor:[UIColor colorWithUTF8String:"DarkRed"]];
    [contentPlane addSubview:redView];

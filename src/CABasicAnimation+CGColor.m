@@ -24,8 +24,8 @@ static void   CABasicAnimationSetInterpolatedColor( CABasicAnimation *self,
    CGColor   color;
 
    color = CGColorMakeWithInterpolatedHSBAComponents( self->_start.float4Value.v,
-                                                     self->_end.float4Value.v,
-                                                     x);
+                                                      self->_end.float4Value.v,
+                                                      x);
    {
       mulle_metaabi_union_void_return( CGColor)   param;
 
@@ -37,9 +37,9 @@ static void   CABasicAnimationSetInterpolatedColor( CABasicAnimation *self,
 }
 
 
-static void   CABasicAnimationSetInterpolatedColorAdditive( CABasicAnimation *self,
-                                                            id object,
-                                                            double x)
+void   CABasicAnimationSetInterpolatedColorAdditive( CABasicAnimation *self,
+                                                     id object,
+                                                     double x)
 {
    CGColor       newColor;
    CGColor       color;

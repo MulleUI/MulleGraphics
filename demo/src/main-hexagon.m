@@ -226,7 +226,7 @@ static void   drawBoxWithDropShadow( CGContext *context,
 }
 
 
-- (void) drawInContext:(CGContext *) context
+- (BOOL) drawInContext:(CGContext *) context
 {
    Line         *line;
    NVGcontext   *vg;
@@ -256,6 +256,7 @@ static void   drawBoxWithDropShadow( CGContext *context,
                           context:context];
    }
    nvgRestore( vg);
+   return( YES);
 }
 
 @end
@@ -287,11 +288,11 @@ int   main( int argc, char *argv[])
       [window setBackgroundColor:CGColorMakeBlack()]; // this avoids the window contents being cleared
       [window setOpaque:YES]; // this avoids the window contents being cleared
 
-      contentPlane = [window contentPlane];
+      contentPlane = [window contentView];
       frame        = [contentPlane contentRect];
       layer        = [HexagonLayer layerWithFrame:frame];
       view         = [UIView viewWithLayer:layer];
-      [view setAutoresizingMask:UIViewAutoresizingFlexible];
+      [view setAutoresizingMask:UIViewAutoresizingScaleToFill];
       [contentPlane addSubview:view];
 
       [app addWindow:window];

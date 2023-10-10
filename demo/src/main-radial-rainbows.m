@@ -51,9 +51,9 @@ static inline struct ColorStop   ColorStopMake( CGFloat *hsba, CGFloat r)
 static inline CGColor   ColorStopGetColor( struct ColorStop *c)
 {
    return( CGColorMakeWithHSBA( c->hsba[ 0],
-                            c->hsba[ 1],
-                            c->hsba[ 2],
-                            c->hsba[ 3]));
+                                c->hsba[ 1],
+                                c->hsba[ 2],
+                                c->hsba[ 3]));
 }
 
 
@@ -64,6 +64,9 @@ static inline CGColor   ColorStopGetColor( struct ColorStop *c)
 }
 
 
+//
+// abuse size = 0,0 and default contentMode 0 to get a default fill
+//
 @property( assign) CGSize   size;
 
 - (void) drawRect:(CGRect) rect
@@ -200,6 +203,16 @@ static void   fillCircleWithHoleAndColorStops( NVGcontext *vg,
    }
 }
 
+
+//
+// this is a little hack for CAImageLayer, which signifies that we "inherit"
+// the canvas size of the layer
+//
+- (CGSize) size 
+{
+   return( CGSizeMake( INFINITY, INFINITY));
+}
+
 @end
 
 
@@ -263,12 +276,12 @@ static void   setupCircle( RadialGradientCircle *circle, CGFloat r)
 #else
       brightness = 0.5;
 #endif
-      hue            = fmodf( ((CGFloat) i / N_COLORSTOPS) * COLOR_CYCLES, 1.0);
+      hue      = fmodf( ((CGFloat) i / N_COLORSTOPS) * COLOR_CYCLES, 1.0);
       hsba[ 0] = hue;
       hsba[ 1] = 1.0;
       hsba[ 2] = brightness;
       hsba[ 3] = 1.0;
-      c              = ColorStopMake( hsba, i * r + HOLE);
+      c        = ColorStopMake( hsba, i * r + HOLE);
       [circle addColorStop:c];
    }
 }
@@ -284,18 +297,23 @@ static void   setupScene( UIWindow *window)
    struct CAAnimationOptions   options;
    CAAnimation                 *animation;
 
-   contentRect = [[window contentPlane] contentRect];
+   contentRect = [[window contentView] contentRect];
 
    circle = [RadialGradientCircle object];
    setupCircle( circle, 900 / 2.0 / N_COLORSTOPS);
 
    layer = [CAImageLayer layerWithFrame:contentRect];
    [layer setImage:circle];
+//   [layer setBorderWidth:2.0];
+//   [layer setBorderColor:CGColorMakeOrange()];
 
    view  = [UIView viewWithLayer:layer];
-   [[window contentPlane] addSubview:view];
+   [[window contentView] addSubview:view];
 
-   options   = CAAnimationOptionsMake( mulle_relativetimerange_make( 0, INFINITY), 0.0, 0);
+   options   = CAAnimationOptionsMake( mulle_relativetimerange_make( 0, INFINITY), 
+                                       0.0, 
+                                       0.0,
+                                       0);
    animation = [RadialGradientCircleAnimation animationWithAnimationOptions:&options];
    [layer addAnimation:animation];
 }

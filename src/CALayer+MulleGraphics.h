@@ -43,7 +43,15 @@
 // transform is setup already
 // alpha is setup already
 //
-- (void) drawInContext:(CGContext *) context;
+// if [super drawInContext:] returns NO, do not continue drawing
+//
+// if you don't want do call [super drawInContext:], you should call
+// CALayerExecuteDrawCallback, so that your code can be patched out from C:
+//
+// if( ! CALayerExecuteDrawCallback( self, context))
+//    return( NO);
+//
+- (BOOL) drawInContext:(CGContext *) context;
 
 //
 // these two methods draw "frame". Bounds and canvas are to be ignored.
@@ -66,6 +74,18 @@
 // Returns canvas.size. Subclasses may want to compute actual used space
 // and return it. Used for layouting by UIView
 - (CGSize) sizeThatFits:(CGSize) size
-                context:(CGContext *) context;
+                context:(id <UILayoutContext>) context;
+
 
 @end
+
+static inline BOOL   CALayerExecuteDrawCallback( CALayer *self,
+                                                 CGContext *context)
+{
+   if( ! self)
+      return( NO);
+   return( ((struct { @defs( CALayer); } *) self)->_drawCallback
+           ? (*((struct { @defs( CALayer); } *) self)->_drawCallback)( self, context)
+           : YES);
+}
+

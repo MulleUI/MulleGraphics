@@ -1,68 +1,143 @@
-#import <MulleGraphics/MulleGraphics.h>
+#import "import-private.h"
 
-#import <stdio.h>
-
-
-@interface Foo : NSObject
-
-@property( copy) CGGradient   *r;
-
-@end
+#include <unistd.h>
 
 
-@implementation Foo
 
-- (void) setR:(CGGradient *) r
+static CATextLayer   *textLayer( CGPaint *textPaint,
+                                 CGPaint *textBackgroundPaint,
+                                 CGPaint *backgroundPaint,
+                                 BOOL clearType)
 {
-   NSUInteger   i, n;
+   CATextLayer   *layer;
 
-   n = [r numberOfColors];
-   printf( "[");
-   for( i = 0; i < n; i++)
-   {
-      printf( "%s{ %g, 0x%08tx }",
-               i ? ", " : " ",
-               [r locationAtIndex:i],
-               CGHexColorMakeWithColor( [r colorAtIndex:i]));
-   }
-   printf( "]\n");
+   layer = [CATextLayer object];
+   [layer setFontPixelSize:20.0f];
+   [layer setTextUTF8String:"VfL Bochum 1848"];
 
-   [_r autorelease];
-   _r = [r copy];
+   [layer setTextPaint:textPaint];
+   [layer setTextBackgroundPaint:textBackgroundPaint];
+   [layer setBackgroundPaint:backgroundPaint];
+   [layer setClearTypeEnabled:clearType];
+
+   return( layer);
 }
 
-@end
 
+static void   positionLayerInView( CALayer *layer, UIView *contentView, CGPoint origin)
+{
+   CGRect   frame;
+   UIView   *view;
+
+   frame.origin = origin;
+   frame.size   = [layer sizeThatFits:CGSizeMake( INFINITY, INFINITY)
+                              context:[contentView layoutContext]];
+   [layer setFrame:frame];
+
+   view  = [UIView viewWithLayer:layer];
+   [contentView addSubview:view];
+}
+
+
+static CGColor   colors[ 13] = 
+{
+   CGColorDataAlizarinCrimson,
+   CGColorDataBrightRed,    
+   CGColorDataCadmiumYellow, 
+   CGColorDataDarkSienna,   
+
+   CGColorDataIndianYellow,   
+   CGColorDataMidnightBlack,  
+   CGColorDataPhthaloBlue,    
+   CGColorDataPhthaloGreen,   
+
+   CGColorDataPrussianBlue,   
+   CGColorDataSapGreen,       
+   CGColorDataTitaniumWhite,  
+   CGColorDataVanDykeBrown,   
+
+   CGColorDataYellowOchre       
+};
+
+
+static void   setupSceneInWindow( UIWindow *window)
+{
+   CATextLayer     *layer;
+   CGRect          frame;
+   UIWindowPlane   *contentView;
+   CGPaint         *windowBackgroundPaint;
+   CGPaint         *grayPaints[ 5];
+   CGPaint         *gradientPaints[ 5];
+   NSUInteger      i;
+   NSUInteger      j;
+   NSUInteger      k;
+
+   contentView           = [window contentView];
+   windowBackgroundPaint = [window backgroundPaint];
+
+   for( i = 0; i < 5; i++)
+      grayPaints[ i] = [CGPaint paintWithColor:CGColorMakeWithGray( i / 4.0f)];
+
+#if 0
+   for( k = 0; k < 2; k++)
+      for( j = 0; j < 2; j++)
+         for( i = 0; i < 5; i++)
+         {
+            layer = textLayer( grayPaints[ i], 
+                               k ? windowBackgroundPaint 
+                                 : grayPaints[ 4], 
+                               windowBackgroundPaint, 
+                               j ? YES : NO);
+            positionLayerInView( layer, 
+                                 contentView, 
+                                 CGPointMake( k * 400 + j * 200 + 20, i * 30 + 20));
+         }
+#endif
+   
+   for( i = 0; i < 5; i++)
+      gradientPaints[ i] = [CGPaint paintWithStartColor:colors[ i]
+                                               endColor:colors[ 12 - i]];
+
+   contentView           = [window contentView];
+   windowBackgroundPaint = [window backgroundPaint];
+
+   for( k = 0; k < 2; k++)
+      for( j = 0; j < 2; j++)
+         for( i = 0; i < 5; i++)
+         {
+            layer = textLayer( gradientPaints[ i], 
+                               k ? windowBackgroundPaint 
+                                 : grayPaints[ 4], 
+                               windowBackgroundPaint, 
+                               j ? YES : NO);
+            positionLayerInView( layer, 
+                                 contentView, 
+                                 CGPointMake( k * 400 + j * 200 + 20, 200 + i * 30 + 20));
+         }
+
+}
 
 
 int   main( int argc, char *argv[])
 {
-   Foo                        *foo;
-   CABasicAnimation           *animation;
-   NSInteger                  i;
-   CGGradient                *start;
-   CGGradient                *end;
+   UIWindow        *window;
+   UIApplication   *app;
+   NSUInteger      styleMask;
 
-   start     = [CGGradient gradientWithStartColor:CGColorMakeBlack()
-                                         endColor:CGColorMakeWhite()];
-   end       = [CGGradient gradientWithStartColor:CGColorMakeRed()
-                                         endColor:CGColorMakeBlue()];
-   foo       = [Foo object];
-   animation = [[[CABasicAnimation alloc] initWithProperty:MulleObjCInstanceSearchProperty( foo, @selector( r))
-                                          startObjectValue:start
-                                            endObjectValue:end
-                                                   options:NULL] autorelease];
-
-   for( i = 0; i <= 5; i++)
+   app = [UIApplication sharedInstance];
    {
-      printf( "%ld: ", i);
-      [animation animateObject:foo
-                  absoluteTime:i / 5.0
-                 animationRate:0.0];
-   }
+      styleMask = UIWindowStyleMaskDefault & ~UIWindowStyleRetained;
+      window    = [UIWindow windowWithFrame:CGRectMake( 0.0, 0.0, 800.0, 800.0)
+                            titleUTF8String:"Demo"
+                                  styleMask:styleMask];
+      [window setBackgroundColor:CGColorMakeWithRGBA( 0.33, 0.33, 0.33, 1.0)];
+      setupSceneInWindow( window);
 
-   return( 0);
+      [app addWindow:window];
+   }
+   return( [app run]);
 }
+
 
 
 //

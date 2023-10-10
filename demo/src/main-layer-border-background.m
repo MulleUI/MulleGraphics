@@ -3,31 +3,48 @@
 #import <string.h>
 
 
-
-void   setupSceneInContentPlane( UIWindowPlane *contentPlane)
+//
+// this demo shows how border paints do not overlap each other
+//
+static UIView   *demoViewWithFrame( CGRect frame, CGColor a, CGColor b)
 {
    CALayer      *layer;
    CGGradient   *gradient;
-   CGRect       canvas;
-   CGRect       contentRect;
-   CGRect       frame;
    UIView       *view;
 
-   contentRect = [contentPlane contentRect];
-   frame       = CGRectInset( contentRect, 20.0, 20.0);
    view        = [UIView viewWithFrame:frame];
 
    // MEMO: could also just forward down to layer via view...
    layer       = (CALayer *) [view layer];
-   gradient    = [CGGradient gradientWithStartColor:CGColorMakeYellow()
-                                           endColor:CGColorMakeMagenta()];
+   gradient    = [CGGradient gradientWithStartColor:a
+                                           endColor:b];
    [layer setBackgroundPaint:gradient];
-   gradient    = [CGGradient gradientWithStartColor:CGColorMakeMagenta()
-                                           endColor:CGColorMakeYellow()];
+   gradient    = [CGGradient gradientWithStartColor:b
+                                           endColor:a];
    [layer setBorderWidth:6.0];
    [layer setBorderPaint:gradient];
+   return( view);
+}
 
-   [contentPlane addSubview:view];
+
+void   setupSceneInContentView( UIView *contentView)
+{
+   CGRect       contentRect;
+   CGRect       frame;
+   UIView       *view;
+
+   contentRect = [contentView contentRect];
+   frame       = CGRectInset( contentRect, 40.0, 40.0);
+   view        = demoViewWithFrame( frame, CGColorMakeYellow(), CGColorMakeMagenta());
+   [contentView addSubview:view];
+
+   frame.origin.x    -= 30.0f;
+   frame.origin.y    += frame.size.height / 4.0f;
+   frame.size.width   = 30.0;
+   frame.size.height  = 30.0;
+
+   view        = demoViewWithFrame( frame, CGColorMakeLimeGreen(), CGColorMakeIndigo());
+   [contentView addSubview:view];
 }
 
 
@@ -44,7 +61,7 @@ int   main()
    window = [UIWindow windowWithFrame:CGRectMake( 0.0, 0.0, 200, 200)];
    [window setBackgroundColor:CGColorMakeBlack()];
 
-   setupSceneInContentPlane( [window contentPlane]);
+   setupSceneInContentView( [window contentView]);
 
    [app addWindow:window];
 

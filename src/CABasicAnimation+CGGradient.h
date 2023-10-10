@@ -43,3 +43,13 @@
 @interface CGGradient( CAInterpolatableValue) < CAInterpolatableValue>
 @end
 
+
+
+@interface CABasicAnimation( CGGradient)
+
++ (CABasicAnimation *) animationWithProperty:(struct _mulle_objc_property *) property
+                             startCGGradient:(CGGradient *) startGradient
+                               endCGGradient:(CGGradient *) endGradient
+                                     options:(struct CABasicAnimationOptions *) options;
+@end
+

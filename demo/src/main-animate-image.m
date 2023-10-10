@@ -16,12 +16,13 @@
 
 @implementation ImageLayer
 
-- (void) drawInContext:(CGContext *) context
+- (BOOL) drawInContext:(CGContext *) context
 {
    struct NVGcontext   *vg;
 
    vg = CGContextGetNVGContext( context);
    mvgFillRectWithPaint( vg, [self canvas], [self paint]);
+   return( YES);
 }
 
 @end
@@ -59,24 +60,24 @@ struct DrawContext
    CGColor          startColor;
    CGColor          endColor;
    CGFloat          strokeWidth;
-   CAAngleRadians   angle;
+   CAAngle          rotation;
 };
 
-struct DrawContext    circleOne =
+struct DrawContext   circleOne =
 {
    CGColorDataYellow,
    CGColorDataBlue,
    80.0,
-   -M_PI_f
+   CARotationNone
 };
 
 
-struct DrawContext    circleTwo =
+struct DrawContext   circleTwo =
 {
    CGColorDataRed,
    CGColorDataLime,
    80.0,
-   +M_PI_f / 2
+   CARotation180
 };
 
 
@@ -86,13 +87,15 @@ static void   drawGradientCircle( CGContext *context, CGSize size, void *userinf
    struct DrawContext  *info = userinfo;
    CGGradient          *gradient;
    NVGcontext          *vg;
+   CACircle            circle;
 
    gradient = [CGGradient gradientWithStartColor:info->startColor
                                         endColor:info->endColor
-                                           angle:info->angle];
-   vg = CGContextGetNVGContext( context);
-   mvgStrokeCircleWithPaint( vg, CGSizeGetCenterPoint( size),
-                                 CGSizeGetInnerRadius( size) - info->strokeWidth / 2.0,
+                                        rotation:info->rotation];
+   vg       = CGContextGetNVGContext( context);
+   circle   = CACircleMake( CGSizeGetCenterPoint( size),
+                            CGSizeGetInnerRadius( size) - info->strokeWidth / 2.0);
+   mvgStrokeCircleWithPaint( vg, circle,
                                  info->strokeWidth,
                                  gradient);
 }
@@ -109,7 +112,7 @@ void   setupSceneAndAnimation( UIWindow *window, CGContext *context)
    UIView          *view;
    UIWindowPlane   *contentPlane;
 
-   contentPlane = [window contentPlane];
+   contentPlane = [window contentView];
 
    frame  = [contentPlane contentRect];
    frame  = CGRectInset( frame, 20, 20);

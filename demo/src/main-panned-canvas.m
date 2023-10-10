@@ -42,7 +42,7 @@ static UIMouseMotionEvent  *handleMouseMotionEvent( UIWindow *window,
       return( event);
 
    // get our layer somewhat clumsily,
-   contentPlane = [window contentPlane];
+   contentPlane = [window contentView];
    contentRect  = [contentPlane contentRect];
    n            = [contentPlane getSubviews:views
                                       range:NSMakeRange( 0, 1)];
@@ -82,12 +82,14 @@ static void  drawStuff( CALayer *layer, void *_context)
    radius       = (canvasExtent - strokeWidth) / 2.0;
 
    vg = CGContextGetNVGContext( context);
-   mvgStrokeCircleWithColor( vg, CGRectGetCenterPoint( canvas), radius, strokeWidth, CGColorMakeRed());
+   mvgStrokeCircleWithColor( vg, CACircleMake( CGRectGetCenterPoint( canvas), radius), strokeWidth, CGColorMakeRed());
 
    [context useDefaultFont];
-   nvgTextColor( vg, CGColorMakeWhite(), CGColorMakeGray());
+   nvgTextColor( vg, CGColorMakeWhite());
+   nvgTextBackgroundColor( vg, CGColorMakeGray());
+
    mvgTextInRect( vg, "Move mouse to pan",
-                      NULL,
+                      (size_t) -1,
                       CGRectMake( 10, 10, 400, 32),
                       CGContentModeScaleAspectFit,
                       MVGTextAlignVisually);
@@ -129,7 +131,7 @@ int   main( int argc, char *argv[])
 
       [window setBackgroundColor:CGColorMakeWithRGBA( 1.0, 1.0, 1.0, 1.0)];
       [window setMouseMotionEventCallback:handleMouseMotionEvent];
-      setupSceneInView( [window contentPlane]);
+      setupSceneInView( [window contentView]);
 
       [app addWindow:window];
    }

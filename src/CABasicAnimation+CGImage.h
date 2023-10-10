@@ -50,10 +50,8 @@
 
 @interface CABasicAnimation( CGImage)
 
-- (id) initWithProperty:(struct _mulle_objc_property *) property
-        startImageValue:(CGImage *) start
-          endImageValue:(CGImage *) end
-                options:(struct CABasicAnimationOptions *) options;
-
-@end
-
++ (CABasicAnimation *) animationWithProperty:(struct _mulle_objc_property *) property
+                                startCGImage:(CGImage *) startImage
+                                  endCGImage:(CGImage *) endImage
+                                     options:(struct CABasicAnimationOptions *) options;
+@end 

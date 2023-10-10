@@ -10,6 +10,28 @@ static char    *filenames[ 2] =
 };
 
 
+static CGContentMode   contentModes[ 12] =
+{
+   CGContentModeScaleToFill,
+   CGContentModeScaleAspectFit,
+   CGContentModeScaleAspectFill,
+   CGContentModeCenterPoint,
+
+   CGContentModeTop,
+   CGContentModeBottom,
+   CGContentModeLeft,
+   CGContentModeRight,
+
+   CGContentModeTopLeft,
+   CGContentModeTopRight,
+   CGContentModeBottomLeft,
+   CGContentModeBottomRight
+};
+
+#define N_CGContentModes  (sizeof( contentModes) / sizeof( contentModes[ 0]))
+
+
+
 //
 // we need to be rendering to create CGImages. "Real" code that uses
 // CAImageLayer will likely use UIImages.
@@ -20,20 +42,20 @@ static void  drawStuff( CALayer *layer, void *_context)
    CGImage         *image;
    CAImageLayer    *imageLayer = (CAImageLayer *) layer;
    CGFrameInfo     *info;
-   CGContentMode   mode;
+   NSUInteger      modeIndex;
    char            *filename;
    NSUInteger      frameNumber;
 
    info        = [context currentFrameInfo];
    frameNumber = [context numberOfFrames];
    image       = (CGImage *) [imageLayer image] ;
-   mode        = (frameNumber / 100) % N_CGContentModes;
+   modeIndex   = (frameNumber / 100) % N_CGContentModes;
 
-   if( ! image || mode == 0)
+   if( ! image || modeIndex == 0)
    {
       filename = filenames[ frameNumber / (100 * N_CGContentModes) & 1];
       image    = [[[CGImage alloc] initWithContentsOfFileCString:filename
-                                                     imageFlags:0
+                                                   textureFlags:0
                                                         context:context] autorelease];
       if( ! image)
       {
@@ -43,7 +65,7 @@ static void  drawStuff( CALayer *layer, void *_context)
       [imageLayer setImage:image];
    }
 
-   [imageLayer setContentMode:mode];
+   [imageLayer setContentMode:contentModes[ modeIndex]];
 }
 
 
@@ -55,13 +77,13 @@ static void   setupSceneInWindow( UIWindow *window)
    UIView          *view;
    UIWindowPlane   *contentPlane;
 
-   contentPlane = [window contentPlane];
+   contentPlane = [window contentView];
    frame        = [contentPlane contentRect];
    frame        = UIEdgeInsetsInsetRect( frame, UIEdgeInsetsMake( 10, 10, 10, 10));
 
    // this works in one-window scenarios well, where there is only one
    // context.
-   layer   = [CAImageLayer layerWithFrame:frame];
+   layer = [CAImageLayer layerWithFrame:frame];
    [layer setDrawCallback:drawStuff];
    [layer setBackgroundColor:CGColorMakeWithRGBA( 0.33, 0.33, 0.33, 1.0)];
 

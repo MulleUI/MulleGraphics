@@ -10,7 +10,7 @@ static void   setupSceneInWindow( UIWindow *window)
    UIView          *view;
    UIWindowPlane   *contentPlane;
 
-   contentPlane = [window contentPlane];
+   contentPlane = [window contentView];
    frame        = [contentPlane contentRect];
    frame        = UIEdgeInsetsInsetRect( frame, UIEdgeInsetsMake( 10, 10, 10, 10));
 

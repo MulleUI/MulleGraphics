@@ -9,4 +9,11 @@
  *
  *      mulle-sde environment set MULLE_MATCH_TO_C_RUN DISABLE
  */
+#ifndef demos_export_h__
+#define demos_export_h__
+
+
 // no headers
+
+
+#endif

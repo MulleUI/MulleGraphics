@@ -62,7 +62,7 @@
 // container for a GPU texture. It needs an active context to be created.
 // We couldn't do this in "setupScene" (without some major effort)
 //
-- (void) drawInContext:(CGContext *) context
+- (BOOL) drawInContext:(CGContext *) context
 {
    CGImage               *image;
    CGRect                canvas;
@@ -95,7 +95,7 @@
    {
       image = [[[CGImage alloc] initWithRGBABytes:_texture
                                        bitmapSize:_bitmapInfo.size
-                                       imageFlags:0
+                                     textureFlags:0
                                           context:context] autorelease];
       [self setImage:image];
    }
@@ -111,7 +111,8 @@
       memset( &_bitmapInfo, 0, sizeof( _bitmapInfo));
    }
 
-   [super drawInContext:context];
+   // TODO: need comment here, why this is last
+   return( [super drawInContext:context]);
 }
 
 @end

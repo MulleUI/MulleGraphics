@@ -68,7 +68,11 @@ enum
 };
 
 
-typedef void  CALayerDrawCallback_t( CALayer *layer, void *ctxt);
+// return NO, it you want to preempt actual drawing of the layer.
+//            i.e. if you use a predefined layer like CATextLayer
+//            and return NO, the CATextLayer will not draw (except for
+//            border and background). So you usually return YES.
+typedef BOOL  CALayerDrawCallback_t( CALayer *layer, void *ctxt);
 
 
 //
@@ -76,20 +80,21 @@ typedef void  CALayerDrawCallback_t( CALayer *layer, void *ctxt);
 // object. They are triggered as part of the renderQueue creation. These
 // animations will run, separately from any "CAAnimator" animations. Therefore
 // making those animations "additive" should be good.
-//
-@interface CALayer : CAImplicitlyAnimatableObject <NSCopying, CAAnimationStorageObject>
+
+@interface CALayer : CAImplicitlyAnimatableObject <CAAnimationStorageObject>
 {
    struct CAAnimationStorage   _animationStorage;
 }
 
 // animatable properties
-@property( observable) CGFloat         cornerRadius;
+@property( observable) MulleCornerInsets   cornerInsets;
+
 @property( observable) CGFloat         borderWidth;
 @property( observable) CGFloat         opacity;
 @property( observable, copy) CGPaint   *borderPaint;
 @property( observable, copy) CGPaint   *backgroundPaint;
 @property( observable) CGPoint         pixelCenter;
-@property( observable) BOOL            masksToBounds;
+@property( assign) BOOL                masksToBounds;
 
 @property( observable) CGRect          frame;
 
@@ -128,15 +133,13 @@ typedef void  CALayerDrawCallback_t( CALayer *layer, void *ctxt);
 @property CALayerDrawCallback_t        *drawCallback;
 
 
+- (void) setCornerRadius:(CGFloat) cornerRadius;
+
 + (instancetype) layerWithFrame:(CGRect) frame;
 + (instancetype) layer;
 
 - (instancetype) init; // designated
 - (instancetype) initWithFrame:(CGRect) frame;
-
-// returns 0 by default, only used for convenience window creation
-- (NSUInteger) windowStyleMaskBits;
-
 
 - (void) setBorderColor:(CGColor) color;
 - (void) setBackgroundColor:(CGColor) color;

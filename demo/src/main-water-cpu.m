@@ -378,10 +378,10 @@ static void   setupSceneInWindow( UIWindow *window)
    layer  = [WaterLayer layerWithFrame:CGRectZero];
    view   = [UIView viewWithLayer:layer];
    [view setMargins:UIEdgeInsetsMake( 10, 10, 10, 10)];
-   [view setAutoresizingMask:UIViewAutoresizingFlexibleWidth|UIViewAutoresizingFlexibleHeight];
+   [view setAutoresizingMask:UIViewAutoresizingScaleToFill];
 
    // place view into window and done
-   contentPlane = [window contentPlane];
+   contentPlane = [window contentView];
    [contentPlane addSubview:view];
 }
 

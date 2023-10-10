@@ -26,3 +26,8 @@ static inline union CAAnimationValue
 
 @end
 
+
+
+void   CABasicAnimationSetInterpolatedColorAdditive( CABasicAnimation *self,
+                                                     id object,
+                                                     double x);

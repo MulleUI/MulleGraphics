@@ -10,17 +10,24 @@
 #import "import.h"
 
 
+//
+// this layer has a CGPath and draws it, nothing else.
+//
 @interface CAShapeLayer : CALayer
 
-@property( observable) CGColor   strokeColor;
-@property( observable) CGColor   fillColor;
+@property( observable, assign) CGFloat        strokeWidth;
+@property( observable, copy) CGPaint          *strokePaint;
+@property( observable, copy) CGPaint          *fillPaint;
+@property( assign, getter=isOwningPath) BOOL  ownsPath;
 
 //
-// Ownership of CGPath is transferred to CALayer and CALayer will call
-// CGPathDestroy on
-// it!
+// Ownership of CGPath is transferred to the CAShapeLayer and CALayer will call
+// CGPathDestroy on it (unless ownsPath is set to NO)
 //
 @property( assign) struct CGPath  *path;
+
+- (void) setStrokeColor:(CGColor) color;
+- (void) setFillColor:(CGColor) color;
 
 @end
 

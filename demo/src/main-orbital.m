@@ -7,9 +7,9 @@
 
 @property( assign) CGPoint         origin;
 @property( assign) CGPoint         lastOrigin;
-@property( assign) CAAngleDegrees  colorAngle;
-@property( assign) CAAngleRadians  angle;
-@property( assign) CAAngleRadians  lastAngle;
+@property( assign) CGFloat         colorAngle;
+@property( assign) CGFloat         angle;
+@property( assign) CGFloat         lastAngle;
 @property( assign) CGFloat         size;
 @property( assign) CGFloat         radius;
 @property( assign) CGFloat         speed;
@@ -43,7 +43,7 @@
 }
 
 
-- (void) drawInContext:(CGContext *) context
+- (BOOL) drawInContext:(CGContext *) context
                 canvas:(CGRect ) canvas
 {
    struct NVGcontext  *vg;
@@ -59,6 +59,7 @@
    nvgStrokeColor( vg, CGColorMakeWithHSLA( hue, 1.0, 0.5, 1.0));
    nvgStrokeWidth( vg, _size);
    nvgStroke( vg);
+   return( YES);
 }
 
 
@@ -141,7 +142,7 @@
 }
 
 
-- (void) drawInContext:(CGContext *) context
+- (BOOL) drawInContext:(CGContext *) context
 {
    Orb          *orb;
    NVGcontext   *vg;
@@ -162,6 +163,7 @@
          [orb drawInContext:context
                      canvas:canvas];
       }
+   return( YES);
 }
 
 @end
@@ -194,12 +196,12 @@ int   main( int argc, char *argv[])
       [window setBackgroundColor:CGColorMakeBlack()]; // this avoids the window contents being cleared
       [window setOpaque:YES]; // this avoids the window contents being cleared
 
-      contentPlane = [window contentPlane];
+      contentPlane = [window contentView];
       contentRect  = [contentPlane contentRect];
       frame        = contentRect;
       layer        = [OrbLayer layerWithFrame:frame];
       view         = [UIView viewWithLayer:layer];
-      [view setAutoresizingMask:UIViewAutoresizingFlexible];
+      [view setAutoresizingMask:UIViewAutoresizingScaleToFill];
       [contentPlane addSubview:view];
 
       [app addWindow:window];

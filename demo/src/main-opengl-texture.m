@@ -19,9 +19,9 @@
  */
 @interface RotatingQuadLayer : CAOpenGLLayer < UIWindowFrameDelegate>
 {
-   GLuint           textureName;
-   CAAngleDegrees   angle[3];
-   GLint            axis;
+   GLuint    textureName;
+   CGFloat   angle[3];
+   GLint     axis;
 }
 @end
 
@@ -146,8 +146,8 @@ static char   texture[ 8 * 8][ 4] =
 // so the function has been split into update and rotate
 - (void) update
 {
-   angle[axis] += 2.0;
-   if( angle[axis] > 360.0)
+   angle[ axis] += 2.0;
+   if( angle[ axis] > 360.0)
       angle[ axis] -= 360.0;
 }
 
@@ -170,7 +170,7 @@ static char   texture[ 8 * 8][ 4] =
 }
 
 
-- (void) drawOpenGLWithContext:(CGContext *) context
+- (void) drawOpenGLInContext:(CGContext *) context
 {
    [self rotate];
    [self display];

@@ -41,19 +41,18 @@
 
 
 // standard interpolation self is start: start + (end - start) * x;
+// gets triggered through standard object behavior of CAInterpolatableValue
+// no need to add it to anything
 - (id) interpolateTo:(id) end
               factor:(double) x
             additive:(BOOL) additive
 {
-   BOOL                       i_inside;
-   BOOL                       j_inside;
-   CAAngleRadians             angle;
-   CAAngleRadians             endAngle;
-   CAAngleRadians             startAngle;
+   CARotation                 rotation;
+   CARotation                 endRotation;
+   CARotation                 startRotation;
    CGColor                    *interpolated_colors;
    CGColor                    end_color;
    CGColor                    start_color;
-   CGColor                    *p;
    CGGradient                 *gradient;
    float                      *dst_locations;
    float                      *end_locations;
@@ -107,15 +106,15 @@
          [self getLocations:start_locations];
          [end getLocations:end_locations];
 
-         i_f     = 0.0f; 
-         j_f     = 0.0f;
+         i_f      = 0.0f; 
+         j_f      = 0.0f;
          i_step_f = (double) startCount / count;
          j_step_f = (double) endCount / count;
 
          for( k = 0; k < count; k++)
          {
-            i = (NSUInteger) roundf( i_f);
-            j = (NSUInteger) roundf( j_f);
+            i = (NSUInteger) floorf( i_f + 0.001f); // 0.999 should be 1.0
+            j = (NSUInteger) floorf( j_f + 0.001f);
 
             if( startCount)
             {
@@ -154,15 +153,15 @@
             j_f += j_step_f;
          }
 
-         startAngle = [self angle];
-         endAngle   = [end angle];
-         angle      = additive
-                      ? CAInterpolateAdditive( startAngle, endAngle, x)
-                      : CAInterpolate( startAngle, endAngle, x);
-         gradient   = [CGGradient gradientWithColors:interpolated_colors
-                                           locations:interpolated_locations
-                                               count:count
-                                               angle:angle];
+         startRotation = [self rotation];
+         endRotation   = [end rotation];
+         rotation      = additive
+                         ? CAInterpolateAdditive( startRotation, endRotation, x)
+                         : CAInterpolate( startRotation, endRotation, x);
+         gradient      = [CGGradient gradientWithColors:interpolated_colors
+                                              locations:interpolated_locations
+                                                  count:count
+                                               rotation:rotation];
       }
    }
    return( gradient);
@@ -176,9 +175,9 @@
 {
    BOOL                       i_inside;
    BOOL                       j_inside;
-   CAAngleRadians             angle;
-   CAAngleRadians             diffAngle;
-   CAAngleRadians             previousAngle;
+   CARotation                 rotation;
+   CARotation                 diffRotation;
+   CARotation                 previousRotation;
    CGColor                    *interpolated_colors;
    CGColorDiff                colordiff;
    CGColorDiff                previous_colordiff;
@@ -252,14 +251,14 @@
             j++;
          }
 
-         previousAngle = [previous angle];
-         diffAngle     = [diff angle];
-         angle         = [self angle] - previousAngle + diffAngle;
+         previousRotation = [previous rotation];
+         diffRotation     = [diff rotation];
+         rotation         = [self rotation] - previousRotation + diffRotation;
          // create new gradient
          gradient  = [CGGradient gradientWithColors:interpolated_colors
                                           locations:interpolated_locations
                                               count:count
-                                              angle:angle];
+                                           rotation:rotation];
       }
    }
    return( gradient);
@@ -267,4 +266,22 @@
 
 @end
 
+
+@implementation CABasicAnimation( CGGradient)
+
++ (CABasicAnimation *) animationWithProperty:(struct _mulle_objc_property *) property
+                             startCGGradient:(CGGradient *) startGradient
+                               endCGGradient:(CGGradient *) endGradient
+                                     options:(struct CABasicAnimationOptions *) options
+{
+   assert( [startGradient isKindOfClass:[CGGradient class]]);
+   assert( ! endGradient || [endGradient isKindOfClass:[CGGradient class]]);
+
+   return( [[[self alloc] initWithProperty:property
+                          startObjectValue:startGradient
+                            endObjectValue:endGradient
+                                  options:options] autorelease]);
+}
+
+@end
 

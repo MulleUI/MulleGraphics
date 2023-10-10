@@ -5,12 +5,12 @@
 
 @interface LSystemLayer : CALayer
 {
-   CGPoint           center;
-   CAAngleDegrees    angle;
+   CGPoint   center;
+   CGFloat   angle;
 
-   char              *string;
-   size_t            string_len;
-   size_t            index;
+   char      *string;
+   size_t    string_len;
+   size_t    index;
 }
 
 @end
@@ -106,11 +106,11 @@ static char   *lindenmayer( char *s)
       oldCenter = center;
        // draw forward
        // polar to cartesian based on step and angle:
-      center.x = oldCenter.x + STEP * cos( CAAngleDegreesToRadians( angle));
-      center.y = oldCenter.y + STEP * sin( CAAngleDegreesToRadians( angle));
+      center.x = oldCenter.x + STEP * cos( CADegreesToRadians( angle));
+      center.y = oldCenter.y + STEP * sin( CADegreesToRadians( angle));
       [context strokeLineFromPoint:oldCenter
                            toPoint:center
-                             width:1.0
+                       strokeWidth:1.0
                           hexColor:0x000000FF];
    }
    else
@@ -139,22 +139,21 @@ static char   *lindenmayer( char *s)
   b = CGFloatMakeRandomMinMax( 0 / 255.0, 50 / 255.0);
   a = CGFloatMakeRandomMinMax( 50 / 255.0, 100 / 255.0);
 
-  [context fillCircleAtPoint:center
-                      radius:radius
-                    hexColor:CGHexColorMakeWithRGBA( r, g, b, a)];
-  [context strokeCircleAtPoint:center
-                        radius:radius
-                         width:1.0
-                      hexColor:0x000000FF];
+  [context fillCircle:CACircleMake( center, radius)
+             hexColor:CGHexColorMakeWithRGBA( r, g, b, a)];
+  [context strokeCircle:CACircleMake( center, radius)
+            strokeWidth:1.0
+               hexColor:0x000000FF];
 }
 
 
-- (void) drawInContext:(CGContext *) context
+- (BOOL) drawInContext:(CGContext *) context
 {
   [self drawNextCommand:string[ index]
               inContext:context];
   if( ++index >= string_len)
       index = 0;
+   return( YES);
 }
 
 @end
@@ -175,7 +174,7 @@ int   main( int argc, char *argv[])
                       titleUTF8String:"Demo"
                             styleMask:UIWindowStyleMaskDefault & ~UIWindowStyleRetained];
    {
-      contentPlane = [window contentPlane];
+      contentPlane = [window contentView];
       layer        = [LSystemLayer layerWithFrame:[contentPlane contentRect]];
       [contentPlane addLayer:layer];
       [window setOpaque:YES];

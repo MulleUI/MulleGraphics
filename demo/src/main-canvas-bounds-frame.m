@@ -141,7 +141,7 @@ int   main()
    window = [UIWindow windowWithFrame:CGRectMake( 0.0, 0.0, 800, 600)];
    [window setBackgroundColor:CGColorMakeWithRGBA( 1.0, 1.0, 1.0, 1.0)];
 
-   setupSceneInContentPlane( [window contentPlane]);
+   setupSceneInContentPlane( [window contentView]);
 
    [window dump];
 

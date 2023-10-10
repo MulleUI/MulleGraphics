@@ -43,20 +43,20 @@
    if( x <= p->nGlyphs)
    {
       offset.x = p->glyphs[ x].x;
-      h = _lineh;
+      h = _metrics.lineHeight;
       y = 0.0f;
       if( h >= 8.0f)
       {
          h -= 2;
          y  = 1;
       }
-      offset.y = -(_lineh / 2); // depends on alignment, really, use middle here
+      offset.y = -(_metrics.lineHeight / 2); // depends on alignment, really, use middle here
 
       nvgBeginPath( vg);
       nvgFillColor( vg, nvgRGBA(255,0,0,255));
       nvgRect( vg,
                canvas.origin.x + _origin.x + offset.x - 0.5,
-               canvas.origin.y + _origin.y - _ascender + y,
+               canvas.origin.y + _origin.y - _metrics.ascender + y,
                1,
                h);
       nvgFill( vg);
@@ -70,7 +70,7 @@
    CGRect                        canvas;
    CGFloat                       min;
    CGFloat                       diff;
-   NVGglyphPosition              *glyph;
+   struct UIGlyphPosition        *glyph;
    struct CATextLayerRowGlyphs   *p;
 
    if( _cursorPosition.y >= _nRows)
@@ -173,7 +173,7 @@ scrolling:
 - (NSUInteger) characterOffsetForCursorPosition:(MulleCursorPosition) cursorPosition
 {
    struct CATextLayerRowGlyphs   *p;
-   NVGglyphPosition              *glyph;
+   struct UIGlyphPosition        *glyph;
    struct mulle_utf8data         data;
 
    if( MulleCursorPositionIsMax( cursorPosition))
@@ -239,9 +239,9 @@ scrolling:
    NSInteger                     y;
    struct CATextLayerRowGlyphs   *p;
 
-   // figure out the row that was hit, a row is _lineh and
-   // drawn at frame.origin.y + _origin.y  + i *_lineh
-   y = (NSInteger) round( (point.y -_origin.y) / _lineh);
+   // figure out the row that was hit, a row is _metrics.lineHeight and
+   // drawn at frame.origin.y + _origin.y  + i *_metrics.lineHeight
+   y = (NSInteger) round( (point.y -_origin.y) / _metrics.lineHeight);
    if( y < 0) 
       return( MulleCursorPositionMake( 0, 0));
    if( y >= _nRows)

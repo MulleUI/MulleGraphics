@@ -11,19 +11,21 @@ endif()
 # contents selected with patternfile ??-source--sources
 #
 set( SOURCES
+src/CAAnimation+CGPaint.m
 src/CABasicAnimation+CGColor.m
 src/CABasicAnimation+CGGradient.m
 src/CABasicAnimation+CGImage.m
 src/CACPUImageLayer.m
 src/CAGradientLayer.m
 src/CAImageLayer+Cursor.m
-src/CAImageLayer+NanoVG.m
 src/CAImageLayer.m
 src/CALayer+MulleGraphics.m
 src/CALayer.m
 src/CAOpenGLLayer.m
-src/CAShapeLayer+NanoVG.m
+src/CAShadowLayer.m
+src/CAShadowLayer+nanovg.m
 src/CAShapeLayer.m
+src/CAShapeLayer+nanovg.m
 src/CATextLayer+Cursor.m
 src/CATextLayer+Selection.m
 src/CATextLayer.m

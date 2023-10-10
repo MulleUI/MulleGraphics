@@ -14,13 +14,16 @@ MULLE_CURSOR_PROPERTIES;
 
 
 @property( assign, getter=isSelected) BOOL   selected;
-@property( observable) CGColor               selectionColor;
+@property( observable, copy) CGPaint         *selectionPaint;
 @property( retain) NSObject <CGDrawable> *   image;
 
 // contentMode is not in UIView, because only UIImageView supports it (for now)
 @property CGContentMode   contentMode;
 
-- (id) initWithImage:(NSObject <CGDrawable> *)  image;
++ (instancetype) layerWithImage:(NSObject <CGDrawable> *)  image;
+- (instancetype) initWithImage:(NSObject <CGDrawable> *)  image;
+
+- (void) setSelectionColor:(CGColor) color;
 
 @end
 

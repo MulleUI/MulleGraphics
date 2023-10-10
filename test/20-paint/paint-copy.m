@@ -3,71 +3,19 @@
 #import <stdio.h>
 
 
-@interface Foo : NSObject
-
-@property( copy) CGGradient   *r;
-
-@end
-
-
-@implementation Foo
-
-- (void) setR:(CGGradient *) r
-{
-   NSUInteger   i, n;
-
-   n = [r numberOfColors];
-   printf( "[");
-   for( i = 0; i < n; i++)
-   {
-      printf( "%s{ %g, 0x%08tx }",
-               i ? ", " : " ",
-               [r locationAtIndex:i],
-               CGHexColorMakeWithColor( [r colorAtIndex:i]));
-   }
-   printf( "]\n");
-
-   [_r autorelease];
-   _r = [r copy];
-}
-
-@end
-
-
-
 int   main( int argc, char *argv[])
 {
-   Foo                *foo;
-   CABasicAnimation   *animation;
-   NSInteger          i;
-   CGGradient         *start;
-   CGGradient         *end;
-   static CGColor     colors[] = { CGColorDataRed, CGColorDataGreen, CGColorDataBlue };
+   CGPaint   *paint;
 
-   start     = [CGGradient gradientWithColor:CGColorMakeGray()];
-   end       = [CGGradient gradientWithColors:colors
-                                    locations:NULL
-                                        count:3];
-   foo       = [Foo object];
+   paint = [CGPaint paintWithColor:CGColorMakeIndigo()];
+   paint = [[paint copy] autorelease];
 
-   printf( "start:\n");
-   [foo setR:start];
-   printf( "end:\n");
-   [foo setR:end];
-   printf( "nil:\n");
-   [foo setR:nil];
-   animation = [[[CABasicAnimation alloc] initWithProperty:MulleObjCInstanceSearchProperty( foo, @selector( r))
-                                          startObjectValue:start
-                                            endObjectValue:end
-                                                   options:NULL] autorelease];
+   // just check we don't crash
 
-   for( i = 0; i <= 5; i++)
-   {
-      printf( "%ld: ", i);
-      [animation animateObject:foo
-                  absoluteTime:i / 5.0
-                 animationRate:0.0];
-   }
+   paint = [CGPaint paintWithStartColor:CGColorMakeIndigo()
+                               endColor:CGColorMakeBlue()];
+   paint = [[paint copy] autorelease];
+
 
    return( 0);
 }
