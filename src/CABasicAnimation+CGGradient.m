@@ -274,8 +274,8 @@
                                endCGGradient:(CGGradient *) endGradient
                                      options:(struct CABasicAnimationOptions *) options
 {
-   assert( [startGradient isKindOfClass:[CGGradient class]]);
-   assert( ! endGradient || [endGradient isKindOfClass:[CGGradient class]]);
+   assert( ! startGradient || [startGradient isKindOfClass:[CGGradient class]]);
+   assert( ! endGradient   || [endGradient isKindOfClass:[CGGradient class]]);
 
    return( [[[self alloc] initWithProperty:property
                           startObjectValue:startGradient

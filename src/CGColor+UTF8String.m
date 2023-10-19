@@ -38,8 +38,47 @@
 #import "import-private.h"
 
 
+@interface CGColorLoader // root class
+@end
 
-char  *CGColorUTF8String( CGColor color)
+
+@implementation CGColorLoader
+
+static int   CGHexColorNamePairCompareByColor( void *a, void *b, void *info)
 {
-   return( MulleObjC_asprintf( "0x%08tx", CGColorGetHexColor( color)));
+   struct CGHexColorNamePair *arg1 = (struct CGHexColorNamePair *) a;
+   struct CGHexColorNamePair *arg2 = (struct CGHexColorNamePair *) b;
+
+   return( (arg1->hexColor > arg2->hexColor) - (arg1->hexColor < arg2->hexColor));
+}
+
+
+static struct
+{
+   struct CGHexColorNamePair   _table[ CGHexColorCommonNameTableSize];
+} Self;
+
+
++ (void) load
+{
+   memcpy( &Self._table, CGHexColorCommonNameTable, sizeof( Self._table));
+   mulle_qsort( &Self._table,
+                CGHexColorCommonNameTableSize,
+                sizeof( Self._table[ 0]),
+                CGHexColorNamePairCompareByColor);
+}
+
+@end
+
+
+char   *CGColorUTF8String( CGColor color)
+{
+   CGHexColor    hexColor;
+   char          *s;
+
+   hexColor = CGColorGetHexColor( color);
+   s        = CGHexColorNamePairSearchNameForHexColor( Self._table,
+                                                       CGHexColorCommonNameTableSize,
+                                                       hexColor);
+   return( s ? s : MulleObjC_asprintf( "#%08tx", hexColor));
 }

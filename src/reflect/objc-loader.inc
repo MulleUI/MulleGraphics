@@ -18,6 +18,7 @@
       { @selector( CATextLayer), @selector( Cursor) },      // de65b073;CATextLayer;58a502f5;Cursor
       { @selector( CATextLayer), @selector( Selection) },      // de65b073;CATextLayer;dea34b5b;Selection
       { @selector( CATextLayer), MULLE_OBJC_NO_CATEGORYID },      // de65b073;CATextLayer;;
+      { @selector( CGColorLoader), MULLE_OBJC_NO_CATEGORYID },      // dd5a2891;CGColorLoader;;
       { @selector( CGGradient), @selector( CAInterpolatableValue) },      // 37670335;CGGradient;dfc7766f;CAInterpolatableValue
       { @selector( CGImagePaint), @selector( CAInterpolatableValue) },      // 3e23b783;CGImagePaint;dfc7766f;CAInterpolatableValue
       { @selector( CGPaint), @selector( CAAnimation) },      // df22fbd2;CGPaint;c85bd814;CAAnimation

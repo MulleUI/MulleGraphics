@@ -23,8 +23,8 @@ static void   CABasicAnimationSetInterpolatedColor( CABasicAnimation *self,
 {
    CGColor   color;
 
-   color = CGColorMakeWithInterpolatedHSBAComponents( self->_start.float4Value.v,
-                                                      self->_end.float4Value.v,
+   color = CGColorMakeWithInterpolatedHSBAComponents( (float *) &self->_start.float4Value,
+                                                      (float *) &self->_end.float4Value,
                                                       x);
    {
       mulle_metaabi_union_void_return( CGColor)   param;
@@ -47,10 +47,10 @@ void   CABasicAnimationSetInterpolatedColorAdditive( CABasicAnimation *self,
    CGColorDiff   step;
    CGColorDiff   previous;
 
-   diff.v[ 0] = CAInterpolateAdditive( self->_start.float4Value.v[ 0], self->_end.float4Value.v[ 0], x);
-   diff.v[ 1] = CAInterpolateAdditive( self->_start.float4Value.v[ 1], self->_end.float4Value.v[ 1], x);
-   diff.v[ 2] = CAInterpolateAdditive( self->_start.float4Value.v[ 2], self->_end.float4Value.v[ 2], x);
-   diff.v[ 3] = CAInterpolateAdditive( self->_start.float4Value.v[ 3], self->_end.float4Value.v[ 3], x);
+   diff.v[ 0] = CAInterpolateAdditive( self->_start.float4Value.v0, self->_end.float4Value.v0, x);
+   diff.v[ 1] = CAInterpolateAdditive( self->_start.float4Value.v1, self->_end.float4Value.v1, x);
+   diff.v[ 2] = CAInterpolateAdditive( self->_start.float4Value.v2, self->_end.float4Value.v2, x);
+   diff.v[ 3] = CAInterpolateAdditive( self->_start.float4Value.v3, self->_end.float4Value.v3, x);
 
    {
       mulle_metaabi_union_void_parameter( CGColor)   param;
@@ -59,14 +59,14 @@ void   CABasicAnimationSetInterpolatedColorAdditive( CABasicAnimation *self,
       color = param.r;
    }
 
-   previous = CGColorDiffMakeWithComponents( self->_previous.float4Value.v);
+   previous = CGColorDiffMakeWithComponents( (float *) &self->_previous.float4Value);
    step     = CGColorDiffSubtract( diff, previous);
    newColor = CGColorAddDiff( color, step);
 
-   self->_previous.float4Value.v[ 0] = diff.v[ 0];
-   self->_previous.float4Value.v[ 1] = diff.v[ 1];
-   self->_previous.float4Value.v[ 2] = diff.v[ 2];
-   self->_previous.float4Value.v[ 3] = diff.v[ 3];
+   self->_previous.float4Value.v0 = diff.v[ 0];
+   self->_previous.float4Value.v1 = diff.v[ 1];
+   self->_previous.float4Value.v2 = diff.v[ 2];
+   self->_previous.float4Value.v3 = diff.v[ 3];
 
    {
       mulle_metaabi_union_void_return( CGColor)   param;
@@ -85,10 +85,10 @@ void   CABasicAnimationSetInterpolatedColorAdditive( CABasicAnimation *self,
 
 char  *CAAnimationValueCGColorUTF8String( union CAAnimationValue value)
 {
-   return( MulleObjC_asprintf( "[rgba=%g,%g,%g,%g]", value.float4Value.v[ 0],
-                                                     value.float4Value.v[ 1],
-                                                     value.float4Value.v[ 2],
-                                                     value.float4Value.v[ 3]));
+   return( MulleObjC_asprintf( "[rgba=%g,%g,%g,%g]", value.float4Value.v0,
+                                                     value.float4Value.v1,
+                                                     value.float4Value.v2,
+                                                     value.float4Value.v3));
 }
 
 
@@ -196,8 +196,8 @@ static struct CABasicAnimationTypeDefinition  CGColorAnimationType =
    range.start = CAAnimationValueMakeWithCGColor( start);
    range.end   = CAAnimationValueMakeWithCGColor( end);
 
-   CGHSBAComponentsPrepareForInterpolation( range.start.float4Value.v,
-                                            range.end.float4Value.v);
+   CGHSBAComponentsPrepareForInterpolation( (float *) &range.start.float4Value,
+                                            (float *) &range.end.float4Value);
 
    return( [self initWithProperty:property
                         valueType:CAAnimationValueCGColor
