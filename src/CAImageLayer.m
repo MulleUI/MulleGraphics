@@ -64,10 +64,7 @@
    CGSize              imageSize;
    CGRect              canvas;
    CGRect              rect;
-   CGRect              displayedRect;
    CGDrawableOptions   options;
-   CGPoint             factor;
-   CGPoint             scale;
 
    if( ! [super drawInContext:context])
       return( NO);
@@ -98,38 +95,8 @@
    if( _displayedRect.size.width != 0.0 && _displayedRect.size.height != 0.0 &&
        [_image respondsToSelector:@selector( drawRect:fromRect:options:context:)])
    {
-      //
-      // Unfortunately OpenGL "overreaches" into neighboring texturing, when
-      // scaling up the pixels
-      // The math gets a little bit too pragmatic here...
-      //
-
-      displayedRect = _displayedRect;
-      scale.x       = rect.size.width  / displayedRect.size.width;
-      scale.y       = rect.size.height / displayedRect.size.height;
-      if( scale.x > 1.0)
-         factor.x = scale.x < 2.0
-                    ? (rect.size.width - displayedRect.size.width) / displayedRect.size.width / 2.0
-                    : 0.5;
-      if( scale.y > 1.0)
-         factor.y = scale.y < 2.0
-                    ? (rect.size.height - displayedRect.size.height) / displayedRect.size.height / 2.0
-                    : 0.5;
-
-      displayedRect.origin.x    += factor.x;
-      displayedRect.origin.y    += factor.y;
-      displayedRect.size.width  -= factor.x * 2.0;
-      displayedRect.size.height -= factor.y * 2.0;
-
-//      MulleUILog( "rect                                   : %s", CGRectUTF8String( rect));
-//      MulleUILog( "_displayedRect (dRect)                 : %s", CGRectUTF8String( _displayedRect));
-//      MulleUILog( "_fummel                                : %s", CGPointUTF8String( _fummel));
-//      MulleUILog( "scale = rect.size / dRect.size         : %s", CGPointUTF8String( scale));
-//      MulleUILog( "factor = _fummel * scale               : %s", CGPointUTF8String( factor));
-//      MulleUILog( "displayedRect = inset( dRect, _fummel) : %s", CGRectUTF8String( displayedRect));
-
       [(CGBitmapDrawable *) _image drawRect:rect
-                                   fromRect:displayedRect
+                                   fromRect:_displayedRect
                                     options:&options
                                     context:context];
    }

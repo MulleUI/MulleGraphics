@@ -66,6 +66,11 @@ static void   setupSceneInWindow( UIWindow *window)
 
    frame = UIEdgeInsetsInsetRect( frame, UIEdgeInsetsMake( 4, 4, 4, 4));
    image = [UIImage imageWithContentsOfFileCString:"Outdoors.png"];
+   if( ! image)
+   {
+      mulle_fprintf( stderr, "\"Outdoors.png\" not found\n");
+      exit( 1);
+   }
    layer = [CAImageLayer layerWithImage:image];
    [layer setFrame:frame];
    [layer setDisplayedRect:CGRectMake( 1.0, 1.0, 32, 32)];
