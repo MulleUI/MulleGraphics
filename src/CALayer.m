@@ -80,8 +80,12 @@
 
    clone = [super copy];
 
-   memset( &clone->_animationStorage, 0, sizeof( _animationStorage));
+   // copy these without the property accessors which do too much
+   clone->_frame  = self->_frame;
+   clone->_bounds = self->_bounds;
+   clone->_canvas = self->_canvas;
 
+   memset( &clone->_animationStorage, 0, sizeof( _animationStorage));
    clone->_debugNameUTF8String = NULL;
    
    return( clone);

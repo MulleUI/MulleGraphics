@@ -762,7 +762,6 @@ static NSUInteger  count_newlines( mulle_utf8_t *s)
                                text:data.characters
                              length:data.length
                       breakRowWidth:width];
-      assert( _nRows > 0);
    }
 
    // produce glyph information for each row

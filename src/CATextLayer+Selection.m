@@ -197,7 +197,7 @@
    {
       // how to keep the cursor position stable ? move cursor to 
       // _selection.location then remove text
-      mulle_buffer_remove_in_range( buffer, _selection.location, _selection.length);
+      mulle_buffer_remove_in_range( buffer, _selection);
       _data.length = mulle_buffer_get_length( buffer);
       _data.characters[ _data.length] = 0;
 

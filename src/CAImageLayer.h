@@ -16,6 +16,7 @@ MULLE_CURSOR_PROPERTIES;
 @property( assign, getter=isSelected) BOOL   selected;
 @property( observable, copy) CGPaint         *selectionPaint;
 @property( retain) NSObject <CGDrawable> *   image;
+@property( assign) CGRect                    displayedRect;
 
 // contentMode is not in UIView, because only UIImageView supports it (for now)
 @property CGContentMode   contentMode;

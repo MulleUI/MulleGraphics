@@ -347,7 +347,7 @@ scrolling:
       mulle_utf32_bufferconvert_to_utf8( &c,
                                          1,
                                          buffer,
-                                         (mulle_utf_add_bytes_function_t) mulle_buffer_add_bytes);      
+                                         mulle_buffer_add_bytes_callback);      
       mulle_buffer_add_string( buffer, &s[ pos]);
    }
 

@@ -123,6 +123,7 @@ typedef BOOL  CALayerDrawCallback_t( CALayer *layer, void *ctxt);
 // this is a bitfield that controls bounds/frame canvas/frame tracking
 @property( assign) NSUInteger          frameTracking;
 
+@property( assign) NSInteger           tag;
 
 // hidden is non-observable why ?
 @property BOOL                         hidden;

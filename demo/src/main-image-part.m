@@ -16,9 +16,9 @@ static BOOL   drawStuff( CALayer *layer, void *_context)
    vg = CGContextGetNVGContext( context);
    if( ! image)
    {
-      image    = [[[CGImage alloc] initWithContentsOfFileCString:"tardbeaver.png"
-                                                   textureFlags:0 //NVG_IMAGE_REPEATX|NVG_IMAGE_REPEATY
-                                                        context:context] autorelease];
+      image = [[[CGImage alloc] initWithContentsOfFileCString:"tardbeaver.png"
+                                                 textureFlags:0 //NVG_IMAGE_REPEATX|NVG_IMAGE_REPEATY
+                                                      context:context] autorelease];
       if( ! image)
       {
          fprintf( stderr, "could not load tardbeaver.png\n");
