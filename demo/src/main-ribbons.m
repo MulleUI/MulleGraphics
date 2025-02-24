@@ -18,11 +18,11 @@ struct ribbons_options
 
 @interface Ribbon : NSObject
 
-@property( assign) CGPoint         origin;
-@property( assign) Ribbon          *neighbor;
-@property( assign) CGPoint         d;
-@property( assign) CGFloat         hue;
-@property( assign) CGColor         color;
+@property( assign) CGPoint   origin;
+@property( assign) Ribbon    *neighbor;
+@property( assign) CGPoint   d;
+@property( assign) CGFloat   hue;
+@property( assign) CGColor   color;
 
 @end
 
@@ -53,7 +53,7 @@ struct ribbons_options
    struct NVGcontext  *vg;
 
    vg  = CGContextGetNVGContext( context);
-   mvgStrokeLineWithColor( vg, self->_origin, [self->_neighbor origin], 1.0, self->_color);
+   mvgStrokeLineWithColor( vg, self->_origin, [self->_neighbor origin], -1.0, self->_color);
    return( YES);
 }
 
@@ -72,7 +72,7 @@ struct ribbons_options
 @end
 
 
-@interface RibbonLayer : CALayer
+@interface RibbonLayer : CGGraphicsLayer
 {
    NSMutableArray  *_ribbons;
 }
@@ -96,7 +96,7 @@ struct ribbons_options
    [super initWithFrame:frame];
 
    self->_ribbons = [NSMutableArray new];
-
+   [self->_ribbons mulleSetThreadSafe:YES];
    canvas = [self canvas];
    base   = CGFloatMakeRandomMinMax( 0, 360);
    for( i = 0; i < opts.numPoints; i++)
@@ -104,6 +104,10 @@ struct ribbons_options
       ribbon = [[[Ribbon alloc] initWithCanvas:canvas
                                           base:base] autorelease];
       [self->_ribbons addObject:ribbon];
+
+      // as the ribbon is private to our "locked" Ribbonlayer, make it 
+      // inherit threadsafeness dynamically
+      [ribbon mulleSetThreadSafe:YES];
    }
 
    for( i = 0; i < opts.numPoints; i++)
@@ -135,7 +139,7 @@ struct ribbons_options
    vg     = CGContextGetNVGContext( context);
    canvas = [self canvas];
 
-   fillColor = CGColorMakeWithRGBA( 0, 0, 0, 10.0 / 255.0);
+   fillColor = CGColorMakeWithRGBA( 0, 0, 0, 5.0 / 255.0);
    mvgFillRectWithColor( vg, canvas, fillColor);
 
    if( opts.maxTicks && _ticks > opts.maxTicks)
@@ -193,13 +197,14 @@ int   main( int argc, char *argv[])
       [view setAutoresizingMask:UIViewAutoresizingScaleToFill];
       [contentPlane addSubview:view];
 
+      perf = [MulleUIPerf object];
+      [window setFrameDelegate:perf];
+
       [app addWindow:window];
    }
 
-   perf = [MulleUIPerf object];
-   [window setFrameDelegate:perf];
 
-   return( [app run]);
+   return( [app runApp]);
 }
 
 

@@ -12,29 +12,35 @@ if( MULLE_TRACE_INCLUDE)
 endif()
 
 #
-# Generated from sourcetree: 9A7D25D7-D5E0-4C1D-B8DB-0E8F2530264A;Xi;no-all-load,no-build,no-cmake-inherit,no-delete,no-dependency,no-fs,no-header,no-import,no-share,no-update;
+# Generated from sourcetree: 9A7D25D7-D5E0-4C1D-B8DB-0E8F2530264A;Xi;no-all-load,no-build,no-cmake-inherit,no-delete,no-dependency,no-fs,no-header,no-import,no-platform-darwin,no-share,no-update;
 # Disable with : `mulle-sourcetree mark Xi `
 # Disable for this platform: `mulle-sourcetree mark Xi no-cmake-platform-${MULLE_UNAME}`
 # Disable for a sdk: `mulle-sourcetree mark Xi no-cmake-sdk-<name>`
 #
-if( NOT XI_LIBRARY)
-   find_library( XI_LIBRARY NAMES
-      Xi
-   )
-   message( STATUS "XI_LIBRARY is ${XI_LIBRARY}")
-   #
-   # The order looks ascending, but due to the way this file is read
-   # it ends up being descending, which is what we need.
-   #
-   if( XI_LIBRARY)
-      #
-      # Add XI_LIBRARY to OS_SPECIFIC_LIBRARIES list.
-      # Disable with: `mulle-sourcetree mark Xi no-cmake-add`
-      #
-      list( APPEND OS_SPECIFIC_LIBRARIES ${XI_LIBRARY})
-      # intentionally left blank
+if( NOT ${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
+   if( COLLECT_OS_SPECIFIC_LIBRARIES_AS_NAMES)
+      list( APPEND OS_SPECIFIC_LIBRARIES "Xi")
    else()
-      # Disable with: `mulle-sourcetree mark Xi no-require-link`
-      message( FATAL_ERROR "XI_LIBRARY was not found")
+      if( NOT XI_LIBRARY)
+         find_library( XI_LIBRARY NAMES
+            Xi
+         )
+         message( STATUS "XI_LIBRARY is ${XI_LIBRARY}")
+         #
+         # The order looks ascending, but due to the way this file is read
+         # it ends up being descending, which is what we need.
+         #
+         if( XI_LIBRARY)
+            #
+            # Add XI_LIBRARY to OS_SPECIFIC_LIBRARIES list.
+            # Disable with: `mulle-sourcetree mark Xi no-cmake-add`
+            #
+            list( APPEND OS_SPECIFIC_LIBRARIES ${XI_LIBRARY})
+            # intentionally left blank
+         else()
+            # Disable with: `mulle-sourcetree mark Xi no-require-link`
+            message( SEND_ERROR "XI_LIBRARY was not found")
+         endif()
+      endif()
    endif()
 endif()

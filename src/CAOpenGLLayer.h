@@ -1,6 +1,6 @@
 #ifdef __has_include
-# if __has_include( "CALayer.h")
-#  import "CALayer.h"
+# if __has_include( "CGGraphicsLayer.h")
+#  import "CGGraphicsLayer.h"
 # endif
 #endif
 
@@ -11,12 +11,17 @@
 
 typedef void   CAOpenGLLayerViewPortCallback_t( CAOpenGLLayer *layer, CGContext *context);
 
-@interface CAOpenGLLayer : CALayer
+@interface CAOpenGLLayer : CGGraphicsLayer
 {
    CGRect   _viewPort;
    CGRect   _scissor;
 @private
    CGRect   _previousViewPort;
+
+   // just needed to draw a default triangle (sigh)
+   GLuint   _program;
+   GLuint   _vao;
+   GLuint   _vbo;
 }
 
 @property( assign) CAOpenGLLayerViewPortCallback_t  *viewPortDidChangeCallback;

@@ -58,13 +58,16 @@ static void   changeLayerString( UIView *view)
 {
    CATextLayer              *layer;
    CGFloat                  insetValue;
+   CGLayoutContext          *context;
    CGRect                   frame;
    CGSize                   size;
+   char                     *s;
    static NSUInteger        i;
    struct MulleEdgeInsets   insets;
-   UIView                   *contentPlane;
+   UIView                   *contentView;
    UIWindow                 *window;
-   char                     *s;
+
+   assert( view);
 
    window = (UIWindow *) [view window];
    assert( window);
@@ -82,26 +85,28 @@ static void   changeLayerString( UIView *view)
 
    MulleUICLog( "%td: %g \"%s\"", i, insetValue, s);
 
-   size = [layer sizeThatFits:CGSizeMake( INFINITY, INFINITY)
-                      context:[window layoutContext]];
+   context = [view layoutContext];
+   size    = [layer sizeThatFits:CGSizeMake( INFINITY, INFINITY)
+                         context:context];
    size.width  += insetValue * 2.0f;
    size.height += insetValue * 2.0f;
-   contentPlane = [window contentPlane];
+   contentView  = [window contentView];
 
-   frame = CGSizeCenterInRect( size, [contentPlane contentRect]);
+   frame = CGSizeCenterInRect( size, [contentView contentRect]);
    [view setFrame:frame];
 }
 
 
-static UIView   *setupSceneInWindow( UIWindow *window)
+static UIView *   setupSceneInWindow( UIWindow *window)
 {
    CATextLayer     *layer;
    CGRect          frame;
    UIView          *view;
-   UIWindowPlane   *contentPlane;
+   UIView          *contentView;
    CGSize          size;
 
-   contentPlane = [window contentView];
+   contentView = [window contentView];
+   [contentView setBackgroundColor:CGColorMakeGray()];
 
    layer = [DemoTextLayer object];
    [layer setFontPixelSize:20.0f];
@@ -112,7 +117,7 @@ static UIView   *setupSceneInWindow( UIWindow *window)
    [layer setTextBackgroundColor:CGColorMakeGray()];
 
    view = [UIView viewWithLayer:layer];
-   [contentPlane addSubview:view];
+   [contentView addSubview:view];
 
    changeLayerString( view);
 
@@ -147,7 +152,7 @@ int   main( int argc, char *argv[])
       window    = [UIWindow windowWithFrame:CGRectMake( 0.0f, 0.0f, 640.0f, 400.0f)
                             titleUTF8String:"Demo"
                                   styleMask:styleMask];
-      view  = setupSceneInWindow( window);
+      view = setupSceneInWindow( window);
       [app addWindow:window];
 
       timer = [[[NSTimer alloc] mulleInitWithRelativeTimeInterval:3.0
@@ -157,7 +162,7 @@ int   main( int argc, char *argv[])
       // after addWindow:
       [window addTimer:timer];
    }
-   return( [app run]);
+   return( [app runApp]);
 }
 
 

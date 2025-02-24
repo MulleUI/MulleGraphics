@@ -3,11 +3,20 @@
 #import <string.h>
 
 
+//
+// This demo shows how to setup some textures before starting the window.
+//
+
+
 // #define START_COLOR   CGColorMakeWhite()
 // #define END_COLOR     CGColorMakeBlue()
+//#define DEBUG_WRITE_IMAGE_PNG
+//#define DEBUG_NO_ANIMATION
+//#define DEBUG_NO_SCENE
+#define FPS               60.0
 
 
-@interface ImageLayer : CALayer
+@interface ImageLayer : CGGraphicsLayer
 
 @property( observable, copy) CGPaint   *paint;
 
@@ -28,6 +37,7 @@
 @end
 
 
+#ifndef DEBUG_NO_ANIMATION
 
 void  setupAnimation( UIWindow *window,
                       ImageLayer *layer,
@@ -53,15 +63,17 @@ void  setupAnimation( UIWindow *window,
    [[window postLayoutAnimator] addAnimation:group];
 }
 
+#endif
 
 
 struct DrawContext
 {
-   CGColor          startColor;
-   CGColor          endColor;
-   CGFloat          strokeWidth;
-   CAAngle          rotation;
+   CGColor   startColor;
+   CGColor   endColor;
+   CGFloat   strokeWidth;
+   CAAngle   rotation;
 };
+
 
 struct DrawContext   circleOne =
 {
@@ -114,28 +126,34 @@ void   setupSceneAndAnimation( UIWindow *window, CGContext *context)
 
    contentPlane = [window contentView];
 
-   frame  = [contentPlane contentRect];
-   frame  = CGRectInset( frame, 20, 20);
-   layer  = [ImageLayer layerWithFrame:frame];
-   image  = [CGLayer layerWithBitmapSize:MulleIntegerSizeMakeWithSize( frame.size)
-                         backgroundColor:CGColorMakeWhite()
-                            drawFunction:drawGradientCircle
-                                userInfo:&circleOne
-                                 context:context];
-//   [image writeToPNGUTF8String:"l1.png"];
-   [layer setPaint:image];
+   frame = [contentPlane contentRect];
+   frame = CGRectInset( frame, 20, 20);
+   image = [CGFramebuffer framebufferWithBitmapSize:CGPixelSizeMakeWithSize( frame.size)
+                                    backgroundColor:CGColorMakeWhite()
+                                       drawFunction:drawGradientCircle
+                                           userInfo:&circleOne
+                                            context:context];
+#ifdef DEBUG_WRITE_IMAGE_PNG
+   [image writeToPNGUTF8String:"l1.png"];
+#endif
 
+   layer = [ImageLayer layerWithFrame:frame];
+   [layer setPaint:image];
    view = [UIView viewWithLayer:layer];
    [contentPlane addSubview:view];
 
-   image2 = [CGLayer layerWithBitmapSize:MulleIntegerSizeMakeWithSize( frame.size)
-                         backgroundColor:CGColorMakeWhite()
-                            drawFunction:drawGradientCircle
-                                userInfo:&circleTwo
-                                 context:context];
-//   [image2 writeToPNGUTF8String:"l2.png"];
+#ifndef DEBUG_NO_ANIMATION
+   image2 = [CGFramebuffer framebufferWithBitmapSize:CGPixelSizeMakeWithSize( frame.size)
+                                     backgroundColor:CGColorMakeWhite()
+                                        drawFunction:drawGradientCircle
+                                            userInfo:&circleTwo
+                                             context:context];
+# ifdef DEBUG_WRITE_IMAGE_PNG
+   [image2 writeToPNGUTF8String:"l2.png"];
+# endif
    // UIView -> CAAnimation
    setupAnimation( window, layer, image2);
+#endif
 }
 
 
@@ -146,13 +164,15 @@ int   main( int argc, char *argv[])
    MulleUIPerf     *perf;
    UIApplication   *app;
    CGContext       *context;
+   BOOL            flag;
 
    app = [UIApplication sharedInstance];
    /*
     * window and app
     */
    styleMask = UIWindowStyleMaskDefault;
-   styleMask = UIWindowsStyleMaskBySetting( styleMask, UIWindowStyleRetained, NO);
+   styleMask = UIWindowsStyleMaskBySetting( styleMask, UIWindowStyleRetainedOnMainThread, YES);
+   styleMask = UIWindowsStyleMaskBySetting( styleMask, UIWindowStylePlanes, NO);
 
    window = [UIWindow windowWithFrame:CGRectMake( 0.0, 0.0, 800.0, 600.0)
                       titleUTF8String:"Demo"
@@ -160,16 +180,36 @@ int   main( int argc, char *argv[])
    assert( window);
 
    [window setBackgroundColor:CGColorMakeWithRGBA( 1.0, 1.0, 1.0, 1.0)];
-   [window setFrameRateHz:60.0];
+#ifdef FPS   
+   [window setFrameRateHz:FPS];
+#endif
 
-   // activate context so we can draw the images
-   // we use the window not the render context, because we are retained but
-   // executing in the main thread
-   context = (CGContext *) [window activateWindowGraphicsContext];
+   //
+   // Need to activate a context so we can draw the images. In retained mode
+   // we draw into offscreen context framebuffers. In non-retained mode, we
+   // draw into regular window context framebuffers. Therefore we have to use
+   // the -renderGraphicsContext and let MulleUI figure out which context to
+   // activate. We can't keep the context active though. Renabling this is 
+   // fairly crucial for performance though.
+   //
+   // As the context may move to another thread, we need to properly
+   // activate and deactivate, otherwise we are in misery
+   //
+#ifndef DEBUG_NO_SCENE
+   flag = [window keepOSGraphicsContextActive];
+   [window setKeepOSGraphicsContextActive:NO];
    {
-      setupSceneAndAnimation( window, context);
+      [window activateRenderGraphicsContext];
+      context = (CGContext *) [window renderGraphicsContext];
+      {
+         setupSceneAndAnimation( window, context);
+      }
+      [window deactivateRenderGraphicsContext];
    }
-   [window deactivateGraphicsContext:context];
+   // if we do this and go from NO to YES, we need to waste the contexts of
+   // the window, otherwise activation won't happen.
+   [window setKeepOSGraphicsContextActive:flag];
+#endif
 
    perf = [MulleUIPerf object];
    [window setFrameDelegate:perf];

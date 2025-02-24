@@ -23,13 +23,12 @@
 //   |                    |
 //   '--------------------'
 //
-static UIMouseMotionEvent  *handleMouseMotionEvent( UIWindow *window,
+static UIMouseMotionEvent  *handleMouseMotionEvent( UIView *contentPlane,
                                                     UIMouseMotionEvent *event)
 {
    CALayer         *layer;
    CGRect          bounds;
    CGRect          contentRect;
-   UIWindowPlane   *contentPlane;
    NSUInteger      n;
    UIView          *view;
    UIView          *views[ 1];
@@ -42,15 +41,14 @@ static UIMouseMotionEvent  *handleMouseMotionEvent( UIWindow *window,
       return( event);
 
    // get our layer somewhat clumsily,
-   contentPlane = [window contentView];
    contentRect  = [contentPlane contentRect];
    n            = [contentPlane getSubviews:views
-                                      range:NSMakeRange( 0, 1)];
+                                      range:NSRangeMake( 0, 1)];
    assert( n == 1);
    view  = views[ 0];
    assert( view);
 
-   layer = (CALayer *) [view layer];
+   layer = (CGGraphicsLayer *) [view layer];
    assert( layer);
    //
    // there we are, now use the mouse motion event to move the bounds
@@ -67,7 +65,7 @@ static UIMouseMotionEvent  *handleMouseMotionEvent( UIWindow *window,
 }
 
 
-static void  drawStuff( CALayer *layer, void *_context)
+static BOOL   drawStuff( CGGraphicsLayer *aLayer, CGContext *_context)
 {
    CGContext           *context = _context;
    CGFloat             canvasExtent;
@@ -76,7 +74,7 @@ static void  drawStuff( CALayer *layer, void *_context)
    CGRect              canvas;
    struct NVGcontext   *vg;
 
-   canvas       = [layer canvas];
+   canvas       = [aLayer canvas];
    canvasExtent = CGSizeGetMinimum( canvas.size);
    strokeWidth  = 3.0;
    radius       = (canvasExtent - strokeWidth) / 2.0;
@@ -93,6 +91,7 @@ static void  drawStuff( CALayer *layer, void *_context)
                       CGRectMake( 10, 10, 400, 32),
                       CGContentModeScaleAspectFit,
                       MVGTextAlignVisually);
+   return( YES);
 }
 
 
@@ -110,7 +109,7 @@ static void   setupSceneInView( UIView *contentPlane)
    [view setBackgroundColor:CGColorMakeWithRGBA( 0.33, 0.33, 0.33, 1.0)];
    [contentPlane addSubview:view];
 
-   layer = (CALayer *) [view layer];
+   layer = (CGGraphicsLayer *) [view layer];
    [layer setDrawCallback:drawStuff];
 
    // The canvas is a square where we draw the circle unto.
@@ -130,12 +129,12 @@ int   main( int argc, char *argv[])
       assert( window);
 
       [window setBackgroundColor:CGColorMakeWithRGBA( 1.0, 1.0, 1.0, 1.0)];
-      [window setMouseMotionEventCallback:handleMouseMotionEvent];
+      [[window contentView] setMouseMotionEventCallback:handleMouseMotionEvent];
       setupSceneInView( [window contentView]);
 
       [app addWindow:window];
    }
-   return( [app run]);
+   return( [app runApp]);
 }
 
 

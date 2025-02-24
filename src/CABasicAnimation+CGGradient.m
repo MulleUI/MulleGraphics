@@ -86,7 +86,7 @@
    assert( count);
 
    n = startCount + endCount + count;
-   mulle_flexarray_do( colors_buf, union CGColorOrColorDiff, 12, n)
+   mulle_alloca_do( colors_buf, union CGColorOrColorDiff, n)
    {
       start_colors        = colors_buf;
       end_colors          = &start_colors[ startCount];
@@ -96,7 +96,7 @@
       [self getColors:(void *) start_colors];
       [end getColors:(void *) end_colors];
 
-      mulle_flexarray_do( locations_buf, float, 12, n)
+      mulle_alloca_do( locations_buf, float, n)
       {
          start_locations        = locations_buf;
          end_locations          = &start_locations[ startCount];
@@ -209,7 +209,7 @@
                                                  count,
                                                  CAAnimationStickyArrayCenter);
    n = previousCount + diffCount + count;
-   mulle_flexarray_do( colors_buf, union CGColorOrColorDiff, 12, n)
+   mulle_alloca_do( colors_buf, union CGColorOrColorDiff, n)
    {
       previous_colordiffs = colors_buf;
       colordiffs          = &previous_colordiffs[ previousCount];
@@ -220,7 +220,7 @@
       [diff getColors:(CGColor *) colordiffs];
       [previous getColors:(CGColor *) previous_colordiffs];
 
-      mulle_flexarray_do( locations_buf, float, 12, n)
+      mulle_alloca_do( locations_buf, float, n)
       {
          previous_locationdiffs = locations_buf;
          locationdiffs          = &previous_locationdiffs[ previousCount];

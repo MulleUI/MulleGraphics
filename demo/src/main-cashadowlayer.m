@@ -80,7 +80,7 @@ int   main( int argc, char *argv[])
       [window setWillRenderFrameCallback:changeShadow];
       [app addWindow:window];
    }
-   return( [app run]);
+   return( [app runApp]);
 }
 
 

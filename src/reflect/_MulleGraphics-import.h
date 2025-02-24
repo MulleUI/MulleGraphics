@@ -11,26 +11,32 @@
  *
  */
 
-// You can tweak the following #import with these commands.
-// (Use 5D78374A-4911-4625-B4A2-EEC28CE39F50 instead of MulleCG if there are duplicate entries)
-//    remove #import: : `mulle-sde dependency mark MulleCG no-header`
-//    rename:              `mulle-sde dependency|library set MulleCG include whatever.h`
-//    reorder:             `mulle-sde dependency move MulleCG <up|down>`
-//    toggle #import:     `mulle-sde dependency mark MulleCG [no-]import`
-//    toggle public:       `mulle-sde dependency mark MulleCG [no-]public`
-//    toggle optional:     `mulle-sde dependency mark MulleCG [no-]require`
-//    remove for platform: `mulle-sde dependency mark MulleCG no-platform-<uname>`
+// To remove the following dependency (headers and library) completely:
+//   `mulle-sde dependency remove MulleCG`
+// (Use 5D78374A-4911-4625-B4A2-EEC28CE39F50 instead of MulleCG, if there are duplicate entries)
+//
+// You can tweak the following #import with these commands:
+//    remove #import      : `mulle-sde dependency mark MulleCG no-header`
+//    rename              : `mulle-sde dependency|library set MulleCG include whatever.h`
+//    reorder             : `mulle-sde dependency move MulleCG <up|down>`
+//    toggle #import      : `mulle-sde dependency mark MulleCG [no-]import`
+//    toggle public       : `mulle-sde dependency mark MulleCG [no-]public`
+//    toggle optional     : `mulle-sde dependency mark MulleCG [no-]require`
+//    remove for platform : `mulle-sde dependency mark MulleCG no-platform-<uname>`
 //        (use `mulle-sourcetree-to-c --unames` to list known values)
 #import <MulleCG/MulleCG.h>   // MulleCG
 
-// You can tweak the following #import with these commands.
-// (Use B3672511-8868-4FDC-98D2-8CEC828555AD instead of MulleCA if there are duplicate entries)
-//    remove #import: : `mulle-sde dependency mark MulleCA no-header`
-//    rename:              `mulle-sde dependency|library set MulleCA include whatever.h`
-//    reorder:             `mulle-sde dependency move MulleCA <up|down>`
-//    toggle #import:     `mulle-sde dependency mark MulleCA [no-]import`
-//    toggle public:       `mulle-sde dependency mark MulleCA [no-]public`
-//    toggle optional:     `mulle-sde dependency mark MulleCA [no-]require`
-//    remove for platform: `mulle-sde dependency mark MulleCA no-platform-<uname>`
+// To remove the following dependency (headers and library) completely:
+//   `mulle-sde dependency remove MulleCA`
+// (Use B3672511-8868-4FDC-98D2-8CEC828555AD instead of MulleCA, if there are duplicate entries)
+//
+// You can tweak the following #import with these commands:
+//    remove #import      : `mulle-sde dependency mark MulleCA no-header`
+//    rename              : `mulle-sde dependency|library set MulleCA include whatever.h`
+//    reorder             : `mulle-sde dependency move MulleCA <up|down>`
+//    toggle #import      : `mulle-sde dependency mark MulleCA [no-]import`
+//    toggle public       : `mulle-sde dependency mark MulleCA [no-]public`
+//    toggle optional     : `mulle-sde dependency mark MulleCA [no-]require`
+//    remove for platform : `mulle-sde dependency mark MulleCA no-platform-<uname>`
 //        (use `mulle-sourcetree-to-c --unames` to list known values)
 #import <MulleCA/MulleCA.h>   // MulleCA

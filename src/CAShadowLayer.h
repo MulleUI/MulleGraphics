@@ -1,13 +1,13 @@
 #ifdef __has_include
-# if __has_include( "CALayer.h")
-#  import "CALayer.h"
+# if __has_include( "CGGraphicsLayer.h")
+#  import "CGGraphicsLayer.h"
 # endif
 #endif
 
 #import "import.h"
 
 
-@interface CAShadowLayer : CALayer
+@interface CAShadowLayer : CGGraphicsLayer
 
 @property( observable, assign) CGFloat          shadowBlur;
 @property( observable, assign) CGColor          shadowColor;

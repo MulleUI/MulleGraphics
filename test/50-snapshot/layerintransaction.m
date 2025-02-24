@@ -5,9 +5,9 @@ int   main( int argc, char *argv[])
 {
    CATransaction      *transaction;
    CAAnimationGroup   *group;
-   CALayer            *layer;
+   CGGraphicsLayer    *layer;
 
-   layer = [CALayer object];
+   layer = [CGGraphicsLayer object];
    [layer setBorderPaint:[CGPaint paintWithColor:CGColorMakeIndigo()]];
 
    transaction = [CATransaction object];

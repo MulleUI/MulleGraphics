@@ -1,8 +1,284 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
+  <component name="AutoImportSettings">
+    <option name="autoReloadType" value="SELECTIVE" />
+  </component>
+  <component name="CMakePresetLoader"><![CDATA[{
+  "useNewFormat": true
+}]]></component>
+  <component name="CMakeProjectFlavorService">
+    <option name="flavorId" value="CMakePlainProjectFlavor" />
+  </component>
+  <component name="CMakeReloadState">
+    <option name="reloaded" value="true" />
+  </component>
+  <component name="CMakeRunConfigurationManager">
+    <generated>
+      <config projectName="MulleGraphics" targetName="mulle_sde_upgrade" />
+      <config projectName="MulleGraphics" targetName="MulleGraphics" />
+      <config projectName="MulleGraphics" targetName="mulle_sde_clean_all" />
+      <config projectName="MulleGraphics" targetName="mulle_sde_clean_target" />
+      <config projectName="MulleGraphics" targetName="mulle_sde_reflect" />
+      <config projectName="MulleGraphics" targetName="mulle_sde_clean_tidy" />
+      <config projectName="MulleGraphics" targetName="_1_MulleGraphics" />
+      <config projectName="MulleGraphics" targetName="mulle_sde_craft_craftorder" />
+      <config projectName="MulleGraphics" targetName="_2_MulleGraphics" />
+    </generated>
+  </component>
   <component name="CMakeSettings">
     <configurations>
       <configuration PROFILE_NAME="Debug" ENABLED="true" CONFIG_NAME="Debug" />
     </configurations>
+  </component>
+  <component name="ChangeListManager">
+    <list default="true" id="4c490e96-7615-4869-b1d1-75f90fa7d097" name="Changes" comment="">
+      <change beforePath="$PROJECT_DIR$/.idea/MulleGraphics.iml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/MulleGraphics.iml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/modules.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/modules.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.mulle/etc/sourcetree/config" beforeDir="false" afterPath="$PROJECT_DIR$/.mulle/etc/sourcetree/config" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.mulle/share/env/environment-extension.sh" beforeDir="false" afterPath="$PROJECT_DIR$/.mulle/share/env/environment-extension.sh" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.mulle/share/env/environment-plugin.sh" beforeDir="false" afterPath="$PROJECT_DIR$/.mulle/share/env/environment-plugin.sh" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.mulle/share/env/environment.sh" beforeDir="false" afterPath="$PROJECT_DIR$/.mulle/share/env/environment.sh" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.mulle/share/env/include-environment.sh" beforeDir="false" afterPath="$PROJECT_DIR$/.mulle/share/env/include-environment.sh" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.mulle/share/env/tool-plugin" beforeDir="false" afterPath="$PROJECT_DIR$/.mulle/share/env/tool-plugin" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.mulle/share/env/version" beforeDir="false" afterPath="$PROJECT_DIR$/.mulle/share/env/version" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.mulle/share/match/match.d/85-header--public-headers" beforeDir="false" afterPath="$PROJECT_DIR$/.mulle/share/match/match.d/85-header--public-headers" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.mulle/share/sde/version/foundation/objc" beforeDir="false" afterPath="$PROJECT_DIR$/.mulle/share/sde/version/foundation/objc" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.mulle/share/sde/version/mulle-c/c" beforeDir="false" afterPath="$PROJECT_DIR$/.mulle/share/sde/version/mulle-c/c" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.mulle/share/sde/version/mulle-foundation/objc" beforeDir="false" afterPath="$PROJECT_DIR$/.mulle/share/sde/version/mulle-foundation/objc" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.mulle/share/sde/version/mulle-foundation/objc-demo" beforeDir="false" afterPath="$PROJECT_DIR$/.mulle/share/sde/version/mulle-foundation/objc-demo" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.mulle/share/sde/version/mulle-objc/objc-demo" beforeDir="false" afterPath="$PROJECT_DIR$/.mulle/share/sde/version/mulle-objc/objc-demo" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.mulle/share/sde/version/mulle-sde/c-cmake" beforeDir="false" afterPath="$PROJECT_DIR$/.mulle/share/sde/version/mulle-sde/c-cmake" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.mulle/share/sde/version/mulle-sde/cmake" beforeDir="false" afterPath="$PROJECT_DIR$/.mulle/share/sde/version/mulle-sde/cmake" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/cmake/reflect/_Dependencies.cmake" beforeDir="false" afterPath="$PROJECT_DIR$/cmake/reflect/_Dependencies.cmake" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/cmake/reflect/_Headers.cmake" beforeDir="false" afterPath="$PROJECT_DIR$/cmake/reflect/_Headers.cmake" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/cmake/reflect/_Libraries.cmake" beforeDir="false" afterPath="$PROJECT_DIR$/cmake/reflect/_Libraries.cmake" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/cmake/reflect/_Sources.cmake" beforeDir="false" afterPath="$PROJECT_DIR$/cmake/reflect/_Sources.cmake" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/cmake/share/CMakeTweaksC.cmake" beforeDir="false" afterPath="$PROJECT_DIR$/cmake/share/CMakeTweaksC.cmake" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/cmake/share/CompilerWarningsC.cmake" beforeDir="false" afterPath="$PROJECT_DIR$/cmake/share/CompilerWarningsC.cmake" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/cmake/share/DependenciesAndLibraries.cmake" beforeDir="false" afterPath="$PROJECT_DIR$/cmake/share/DependenciesAndLibraries.cmake" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/cmake/share/Environment.cmake" beforeDir="false" afterPath="$PROJECT_DIR$/cmake/share/Environment.cmake" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/cmake/share/Executable.cmake" beforeDir="false" afterPath="$PROJECT_DIR$/cmake/share/Executable.cmake" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/cmake/share/ExecutableObjC.cmake" beforeDir="false" afterPath="$PROJECT_DIR$/cmake/share/ExecutableObjC.cmake" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/cmake/share/Framework.cmake" beforeDir="false" afterPath="$PROJECT_DIR$/cmake/share/Framework.cmake" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/cmake/share/Headers.cmake" beforeDir="false" afterPath="$PROJECT_DIR$/cmake/share/Headers.cmake" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/cmake/share/IDESupport.cmake" beforeDir="false" afterPath="$PROJECT_DIR$/cmake/share/IDESupport.cmake" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/cmake/share/Library.cmake" beforeDir="false" afterPath="$PROJECT_DIR$/cmake/share/Library.cmake" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/cmake/share/Motd.cmake" beforeDir="false" afterPath="$PROJECT_DIR$/cmake/share/Motd.cmake" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/demo/.mulle/etc/sourcetree/config" beforeDir="false" afterPath="$PROJECT_DIR$/demo/.mulle/etc/sourcetree/config" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/demo/CMakeLists.txt" beforeDir="false" afterPath="$PROJECT_DIR$/demo/CMakeLists.txt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/demo/cmake/ExecutableObjC.cmake" beforeDir="false" afterPath="$PROJECT_DIR$/demo/cmake/ExecutableObjC.cmake" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/demo/cmake/reflect/_Dependencies.cmake" beforeDir="false" afterPath="$PROJECT_DIR$/demo/cmake/reflect/_Dependencies.cmake" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/demo/cmake/reflect/_Libraries.cmake" beforeDir="false" afterPath="$PROJECT_DIR$/demo/cmake/reflect/_Libraries.cmake" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/demo/src/main-animate-circles.m" beforeDir="false" afterPath="$PROJECT_DIR$/demo/src/main-animate-circles.m" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/demo/src/main-animate-gradient.m" beforeDir="false" afterPath="$PROJECT_DIR$/demo/src/main-animate-gradient.m" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/demo/src/main-animate-image.m" beforeDir="false" afterPath="$PROJECT_DIR$/demo/src/main-animate-image.m" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/demo/src/main-canvas-bounds-frame.m" beforeDir="false" afterPath="$PROJECT_DIR$/demo/src/main-canvas-bounds-frame.m" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/demo/src/main-cashadowlayer.m" beforeDir="false" afterPath="$PROJECT_DIR$/demo/src/main-cashadowlayer.m" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/demo/src/main-cashapelayer.m" beforeDir="false" afterPath="$PROJECT_DIR$/demo/src/main-cashapelayer.m" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/demo/src/main-catextlayer-cleartype.m" beforeDir="false" afterPath="$PROJECT_DIR$/demo/src/main-catextlayer-cleartype.m" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/demo/src/main-catextlayer-size.m" beforeDir="false" afterPath="$PROJECT_DIR$/demo/src/main-catextlayer-size.m" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/demo/src/main-catextlayer.m" beforeDir="false" afterPath="$PROJECT_DIR$/demo/src/main-catextlayer.m" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/demo/src/main-checkerboard.m" beforeDir="false" afterPath="$PROJECT_DIR$/demo/src/main-checkerboard.m" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/demo/src/main-hexagon.m" beforeDir="false" afterPath="$PROJECT_DIR$/demo/src/main-hexagon.m" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/demo/src/main-image-part-scaled.m" beforeDir="false" afterPath="$PROJECT_DIR$/demo/src/main-image-part-scaled.m" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/demo/src/main-image-part.m" beforeDir="false" afterPath="$PROJECT_DIR$/demo/src/main-image-part.m" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/demo/src/main-image.m" beforeDir="false" afterPath="$PROJECT_DIR$/demo/src/main-image.m" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/demo/src/main-l-system.m" beforeDir="false" afterPath="$PROJECT_DIR$/demo/src/main-l-system.m" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/demo/src/main-layer-border-background.m" beforeDir="false" afterPath="$PROJECT_DIR$/demo/src/main-layer-border-background.m" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/demo/src/main-opengl-mix.m" beforeDir="false" afterPath="$PROJECT_DIR$/demo/src/main-opengl-mix.m" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/demo/src/main-opengl-texture.m" beforeDir="false" afterPath="$PROJECT_DIR$/demo/src/main-opengl-texture.m" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/demo/src/main-opengl-texture2.m" beforeDir="false" afterPath="$PROJECT_DIR$/demo/src/main-opengl-texture2.m" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/demo/src/main-opengllayer.m" beforeDir="false" afterPath="$PROJECT_DIR$/demo/src/main-opengllayer.m" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/demo/src/main-orbital.m" beforeDir="false" afterPath="$PROJECT_DIR$/demo/src/main-orbital.m" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/demo/src/main-panned-canvas.m" beforeDir="false" afterPath="$PROJECT_DIR$/demo/src/main-panned-canvas.m" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/demo/src/main-plasma-cpu.m" beforeDir="false" afterPath="$PROJECT_DIR$/demo/src/main-plasma-cpu.m" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/demo/src/main-plasma-opengl.m" beforeDir="false" afterPath="$PROJECT_DIR$/demo/src/main-plasma-opengl.m" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/demo/src/main-radial-rainbows.m" beforeDir="false" afterPath="$PROJECT_DIR$/demo/src/main-radial-rainbows.m" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/demo/src/main-ribbons.m" beforeDir="false" afterPath="$PROJECT_DIR$/demo/src/main-ribbons.m" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/demo/src/main-scaled-canvas.m" beforeDir="false" afterPath="$PROJECT_DIR$/demo/src/main-scaled-canvas.m" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/demo/src/main-tunnel-cpu.m" beforeDir="false" afterPath="$PROJECT_DIR$/demo/src/main-tunnel-cpu.m" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/demo/src/main-water-cpu.m" beforeDir="false" afterPath="$PROJECT_DIR$/demo/src/main-water-cpu.m" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/demo/src/main-whirl.m" beforeDir="false" afterPath="$PROJECT_DIR$/demo/src/main-whirl.m" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/demo/src/reflect/_demos-export.h" beforeDir="false" afterPath="$PROJECT_DIR$/demo/src/reflect/_demos-export.h" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/demo/src/reflect/_demos-import.h" beforeDir="false" afterPath="$PROJECT_DIR$/demo/src/reflect/_demos-import.h" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/demo/src/reflect/_demos-provide.h" beforeDir="false" afterPath="$PROJECT_DIR$/demo/src/reflect/_demos-provide.h" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/CABasicAnimation+CGColor.m" beforeDir="false" afterPath="$PROJECT_DIR$/src/CABasicAnimation+CGColor.m" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/CABasicAnimation+CGGradient.m" beforeDir="false" afterPath="$PROJECT_DIR$/src/CABasicAnimation+CGGradient.m" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/CACPUImageLayer.m" beforeDir="false" afterPath="$PROJECT_DIR$/src/CACPUImageLayer.m" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/CAGradientLayer.h" beforeDir="false" afterPath="$PROJECT_DIR$/src/CAGradientLayer.h" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/CAGradientLayer.m" beforeDir="false" afterPath="$PROJECT_DIR$/src/CAGradientLayer.m" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/CAImageLayer+Cursor.m" beforeDir="false" afterPath="$PROJECT_DIR$/src/CAImageLayer+Cursor.m" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/CAImageLayer.h" beforeDir="false" afterPath="$PROJECT_DIR$/src/CAImageLayer.h" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/CAImageLayer.m" beforeDir="false" afterPath="$PROJECT_DIR$/src/CAImageLayer.m" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/CALayer+MulleGraphics.h" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/CALayer+MulleGraphics.m" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/CALayer.h" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/CALayer.m" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/CAOpenGLLayer.h" beforeDir="false" afterPath="$PROJECT_DIR$/src/CAOpenGLLayer.h" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/CAOpenGLLayer.m" beforeDir="false" afterPath="$PROJECT_DIR$/src/CAOpenGLLayer.m" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/CAShadowLayer+nanovg.m" beforeDir="false" afterPath="$PROJECT_DIR$/src/CAShadowLayer+nanovg.m" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/CAShadowLayer.h" beforeDir="false" afterPath="$PROJECT_DIR$/src/CAShadowLayer.h" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/CAShapeLayer+nanovg.m" beforeDir="false" afterPath="$PROJECT_DIR$/src/CAShapeLayer+nanovg.m" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/CAShapeLayer.h" beforeDir="false" afterPath="$PROJECT_DIR$/src/CAShapeLayer.h" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/CATextLayer+Selection.m" beforeDir="false" afterPath="$PROJECT_DIR$/src/CATextLayer+Selection.m" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/CATextLayer.h" beforeDir="false" afterPath="$PROJECT_DIR$/src/CATextLayer.h" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/CATextLayer.m" beforeDir="false" afterPath="$PROJECT_DIR$/src/CATextLayer.m" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/CGColor+MulleObjC.h" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/CGColor+UTF8String.h" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/CGColor+UTF8String.m" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/reflect/_MulleGraphics-export.h" beforeDir="false" afterPath="$PROJECT_DIR$/src/reflect/_MulleGraphics-export.h" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/reflect/_MulleGraphics-import.h" beforeDir="false" afterPath="$PROJECT_DIR$/src/reflect/_MulleGraphics-import.h" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/reflect/objc-loader.inc" beforeDir="false" afterPath="$PROJECT_DIR$/src/reflect/objc-loader.inc" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/test/.mulle/etc/sourcetree/config" beforeDir="false" afterPath="$PROJECT_DIR$/test/.mulle/etc/sourcetree/config" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/test/.mulle/share/env/environment-extension.sh" beforeDir="false" afterPath="$PROJECT_DIR$/test/.mulle/share/env/environment-extension.sh" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/test/.mulle/share/env/environment-plugin.sh" beforeDir="false" afterPath="$PROJECT_DIR$/test/.mulle/share/env/environment-plugin.sh" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/test/.mulle/share/env/environment.sh" beforeDir="false" afterPath="$PROJECT_DIR$/test/.mulle/share/env/environment.sh" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/test/.mulle/share/env/include-environment.sh" beforeDir="false" afterPath="$PROJECT_DIR$/test/.mulle/share/env/include-environment.sh" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/test/.mulle/share/env/tool-plugin" beforeDir="false" afterPath="$PROJECT_DIR$/test/.mulle/share/env/tool-plugin" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/test/.mulle/share/env/version" beforeDir="false" afterPath="$PROJECT_DIR$/test/.mulle/share/env/version" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/test/.mulle/share/sde/version/mulle-sde/base-test-runtime" beforeDir="false" afterPath="$PROJECT_DIR$/test/.mulle/share/sde/version/mulle-sde/base-test-runtime" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/test/.mulle/share/sde/version/mulle-sde/c-test-runtime" beforeDir="false" afterPath="$PROJECT_DIR$/test/.mulle/share/sde/version/mulle-sde/c-test-runtime" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/test/.mulle/share/sde/version/mulle-sde/objc-test-runtime" beforeDir="false" afterPath="$PROJECT_DIR$/test/.mulle/share/sde/version/mulle-sde/objc-test-runtime" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/test/.mulle/share/sourcetree/config" beforeDir="false" afterPath="$PROJECT_DIR$/test/.mulle/share/sourcetree/config" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/test/10-first/calayerleak.m" beforeDir="false" afterPath="$PROJECT_DIR$/test/10-first/calayerleak.m" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/test/10-first/catextlayerleak.m" beforeDir="false" afterPath="$PROJECT_DIR$/test/10-first/catextlayerleak.m" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/test/50-snapshot/calayersnap.m" beforeDir="false" afterPath="$PROJECT_DIR$/test/50-snapshot/calayersnap.m" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/test/50-snapshot/layerintransaction.m" beforeDir="false" afterPath="$PROJECT_DIR$/test/50-snapshot/layerintransaction.m" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/test/50-snapshot/paintintransaction.m" beforeDir="false" afterPath="$PROJECT_DIR$/test/50-snapshot/paintintransaction.m" afterDir="false" />
+    </list>
+    <option name="SHOW_DIALOG" value="false" />
+    <option name="HIGHLIGHT_CONFLICTS" value="true" />
+    <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
+    <option name="LAST_RESOLUTION" value="IGNORE" />
+  </component>
+  <component name="ClangdSettings">
+    <option name="formatViaClangd" value="false" />
+  </component>
+  <component name="ExecutionTargetManager" SELECTED_TARGET="CMakeBuildProfile:Debug" />
+  <component name="Git.Settings">
+    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
+  </component>
+  <component name="ProjectColorInfo"><![CDATA[{
+  "associatedIndex": 3
+}]]></component>
+  <component name="ProjectId" id="2oafUQX5gvIORPqSggNlyrUvEK1" />
+  <component name="ProjectViewState">
+    <option name="hideEmptyMiddlePackages" value="true" />
+    <option name="showLibraryContents" value="true" />
+  </component>
+  <component name="PropertiesComponent"><![CDATA[{
+  "keyToString": {
+    "RunOnceActivity.CodyAccountHistoryMigration": "true",
+    "RunOnceActivity.CodyAccountsIdsRefresh": "true",
+    "RunOnceActivity.CodyAssignOrphanedChatsToActiveAccount": "true",
+    "RunOnceActivity.CodyConvertUrlToCodebaseName": "true",
+    "RunOnceActivity.CodyHistoryLlmMigration": "true",
+    "RunOnceActivity.CodyMigrateChatHistory-v2": "true",
+    "RunOnceActivity.CodyProjectSettingsMigration": "true",
+    "RunOnceActivity.ShowReadmeOnStart": "true",
+    "RunOnceActivity.ToggleCodyToolWindowAfterMigration": "true",
+    "RunOnceActivity.cidr.known.project.marker": "true",
+    "RunOnceActivity.readMode.enableVisualFormatting": "true",
+    "cf.first.check.clang-format": "false",
+    "cidr.known.project.marker": "true",
+    "git-widget-placeholder": "master",
+    "node.js.detected.package.eslint": "true",
+    "node.js.detected.package.tslint": "true",
+    "node.js.selected.package.eslint": "(autodetect)",
+    "node.js.selected.package.tslint": "(autodetect)",
+    "nodejs_package_manager_path": "npm",
+    "vue.rearranger.settings.migration": "true"
+  }
+}]]></component>
+  <component name="RunManager" selected="CMake Application.mulle_sde_clean_all">
+    <configuration default="true" type="CLionExternalRunConfiguration" factoryName="Application" REDIRECT_INPUT="false" ELEVATE="false" USE_EXTERNAL_CONSOLE="false" EMULATE_TERMINAL="false" PASS_PARENT_ENVS_2="true">
+      <method v="2">
+        <option name="CLION.EXTERNAL.BUILD" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="MulleGraphics" type="CMakeRunConfiguration" factoryName="Application" REDIRECT_INPUT="false" ELEVATE="false" USE_EXTERNAL_CONSOLE="false" EMULATE_TERMINAL="false" PASS_PARENT_ENVS_2="true" PROJECT_NAME="MulleGraphics" TARGET_NAME="MulleGraphics" CONFIG_NAME="Debug">
+      <method v="2">
+        <option name="com.jetbrains.cidr.execution.CidrBuildBeforeRunTaskProvider$BuildBeforeRunTask" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="_1_MulleGraphics" type="CMakeRunConfiguration" factoryName="Application" REDIRECT_INPUT="false" ELEVATE="false" USE_EXTERNAL_CONSOLE="false" EMULATE_TERMINAL="false" PASS_PARENT_ENVS_2="true" PROJECT_NAME="MulleGraphics" TARGET_NAME="_1_MulleGraphics" CONFIG_NAME="Debug">
+      <method v="2">
+        <option name="com.jetbrains.cidr.execution.CidrBuildBeforeRunTaskProvider$BuildBeforeRunTask" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="_2_MulleGraphics" type="CMakeRunConfiguration" factoryName="Application" REDIRECT_INPUT="false" ELEVATE="false" USE_EXTERNAL_CONSOLE="false" EMULATE_TERMINAL="false" PASS_PARENT_ENVS_2="true" PROJECT_NAME="MulleGraphics" TARGET_NAME="_2_MulleGraphics" CONFIG_NAME="Debug">
+      <method v="2">
+        <option name="com.jetbrains.cidr.execution.CidrBuildBeforeRunTaskProvider$BuildBeforeRunTask" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="mulle_sde_clean_all" type="CMakeRunConfiguration" factoryName="Application" REDIRECT_INPUT="false" ELEVATE="false" USE_EXTERNAL_CONSOLE="false" EMULATE_TERMINAL="false" PASS_PARENT_ENVS_2="true" PROJECT_NAME="MulleGraphics" TARGET_NAME="mulle_sde_clean_all" CONFIG_NAME="Debug">
+      <method v="2">
+        <option name="com.jetbrains.cidr.execution.CidrBuildBeforeRunTaskProvider$BuildBeforeRunTask" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="mulle_sde_clean_target" type="CMakeRunConfiguration" factoryName="Application" REDIRECT_INPUT="false" ELEVATE="false" USE_EXTERNAL_CONSOLE="false" EMULATE_TERMINAL="false" PASS_PARENT_ENVS_2="true" PROJECT_NAME="MulleGraphics" TARGET_NAME="mulle_sde_clean_target" CONFIG_NAME="Debug">
+      <method v="2">
+        <option name="com.jetbrains.cidr.execution.CidrBuildBeforeRunTaskProvider$BuildBeforeRunTask" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="mulle_sde_clean_tidy" type="CMakeRunConfiguration" factoryName="Application" REDIRECT_INPUT="false" ELEVATE="false" USE_EXTERNAL_CONSOLE="false" EMULATE_TERMINAL="false" PASS_PARENT_ENVS_2="true" PROJECT_NAME="MulleGraphics" TARGET_NAME="mulle_sde_clean_tidy" CONFIG_NAME="Debug">
+      <method v="2">
+        <option name="com.jetbrains.cidr.execution.CidrBuildBeforeRunTaskProvider$BuildBeforeRunTask" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="mulle_sde_craft_craftorder" type="CMakeRunConfiguration" factoryName="Application" REDIRECT_INPUT="false" ELEVATE="false" USE_EXTERNAL_CONSOLE="false" EMULATE_TERMINAL="false" PASS_PARENT_ENVS_2="true" PROJECT_NAME="MulleGraphics" TARGET_NAME="mulle_sde_craft_craftorder" CONFIG_NAME="Debug">
+      <method v="2">
+        <option name="com.jetbrains.cidr.execution.CidrBuildBeforeRunTaskProvider$BuildBeforeRunTask" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="mulle_sde_reflect" type="CMakeRunConfiguration" factoryName="Application" REDIRECT_INPUT="false" ELEVATE="false" USE_EXTERNAL_CONSOLE="false" EMULATE_TERMINAL="false" PASS_PARENT_ENVS_2="true" PROJECT_NAME="MulleGraphics" TARGET_NAME="mulle_sde_reflect" CONFIG_NAME="Debug">
+      <method v="2">
+        <option name="com.jetbrains.cidr.execution.CidrBuildBeforeRunTaskProvider$BuildBeforeRunTask" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="mulle_sde_upgrade" type="CMakeRunConfiguration" factoryName="Application" REDIRECT_INPUT="false" ELEVATE="false" USE_EXTERNAL_CONSOLE="false" EMULATE_TERMINAL="false" PASS_PARENT_ENVS_2="true" PROJECT_NAME="MulleGraphics" TARGET_NAME="mulle_sde_upgrade" CONFIG_NAME="Debug">
+      <method v="2">
+        <option name="com.jetbrains.cidr.execution.CidrBuildBeforeRunTaskProvider$BuildBeforeRunTask" enabled="true" />
+      </method>
+    </configuration>
+    <list>
+      <item itemvalue="CMake Application.mulle_sde_clean_all" />
+      <item itemvalue="CMake Application.mulle_sde_clean_target" />
+      <item itemvalue="CMake Application.mulle_sde_clean_tidy" />
+      <item itemvalue="CMake Application.mulle_sde_craft_craftorder" />
+      <item itemvalue="CMake Application.mulle_sde_reflect" />
+      <item itemvalue="CMake Application.mulle_sde_upgrade" />
+      <item itemvalue="CMake Application._1_MulleGraphics" />
+      <item itemvalue="CMake Application._2_MulleGraphics" />
+      <item itemvalue="CMake Application.MulleGraphics" />
+    </list>
+  </component>
+  <component name="SpellCheckerSettings" RuntimeDictionaries="0" Folders="0" CustomDictionaries="0" DefaultDictionary="application-level" UseSingleDictionary="true" transferred="true" />
+  <component name="TaskManager">
+    <task active="true" id="Default" summary="Default task">
+      <changelist id="4c490e96-7615-4869-b1d1-75f90fa7d097" name="Changes" comment="" />
+      <created>1731112622818</created>
+      <option name="number" value="Default" />
+      <option name="presentableId" value="Default" />
+      <updated>1731112622818</updated>
+      <workItem from="1731112623975" duration="1156000" />
+    </task>
+    <servers />
+  </component>
+  <component name="TypeScriptGeneratedFilesManager">
+    <option name="version" value="3" />
+  </component>
+  <component name="XDebuggerManager">
+    <breakpoint-manager>
+      <breakpoints>
+        <line-breakpoint enabled="true" type="com.jetbrains.cidr.execution.debugger.OCBreakpointType">
+          <url>file://$PROJECT_DIR$/src/CAOpenGLLayer.m</url>
+          <line>2</line>
+          <option name="timeStamp" value="1" />
+        </line-breakpoint>
+      </breakpoints>
+    </breakpoint-manager>
   </component>
 </project>

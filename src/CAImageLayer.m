@@ -2,7 +2,7 @@
 
 #import "import-private.h"
 
-#import "CALayer+MulleGraphics.h"
+#import "CGGraphicsLayer+MulleGraphics.h"
 
 
 // #define RENDER_DEBUG
@@ -37,6 +37,23 @@
    [self setImage:image];
    return( self);
 }
+
+
+- (void) mulleGainAccess
+{
+   [super mulleGainAccess];
+   [self->_image mulleGainAccess];  
+   [self->_selectionPaint mulleGainAccess];  
+}
+
+
+- (void) mulleRelinquishAccess
+{
+   [self->_selectionPaint mulleRelinquishAccess];  
+   [self->_image mulleRelinquishAccess];  
+   [super mulleRelinquishAccess];
+}
+
 
 
 - (void) setSelectionColor:(CGColor) color

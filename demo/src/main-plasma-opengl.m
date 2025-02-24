@@ -4,9 +4,19 @@
 
 #include <stdio.h>
 #include <math.h>
-#include <GL/gl.h>
-#include <GL/glu.h>
 
+#ifdef __APPLE__
+
+int   main( void)
+{
+   fprintf( stderr, "%s does not run on your platform\n", __FILE__);
+   return( 1);
+}
+
+#else
+
+# include <GL/gl.h>
+# include <GL/glu.h>
 
 // This demo shows how you can fairly easily convert OpenGL code into
 // a CAOpenGLLayer subclass.
@@ -375,9 +385,10 @@ int   main( int argc, char *argv[])
 
    [app addWindow:window];
 
-   return( [app run]);
+   return( [app runApp]);
 }
 
+#endif
 
 
 //

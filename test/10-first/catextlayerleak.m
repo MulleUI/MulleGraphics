@@ -16,8 +16,7 @@ int   main( int argc, char *argv[])
    [layer setTextColor:CGColorMakeOliveDrab()];
    [layer setFontNameUTF8String:"sansibar"];
    
-   layer2 = [[layer copy] autorelease];
-   printf( "%s\n", [layer2 textUTF8String]);
+   printf( "%s\n", [layer textUTF8String]);
 
    return( 0);
 }

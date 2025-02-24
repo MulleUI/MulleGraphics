@@ -36,11 +36,11 @@ static CGContentMode   contentModes[ 12] =
 // we need to be rendering to create CGImages. "Real" code that uses
 // CAImageLayer will likely use UIImages.
 //
-static void  drawStuff( CALayer *layer, void *_context)
+static BOOL   drawStuff( CGGraphicsLayer *aLayer, CGContext *_context)
 {
    CGContext       *context = _context;
    CGImage         *image;
-   CAImageLayer    *imageLayer = (CAImageLayer *) layer;
+   CAImageLayer    *imageLayer = (CAImageLayer *) aLayer;
    CGFrameInfo     *info;
    NSUInteger      modeIndex;
    char            *filename;
@@ -66,6 +66,7 @@ static void  drawStuff( CALayer *layer, void *_context)
    }
 
    [imageLayer setContentMode:contentModes[ modeIndex]];
+   return( YES);
 }
 
 
@@ -106,7 +107,7 @@ int   main( int argc, char *argv[])
 
       [app addWindow:window];
    }
-   return( [app run]);
+   return( [app runApp]);
 }
 
 

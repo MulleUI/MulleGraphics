@@ -32,6 +32,16 @@ src/include-private.h
 )
 
 #
+# contents selected with patternfile ??-header--project-only-headers
+#
+set( PROJECT_ONLY_HEADERS
+src/blur.frag.glsl.inc
+src/blur.vert.glsl.inc
+src/shader.glsl.inc
+src/tunnelstonetex.inc
+)
+
+#
 # contents selected with patternfile ??-header--public-generated-headers
 #
 set( PUBLIC_GENERATED_HEADERS
@@ -53,11 +63,7 @@ src/include.h
 # contents selected with patternfile ??-header--public-headers
 #
 set( PUBLIC_HEADERS
-src/blur.frag.glsl.inc
-src/blur.vert.glsl.inc
 src/demos-version.h
 src/reflect/_demos-include-public.h
-src/shader.glsl.inc
-src/tunnelstonetex.inc
 )
 

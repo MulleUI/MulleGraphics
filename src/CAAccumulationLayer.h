@@ -1,9 +1,8 @@
 //
-//  CGColor+UTF8String.m
-//  MulleUIBase
+//  CAAccumulationLayer.m
+//  MulleGraphics
 //
-//  Copyright (c) 2022 Nat! - Mulle kybernetiK.
-//  Copyright (c) 2022 Codeon GmbH.
+//  Copyright (c) 2024 Nat! - Mulle kybernetiK.
 //  All rights reserved.
 //
 //
@@ -33,52 +32,46 @@
 //  ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 //  POSSIBILITY OF SUCH DAMAGE.
 //
-#import "CGColor+UTF8String.h"
+#ifdef __has_include
+# if __has_include( "CGGraphicsLayer.h")
+#  import "CGGraphicsLayer.h"
+# endif
+#endif
 
-#import "import-private.h"
+#import "import.h"
 
 
-@interface CGColorLoader // root class
+
+//
+// If you subclass from CAAccumulationLayer your drawings are accumulated
+// over frames and the previous drawing is shifted and decayed. This only
+// works for the one CALayer that subclasses this. Your CALayer just
+// draws in -drawInContext: (like always)
+//
+@interface CAAccumulationLayer : CGGraphicsLayer
+{
+   CGFramebuffer              *_framebuffer[ 2];
+   NSUInteger                 _currentFramebufferIndex;
+
+   struct CGFramebufferRenderInfo   _memo;
+}
+
+@property( retain, dynamic) CGFramebuffer  *currentFramebuffer;
+@property( retain, dynamic) CGFramebuffer  *previousFramebuffer;
+@property( assign) MulleEdgeInsets         previousFramebufferInsets;
+@property( assign) float                   decay;
+
+
+- (void) swapFramebuffers;
+
+- (CGRect) rectForPreviousFramebuffer:(CGFramebuffer *) layer
+                               canvas:(CGRect) canvas;
+
+- (float) alphaForPreviousFramebuffer:(CGFramebuffer *) layer
+                               inRect:(CGRect) rect
+                               canvas:(CGRect) canvas;
+
+- (void) drawPreviousFramebuffer:(CGFramebuffer *) layer
+                       inContext:(CGContext *) context
+                          canvas:(CGRect) canvas;
 @end
-
-
-@implementation CGColorLoader
-
-static int   CGHexColorNamePairCompareByColor( void *a, void *b, void *info)
-{
-   struct CGHexColorNamePair *arg1 = (struct CGHexColorNamePair *) a;
-   struct CGHexColorNamePair *arg2 = (struct CGHexColorNamePair *) b;
-
-   return( (arg1->hexColor > arg2->hexColor) - (arg1->hexColor < arg2->hexColor));
-}
-
-
-static struct
-{
-   struct CGHexColorNamePair   _table[ CGHexColorCommonNameTableSize];
-} Self;
-
-
-+ (void) load
-{
-   memcpy( &Self._table, CGHexColorCommonNameTable, sizeof( Self._table));
-   mulle_qsort( &Self._table,
-                CGHexColorCommonNameTableSize,
-                sizeof( Self._table[ 0]),
-                CGHexColorNamePairCompareByColor);
-}
-
-@end
-
-
-char   *CGColorUTF8String( CGColor color)
-{
-   CGHexColor    hexColor;
-   char          *s;
-
-   hexColor = CGColorGetHexColor( color);
-   s        = CGHexColorNamePairSearchNameForHexColor( Self._table,
-                                                       CGHexColorCommonNameTableSize,
-                                                       hexColor);
-   return( s ? s : MulleObjC_asprintf( "#%08tx", hexColor));
-}

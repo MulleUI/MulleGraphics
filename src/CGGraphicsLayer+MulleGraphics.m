@@ -1,10 +1,10 @@
-#import "CALayer+MulleGraphics.h"
+#import "CGGraphicsLayer+MulleGraphics.h"
 
 #import "import-private.h"
 
 #define USE_SCISSOR 
 
-@implementation CALayer ( MulleGraphics)
+@implementation CGGraphicsLayer ( MulleGraphics)
 
 - (void) fillBackgroundInContext:(CGContext *) context
                            paint:(CGPaint *) paint
@@ -71,7 +71,7 @@
 
 - (BOOL) drawInContext:(CGContext *) context
 {
-   return( CALayerExecuteDrawCallback( self, context));
+   return( CGGraphicsLayerExecuteDrawCallback( self, context));
 }
 
 
@@ -183,6 +183,16 @@
 }
 
 
+- (void) willDrawInContext:(CGContext *) context
+{
+}
+
+
+- (void) didDrawInContext:(CGContext *) context
+{
+}
+
+
 - (void) renderInContext:(CGContext *) context
 {
    CGAffineTransform   localTransform;
@@ -252,7 +262,9 @@
       //                             bounds.size.height);
 
       // implementers should restore scissor/transform changes themselves
+      [self willDrawInContext:context];
       [self drawInContext:context];
+      [self didDrawInContext:context];
    }
 
    //

@@ -1,6 +1,16 @@
 #import "import-private.h"
 
 
+#ifdef __APPLE__
+
+int   main( void)
+{
+   fprintf( stderr, "%s does not run on your platform\n", __FILE__);
+   return( 1);
+}
+
+#else
+
 // texture from Unreal Tournament 2003 used w/o permission
 static char  tunnelstonetex_png_data[] =
 #include "tunnelstonetex.inc"
@@ -150,9 +160,10 @@ int   main( int argc, char *argv[])
       [window setFrameRateHz:1 / 3.0f];
       [app addWindow:window];
    }
-   return( [app run]);
+   return( [app runApp]);
 }
 
+#endif
 
 
 

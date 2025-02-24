@@ -3,6 +3,7 @@
 // stolen and adapted from paper.js JavaScript
 // http://paperjs.org/examples/radial-rainbows/
 
+// MEMO: seems to top out at 90.0HZ with debug
 #define HZ                  120.0
 #define N_COLORSTOPS        40
 #define COLOR_CYCLES        2           // number of rainbows on screen at same time
@@ -223,8 +224,7 @@ static void   fillCircleWithHoleAndColorStops( NVGcontext *vg,
 @implementation RadialGradientCircleAnimation
 
 - (void) animateObject:(id) object
-normalizedRelativeTime:(double) t
-           elapsedTime:(mulle_relativetime_t) time
+    animationFrameInfo:(struct CAAnimationFrameInfo *) info
 {
    CAImageLayer           *imageLayer = object;
    RadialGradientCircle   *circle;
@@ -235,11 +235,11 @@ normalizedRelativeTime:(double) t
    circle = (RadialGradientCircle *) [imageLayer image];
    assert( [circle isKindOfClass:[RadialGradientCircle class]]);
 
-   // animation values are calcuated for 60Hz framerate, check how
+   // animation values are calculated for 60Hz framerate, check how
    // much we need to multiply with for the elapsed time to make it
    // look natural
-   factor = time / (1.0 / HZ);  // expected elapsedTime
-  //  fprintf( stderr, "%.3f\n", factor);
+   factor = info->delta / (1.0 / HZ);  // expected elapsedTime
+   // MulleUILog( "%.6f %.6f\n", info->elapsedTime, factor);
 
    n = [circle numberOfColorStops];
    for( i = 0; i < n; i++)
@@ -334,12 +334,13 @@ int   main( int argc, char *argv[])
 
       setupScene( window);
 
+      perf = [MulleUIPerf object];
+      [window setFrameDelegate:perf];
+
       [app addWindow:window];
    }
 
-   perf = [MulleUIPerf object];
-   [window setFrameDelegate:perf];
 
-   return( [app run]);
+   return( [app runApp]);
 }
 

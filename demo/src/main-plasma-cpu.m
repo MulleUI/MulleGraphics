@@ -94,7 +94,7 @@ static inline NSUInteger   plasma_function( NSUInteger x, NSUInteger y)
    NSUInteger    x, y;
 
    assert( CGBitmapInfoGetEncoding( bitmapInfo) == CGBitmapEncodingRGBABytes);
-   assert( MulleIntegerSizeEqualToIntegerSize( CGBitmapInfoGetSize( bitmapInfo), MulleIntegerSizeMake( W, H)));
+   assert( CGPixelSizeEqualToPixelSize( CGBitmapInfoGetSize( bitmapInfo), CGPixelSizeMake( W, H)));
 
    // the parameter to shift the palette varies with time
    paletteShift = (NSUInteger) (mulle_absolutetime_now() * FRAMERATE_HZ);
@@ -109,7 +109,7 @@ static inline NSUInteger   plasma_function( NSUInteger x, NSUInteger y)
 @end
 
 
-static void   drawGrid( CALayer *layer, void *_context)
+static BOOL   drawGrid( CGGraphicsLayer *layer, CGContext *_context)
 {
    CGContext    *context = _context;
    CGRect       canvas;
@@ -144,6 +144,8 @@ static void   drawGrid( CALayer *layer, void *_context)
    nvgStrokeWidth( vg, 0.2);
    nvgStrokeColor( vg, [UIColor darkGrayColor]);
    nvgStroke( vg);
+
+   return( YES);
 }
 
 //
@@ -152,7 +154,7 @@ static void   drawGrid( CALayer *layer, void *_context)
 //
 @interface PlasmaView : UIView
 {
-   CALayer   *_gridLayer;
+   CGGraphicsLayer   *_gridLayer;
 }
 @end
 
@@ -164,7 +166,7 @@ static void   drawGrid( CALayer *layer, void *_context)
    return( [PlasmaLayer class]);
 }
 
-- (instancetype) initWithLayer:(CALayer *) layer
+- (instancetype) initWithLayer:(id <UILayer>) layer
                          frame:(CGRect) frame
 {
    CGRect    rect;
@@ -172,7 +174,7 @@ static void   drawGrid( CALayer *layer, void *_context)
    [super initWithLayer:layer
                   frame:frame];
 
-   _gridLayer = [CALayer layerWithFrame:CGRectZero];
+   _gridLayer = [CGGraphicsLayer layerWithFrame:CGRectZero];
 
    rect = CGRectMake( 0, 0, W , H);
    [_gridLayer setCanvas:rect];
@@ -194,7 +196,6 @@ static void   drawGrid( CALayer *layer, void *_context)
 }
 
 @end
-
 
 
 static PlasmaView   *setupPlasmaView( UIWindow *window, CGColor color)
@@ -222,7 +223,7 @@ int   main( int argc, char *argv[])
 
    app = [UIApplication sharedInstance];
    // before creating windows
-   [CGContext setDebugEnabled:YES];
+   [CGContext setDebuggingFlags:YES];
 
    window = [UIWindow windowWithFrame:CGRectMake( 0.0f, 0.0f, 640.0f, 400.0f)];
    [window setBackgroundColor:CGColorMakeWithRGBA( 0.0, 0.0, 0.0, 1.0)];
@@ -239,11 +240,11 @@ int   main( int argc, char *argv[])
       [plasmaView setAutoresizingMask:UIViewAutoresizingScaleToFill];
       [contentPlane addSubview:plasmaView];
    }
-
-   [app addWindow:window];
    [window setFrameRateHz:FRAMERATE_HZ];
 
-   return( [app run]);
+   [app addWindow:window];
+
+   return( [app runApp]);
 }
 
 

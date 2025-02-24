@@ -145,7 +145,7 @@
    if( i == NSNotFound)
       return;
 
-   _selection      = NSMakeRange( i, 0);  // memorize start
+   _selection      = NSRangeMake( i, 0);  // memorize start
    _startSelection = i;
 }
 
@@ -160,9 +160,9 @@
 
    // is cursor to the left ?
    if( i <= _startSelection)
-      _selection = NSMakeRange( i, _startSelection - i);
+      _selection = NSRangeMake( i, _startSelection - i);
    else
-      _selection = NSMakeRange( _startSelection, i - _startSelection);
+      _selection = NSRangeMake( _startSelection, i - _startSelection);
 #if 0
    fprintf( stderr, "Selection: %.*s (%ld, %ld)\n",
          (int) _selection.length, &_data.characters[ _selection.location],
@@ -185,13 +185,13 @@
 
 - (void) deselectAll
 {
-   [self setSelection:NSMakeRange( 0, 0)];
+   [self setSelection:NSRangeMake( 0, 0)];
 }
 
 
 - (void) deleteSelection
 {
-   struct MulleIntegerPoint   cursorPosition;
+   CGPixelPoint   cursorPosition;
 
    mulle_buffer_do_inflexible_filled( buffer, _data.characters, _data.length)
    {
@@ -203,7 +203,7 @@
 
       cursorPosition = [self cursorPositionForCharacterOffset:_selection.location];   
       [self setCursorPosition:cursorPosition];
-      [self setSelection:NSMakeRange( 0, 0)];
+      [self setSelection:NSRangeMake( 0, 0)];
    }
 }
 

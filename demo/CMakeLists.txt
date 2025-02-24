@@ -25,6 +25,16 @@ include( Files)
 
 include( Dependencies OPTIONAL)
 
+if( UNIX)
+   message( STATUS "is UNIX")
+endif()
+if( NOT (APPLE OR COSMOPOLITAN OR MUSL_STATIC_ONLY))
+   if( UNIX)
+      message( STATUS "is glibc")
+   endif()
+endif()
+
+
 # remove this, we have freeglut or ?
 list( REMOVE_ITEM OS_SPECIFIC_LIBRARIES ${GLU_LIBRARY})
 
@@ -40,21 +50,13 @@ foreach( MAIN_SOURCE ${SOURCES})
 
    include( Executable)
 
-   if( UNIX)
-      message( STATUS "is UNIX")
-   endif()
-   if( NOT (APPLE OR COSMOPOLITAN OR MUSL_STATIC_ONLY))
-      if( UNIX)
-         message( STATUS "is glibc")
-      endif()
-   endif()
-
-   if( LINK_PHASE)
-      target_link_options( "${EXECUTABLE_LINK_TARGET}"
-         PUBLIC
-            "SHELL:LINKER:--export-dynamic"
-      )
-   endif()
+   # why was this needed ?
+#   if( LINK_PHASE)
+#      target_link_options( "${EXECUTABLE_LINK_TARGET}"
+#         PUBLIC
+#            "SHELL:LINKER:--export-dynamic"
+#      )
+#   endif()
 
    include( InstallExecutable)
    include( FinalOutput OPTIONAL)

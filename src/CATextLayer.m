@@ -2,11 +2,14 @@
 
 #import "import-private.h"
 
-#import "CALayer+MulleGraphics.h"
+#import "CGGraphicsLayer+MulleGraphics.h"
 #import "CATextLayer+Cursor.h"
 #import "CATextLayer+Selection.h"
 
 #include <ctype.h>
+
+
+//#define CATEXTLAYER_DATA_DEBUG
 
 
 NS_ENUM_TABLE( CATextLayerAlignmentMode, 3) =
@@ -35,7 +38,7 @@ NS_ENUM_TABLE( NSLineBreakMode, 2) =
 };
 
 
-@implementation CATextLayer : CALayer
+@implementation CATextLayer
 
 // will also be used by copy
 - (void) _init
@@ -64,7 +67,7 @@ NS_ENUM_TABLE( NSLineBreakMode, 2) =
    _textPaint           = nil;  // default, depend on backgroundColor
    _suggestedTextPaint  = [[CGPaint paintWithHexColor:CGHexColorBlack] copy];
    _selectionPaint      = [[CGPaint paintWithHexColor:0x7FFF7F7F] copy];
-   _textRange           = NSMakeRange( NSNotFound, 0);
+   _textRange           = NSRangeMake( NSNotFound, 0);
 
    // because Fonts are crap and don't adhere to size requests properly, it's
    // usually better to overdraw than to clip.
@@ -108,36 +111,47 @@ NS_ENUM_TABLE( NSLineBreakMode, 2) =
    [_suggestedTextPaint release];
 
    MulleObjCInstanceDeallocateMemory( self, _fontNameUTF8String);
-   MulleObjCInstanceDeallocateMemory( self, _data.characters);
+
+#ifdef CATEXTLAYER_DATA_DEBUG
+   if( _data.characters)
+      MulleUILog( "free %p for _data", _data.characters);
+#endif
+   mulle_utf8data_done( &_data, MulleObjCInstanceGetAllocator( self));
 
    [super dealloc];
 }
 
 
-- (id) copy
-{
-   CATextLayer              *copy;
-   struct mulle_allocator   *allocator;
-
-   copy = [super copy];
-
-   //
-   // somewhat tricky code, to make copy fully functional. Properties are
-   // copied by -co
-
-   // this inits _rowArray and
-   [self _init];
-
-   allocator                 = MulleObjCInstanceGetAllocator( copy);
-   copy->_data               = mulle_utf8data_copy( copy->_data, allocator);
-   copy->_suggestedTextPaint = [copy->_suggestedTextPaint copy];
-   copy->_fontNameUTF8String = NULL;
-
-   MulleObjCObjectSetDuplicatedUTF8String( copy,
-                                          (char **) &copy->_fontNameUTF8String,
-                                          (char *) _fontNameUTF8String);
-   return( copy);
-}
+// - (id) mutableCopy
+// {
+//    CATextLayer              *copy;
+//    struct mulle_allocator   *allocator;
+//    struct mulle_utf8data    data;
+//
+//    copy = [super mutableCopy];
+//
+//    //
+//    // somewhat tricky code, to make copy fully functional. Properties are
+//    // copied by -co
+//
+//    // this inits _rowArray and
+//    [self _init];
+//
+//    allocator                 = MulleObjCInstanceGetAllocator( copy);
+//    data                      = copy->_data;
+//    copy->_data               = mulle_utf8data_copy( data, allocator);
+// #ifdef CATEXTLAYER_DATA_DEBUG
+//    if( data.characters)
+//       MulleUILog( "copied %p of to %@ _data %p", data.characters, copy->_data.characters, copy);
+// #endif
+//    copy->_suggestedTextPaint = [copy->_suggestedTextPaint copy];
+//    copy->_fontNameUTF8String = NULL;
+//
+//    MulleObjCObjectSetDuplicatedUTF8String( copy,
+//                                           (char **) &copy->_fontNameUTF8String,
+//                                           (char *) _fontNameUTF8String);
+//    return( copy);
+// }
 
 
 - (CGFloat) fontAscender
@@ -226,8 +240,6 @@ NS_ENUM_TABLE( NSLineBreakMode, 2) =
 
    return( _textSize);
 }
-
-
 
 
 - (void) getTextVisualBounds:(CGRect *) vbounds
@@ -388,30 +400,35 @@ next:
 
    allocator = MulleObjCInstanceGetAllocator( self);
 
-   mulle_allocator_free( allocator, _data.characters);
+#ifdef CATEXTLAYER_DATA_DEBUG
+   if( data.length)
+      MulleUILog( "free %p for _data", _data.characters);
+#endif
+   mulle_utf8data_done( &_data, allocator);
 
    // don't want two trailing zeroes in incoming data
    // need one trailing zero though
    assert( ! data.length || data.characters[ data.length - 1]);
    assert( ! data.characters[ data.length]);
 
-   _data = data;
-
+#ifdef CATEXTLAYER_DATA_DEBUG
+   MulleUILog( "set %p for _data", data.characters);
+#endif
+   _data       = data;
    // clear this to be recomputed later
    _textSize   = CGSizeZero;
-
    // reset
-   _textRange  = NSMakeRange( NSNotFound, 0);
+   _textRange  = NSRangeMake( NSNotFound, 0);
 }
 
 
 - (void) setTextUTF8Data:(struct mulle_utf8data) data
 {
    struct mulle_allocator   *allocator;
-   char                     *p;
    NSUInteger               length;
+   struct mulle_utf8data    copied;
 
-   if( data.characters == _data.characters)
+   if( data.characters == _data.characters && data.length == _data.length)
       return;
 
    allocator = MulleObjCInstanceGetAllocator( self);
@@ -422,11 +439,8 @@ next:
       if( ! data.characters[ length - 1])
          --length;
 
-   p = mulle_allocator_malloc( allocator, length + 1);
-   memcpy( p, data.characters, length);
-   p[ length] = 0;
-
-   [self _setTextUTF8Data:mulle_utf8data_make( p, length)];
+   mulle_utf8data_init( &copied, data.characters, length, allocator);
+   [self _setTextUTF8Data:copied];
 }
 
 
@@ -494,9 +508,9 @@ static void   assert_sane_font_name( char *s)
       return( _textRange);
 
    if( mulle_utf8_information( _data.characters, _data.length, &info))
-      return( NSMakeRange( NSNotFound, 0));
+      return( NSRangeMake( NSNotFound, 0));
 
-   _textRange = NSMakeRange( 0, info.utf32len);
+   _textRange = NSRangeMake( 0, info.utf32len);
    return( _textRange);
 }
 
@@ -1062,7 +1076,7 @@ static NSUInteger  count_newlines( mulle_utf8_t *s)
    isCursorDrawn = NO;
    for( i = 0; i < _nRows; i++)
    {
-      textRange = NSMakeRange( _rows[ i].start - (char *) data.characters,
+      textRange = NSRangeMake( _rows[ i].start - (char *) data.characters,
                                _rows[ i].end - _rows[ i].start);
 
       rect = CGRectMake( canvas.origin.x + _origin.x,

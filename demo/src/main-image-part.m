@@ -3,17 +3,20 @@
 #include <unistd.h>
 
 
-static BOOL   drawStuff( CALayer *layer, void *_context)
+static MulleUIResourceStorageKeyDefine( tardbeaver);
+
+static BOOL   drawStuff( CGGraphicsLayer *layer, CGContext *_context)
 {
    CGContext          *context = _context;
-   static CGImage     *image;
    CGRect             rect;
    CGRect             patternRect;
    struct NVGpaint    imgPaint;
    struct NVGcontext  *vg;
    CGSize             imageSize;
+   CGImage            *image;
 
-   vg = CGContextGetNVGContext( context);
+   vg    = CGContextGetNVGContext( context);
+   image = [context resourceForKey:MulleUIResourceStorageKey( tardbeaver)];
    if( ! image)
    {
       image = [[[CGImage alloc] initWithContentsOfFileCString:"tardbeaver.png"
@@ -24,6 +27,8 @@ static BOOL   drawStuff( CALayer *layer, void *_context)
          fprintf( stderr, "could not load tardbeaver.png\n");
          _exit( 1);
       }
+      [context setResource:image
+                    forKey:MulleUIResourceStorageKey( tardbeaver)];
    }
 
    imageSize   = [image size];
@@ -55,8 +60,8 @@ static void   setupSceneInWindow( UIWindow *window)
    // this works in one-window scenarios well, where there is only one
    // context.
    view = [UIView viewWithFrame:frame];
-   [(CALayer *) [view layer] setDrawCallback:drawStuff];
-   [(CALayer *) [view layer] setBackgroundColor:CGColorMakeWithRGBA( 0.33, 0.33, 0.33, 1.0)];
+   [(CGGraphicsLayer *) [view layer] setDrawCallback:drawStuff];
+   [(CGGraphicsLayer *) [view layer] setBackgroundColor:CGColorMakeWithRGBA( 0.33, 0.33, 0.33, 1.0)];
 
    [contentView addSubview:view];
 }
@@ -76,7 +81,7 @@ int   main( int argc, char *argv[])
 
       [app addWindow:window];
    }
-   return( [app run]);
+   return( [app runApp]);
 }
 
 

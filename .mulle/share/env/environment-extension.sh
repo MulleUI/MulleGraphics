@@ -23,9 +23,28 @@ export MULLE_MATCH_IGNORE_PATH=""
 
 
 #
+# mulle-c and mulle-objc projects have an actual latest tag, so don't resolve
+#
+export MULLE_SOURCETREE_RESOLVE_TAG="NO"
+
+
+#
 # If you are really basing on MulleObjC you need this startup lib
 #
 export PREFERRED_STARTUP_LIBRARY="Foundation-startup"
+
+
+#
+# noob it up a little, to only have ObjC headers for
+# Foundation as the default.
+#
+export MULLE_SOURCETREE_TO_C_INCLUDE_FILE="DISABLE"
+
+
+#
+#
+#
+export MULLE_SOURCETREE_TO_C_PRIVATEINCLUDE_FILE="DISABLE"
 
 
 #

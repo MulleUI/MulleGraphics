@@ -11,4 +11,36 @@ if( MULLE_TRACE_INCLUDE)
    message( STATUS "# Include \"${CMAKE_CURRENT_LIST_FILE}\"" )
 endif()
 
-# there are no libraries in the sourcetree
+#
+# Generated from sourcetree: 4B2C809B-C031-45AD-B339-64634536F448;OpenGL;no-build,no-cmake-inherit,no-delete,no-dependency,no-fs,no-header,no-import,no-share,no-update,only-framework,only-platform-darwin;
+# Disable with : `mulle-sourcetree mark OpenGL `
+# Disable for this platform: `mulle-sourcetree mark OpenGL no-cmake-platform-${MULLE_UNAME}`
+# Disable for a sdk: `mulle-sourcetree mark OpenGL no-cmake-sdk-<name>`
+#
+if( ${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
+   if( COLLECT_ALL_LOAD_OS_SPECIFIC_FRAMEWORKS_AS_NAMES)
+      list( APPEND ALL_LOAD_OS_SPECIFIC_FRAMEWORKS "OpenGL")
+   else()
+      if( NOT OPEN_GL_FRAMEWORK)
+         find_library( OPEN_GL_FRAMEWORK NAMES
+            OpenGL
+         )
+         message( STATUS "OPEN_GL_FRAMEWORK is ${OPEN_GL_FRAMEWORK}")
+         #
+         # The order looks ascending, but due to the way this file is read
+         # it ends up being descending, which is what we need.
+         #
+         if( OPEN_GL_FRAMEWORK)
+            #
+            # Add OPEN_GL_FRAMEWORK to ALL_LOAD_OS_SPECIFIC_FRAMEWORKS list.
+            # Disable with: `mulle-sourcetree mark OpenGL no-cmake-add`
+            #
+            list( APPEND ALL_LOAD_OS_SPECIFIC_FRAMEWORKS ${OPEN_GL_FRAMEWORK})
+            # intentionally left blank
+         else()
+            # Disable with: `mulle-sourcetree mark OpenGL no-require-link`
+            message( SEND_ERROR "OPEN_GL_FRAMEWORK was not found")
+         endif()
+      endif()
+   endif()
+endif()

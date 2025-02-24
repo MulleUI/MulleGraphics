@@ -37,7 +37,7 @@
 
 #import "import-private.h"
 
-#import "CALayer+MulleGraphics.h"
+#import "CGGraphicsLayer+MulleGraphics.h"
 
 
 
@@ -53,7 +53,7 @@
 - (void) drawInBytes:(void *) texture
           bitmapInfo:(struct CGBitmapInfo) bitmapInfo
 {
-   memset( texture, 0xFF, CGBitmapInfoGetAllocationSize( bitmapInfo));
+   memset( texture, 0xFF, CGBitmapInfoGetAllocationLength( bitmapInfo));
 }
 
 //
@@ -66,12 +66,12 @@
 {
    CGImage               *image;
    CGRect                canvas;
-   struct MulleIntegerSize   bitmapSize;
-   struct MulleIntegerSize   imageSize;
+   CGPixelSize   bitmapSize;
+   CGPixelSize   imageSize;
 
    // check to see of we need a new image
    canvas     = [self canvas];
-   bitmapSize = MulleIntegerSizeMakeWithSize( canvas.size);
+   bitmapSize = CGPixelSizeMakeWithSize( canvas.size);
 
    image      = (CGImage *) [self image];
    imageSize  = [image bitmapSize];
@@ -85,7 +85,7 @@
    _bitmapInfo = CGBitmapInfoMake( bitmapSize, 0, CGBitmapEncodingRGBABytes);
    if( ! _texture)
       _texture = mulle_allocator_malloc( MulleObjCInstanceGetAllocator( self),
-                                         CGBitmapInfoGetAllocationSize( _bitmapInfo));
+                                         CGBitmapInfoGetAllocationLength( _bitmapInfo));
 
    [self drawInBytes:_texture
           bitmapInfo:_bitmapInfo];
@@ -100,7 +100,8 @@
       [self setImage:image];
    }
    else
-      [image setBytes:_texture];
+      [context setRGBABytes:_texture
+               forTextureID:[image textureID]];
 
    // We don't have to keep it around, though we haven't drawn yet
    // Usually we don't unless requested.

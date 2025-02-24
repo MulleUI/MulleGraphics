@@ -1,20 +1,20 @@
 #ifdef __has_include
-# if __has_include( "CALayer.h")
-#  import "CALayer.h"
+# if __has_include( "CGGraphicsLayer.h")
+#  import "CGGraphicsLayer.h"
 # endif
 #endif
 
 #import "import.h"
 
 
-@interface CAImageLayer : CALayer
+@interface CAImageLayer : CGGraphicsLayer
 
 // hack for textStorage, so it can be inlined in text
 MULLE_CURSOR_PROPERTIES;
 
 
 @property( assign, getter=isSelected) BOOL   selected;
-@property( observable, copy) CGPaint         *selectionPaint;
+@property( observable, copy) CGPaint *       selectionPaint;
 @property( retain) NSObject <CGDrawable> *   image;
 @property( assign) CGRect                    displayedRect;
 

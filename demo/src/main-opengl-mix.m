@@ -2,7 +2,18 @@
 
 #import <string.h>
 
+#ifdef __APPLE__
 
+int   main( void)
+{
+   fprintf( stderr, "%s does not run on your platform\n", __FILE__);
+   return( 1);
+}
+
+#else
+
+// If this demo doesn't animate, you messed up the UIWindowDisplayBits. The
+// animation is not triggering the next frame.
 
 @interface OpenGLTeapotLayer : CAOpenGLLayer
 {
@@ -10,7 +21,7 @@
 }
 
 @property( observable, assign) CGPoint      rotation;
-@property( observable, assign) NSUInteger   grid;
+@property( observable, assign) NSInteger    grid;  // must be signed for animation
 
 @end
 
@@ -197,6 +208,7 @@ static float cpData[][3] = {
 @interface OpenGLTeapotView : UIView
 @end
 
+
 @implementation OpenGLTeapotView
 
 + (Class) layerClass
@@ -274,6 +286,7 @@ static UIView   *setupTeapotView( UIWindow *window, CGColor color, int grid)
    OpenGLTeapotLayer                *layer;
    OpenGLTeapotView                 *view;
    struct CABasicAnimationOptions   options;
+   struct _mulle_objc_property      *property;
 
    //frame.origin.x = CGRectGetMaxX( rect) - frame.size.width;
 //   view  = [UIView viewWithFrame:CGRectZero];
@@ -288,7 +301,8 @@ static UIView   *setupTeapotView( UIWindow *window, CGColor color, int grid)
                                                NO);
 
    layer     = (OpenGLTeapotLayer *) [view layer];
-   animation = [[[CABasicAnimation alloc] initWithProperty:MulleObjCInstanceSearchProperty( layer, @selector( rotation))
+   property  = MulleObjCInstanceSearchProperty( layer, @selector( rotation));
+   animation = [[[CABasicAnimation alloc] initWithProperty:property
                                            startPointValue:CGPointMake( 0, 0)
                                              endPointValue:CGPointMake( 360, 720)
                                                    options:&options] autorelease];
@@ -321,7 +335,6 @@ static BOOL   layoutRedView( UIView *view)
    frame = UIEdgeInsetsInsetRect( rects[ 1], UIEdgeInsetsMake( 0, 0, 50, 50));
    [blueView setFrame:frame
               animate:YES];
-
 
    frame              = contentRect;
 
@@ -397,7 +410,7 @@ int   main( int argc, char *argv[])
    /*
     * window and app
     */
-   app    = [UIApplication sharedInstance];
+   app       = [UIApplication sharedInstance];
 
    // teapot is old code
    styleMask = UIWindowStyleMaskDefault;
@@ -408,12 +421,15 @@ int   main( int argc, char *argv[])
                             styleMask:styleMask];
    [window setBackgroundColor:CGColorMakeWithRGBA( 0.0, 0.0, 0.0, 1.0)];
 //   [window setFrameRateHz:5.0];
-   [app addWindow:window];
 
    setupScene( window);
 
-   return( [app run]);
+   [app addWindow:window];
+
+   return( [app runApp]);
 }
+
+#endif
 
 
 

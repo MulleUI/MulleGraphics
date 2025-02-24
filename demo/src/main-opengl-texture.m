@@ -3,6 +3,16 @@
 #include <math.h>
 
 
+#ifdef __APPLE__
+
+int   main( void)
+{
+   fprintf( stderr, "%s does not run on your platform\n", __FILE__);
+   return( 1);
+}
+
+#else
+
 /*
  * This demo is the MulleUICore mulle-glfw-texture demo, which was derived
  * from GLUT, and puts it into a CGOpenGLLayer. This requires lots of changes
@@ -205,7 +215,7 @@ graphicsContext:(id <UIGraphicsContext>) context;
 //       //[window setFrameRateHz:1000/20.0];
 //       //[window setFrameDelegate:layer];
 //    }
-//    return( [app run]);
+//    return( [app runApp]);
 // }
 
 int   main()
@@ -236,9 +246,10 @@ int   main()
 
       [app addWindow:window];
    }
-   return( [app run]);
+   return( [app runApp]);
 }
 
+#endif
 
 
 

@@ -78,7 +78,7 @@ static char  tunnelstonetex_png_data[] =
       abort();
 
    bitmapInfo = [_textureImage bitmapInfo];
-   assert( MulleIntegerSizeEqualToIntegerSize( CGBitmapInfoGetSize( bitmapInfo), MulleIntegerSizeMake( TEX_W, TEX_H)));
+   assert( CGPixelSizeEqualToPixelSize( CGBitmapInfoGetSize( bitmapInfo), CGPixelSizeMake( TEX_W, TEX_H)));
 
    rect = CGRectMake( 0, 0, W, H);
 
@@ -106,7 +106,7 @@ static char  tunnelstonetex_png_data[] =
    uint32_t      color;
 
    assert( CGBitmapInfoGetEncoding( bitmapInfo) == CGBitmapEncodingRGBABytes);
-   assert( MulleIntegerSizeEqualToIntegerSize( CGBitmapInfoGetSize( bitmapInfo), MulleIntegerSizeMake( W, H)));
+   assert( CGPixelSizeEqualToPixelSize( CGBitmapInfoGetSize( bitmapInfo), CGPixelSizeMake( W, H)));
 
    dst_pixels = texture;
    src_pixels = [_textureImage bytes];
@@ -163,7 +163,7 @@ int   main( int argc, char *argv[])
    UIWindow        *window;
    UIApplication   *app;
    TunnelView      *tunnelView;
-   UIWindowPlane   *contentPlane;
+   UIView          *contentView;
    CGContext       *context;
 
    /*
@@ -172,12 +172,12 @@ int   main( int argc, char *argv[])
 
    app = [UIApplication sharedInstance];
    // before creating windows
-   //[CGContext setDebugEnabled:YES];
+   //[CGContext setDebuggingFlags:YES];
 
    window = [UIWindow windowWithFrame:CGRectMake( 0.0f, 0.0f, 640.0f, 400.0f)];
    [window setBackgroundColor:CGColorMakeWithRGBA( 0.0, 0.0, 0.0, 1.0)];
    {
-      contentPlane = [window contentView];
+      contentView = [window contentView];
 
       tunnelView  = [TunnelView viewWithFrame:CGRectZero];
       [tunnelView setAutoresizingMask:UIViewAutoresizingScaleToFill];
@@ -185,13 +185,13 @@ int   main( int argc, char *argv[])
       [tunnelView setBorderColor:[UIColor whiteColor]];
       [tunnelView setBorderWidth:6.0];
 
-      [contentPlane addSubview:tunnelView];
+      [contentView addSubview:tunnelView];
    }
 
    [app addWindow:window];
    [window setFrameRateHz:FRAMERATE_HZ];
 
-   return( [app run]);
+   return( [app runApp]);
 }
 
 

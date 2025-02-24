@@ -59,11 +59,15 @@ struct whirls_options
    CGFloat  x      = CGFloatMakeRandomMinMax( 0, canvas.size.width);
    CGFloat  y      = CGFloatMakeRandomMinMax( 0, canvas.size.height);
    CGFloat  hue    = base + atan2( center.x - y, center.y - x) * 180 / M_PI_f;
+   CGFloat  rotation;
 
    self->_origin.x   = x;
    self->_origin.y   = y;
    self->_lastOrigin = self->_origin;
-   self->_color      = CGColorMakeWithHSLA( fabs( CADegreesToRotation( hue)), 1.0, 0.5, 0.0);
+   rotation          = fabs( fmod( CADegreesToRotation( hue), 1.0));
+   if( rotation < 0.0 || rotation > 1.0)
+      mulle_fprintf( stderr, "hue: %g, rotation: %g\n", hue, rotation);
+   self->_color      = CGColorMakeWithHSLA( rotation, 1.0, 0.5, 0.0);
 
    return( self);
 }
@@ -79,7 +83,7 @@ struct whirls_options
 }
 
 
-- (void) updateWithZoff:(CGFloat) zoff
+- (void) updateWithZOffset:(CGFloat) zoff
 {
    CGFloat   radians;
 
@@ -111,7 +115,7 @@ struct whirls_options
 @end
 
 
-@interface WhirlLayer : CALayer
+@interface WhirlLayer : CGGraphicsLayer
 {
    NSMutableArray  *_whirls;
 
@@ -146,6 +150,21 @@ struct whirls_options
 }
 
 
+- (void) mulleGainAccess
+{
+   [super mulleGainAccess];
+   [_whirls mulleGainAccess];
+}
+
+
+- (void) mulleRelinquishAccess
+{
+   [_whirls mulleRelinquishAccess];
+   [super mulleRelinquishAccess];
+}
+
+
+
 - (void) dealloc
 {
    [self->_whirls release];
@@ -166,7 +185,7 @@ struct whirls_options
 
    for( whirl in _whirls)
    {
-      [whirl updateWithZoff:_zoff];
+      [whirl updateWithZOffset:_zoff];
       [whirl drawInContext:context];
       [whirl updateWithCanvas:canvas
                       hueBase:_hueBase];
@@ -176,7 +195,6 @@ struct whirls_options
    _zoff    += opts.zInc;
    return( YES);
 }
-
 
 @end
 
@@ -196,7 +214,7 @@ int   main( int argc, char *argv[])
 
    app = [UIApplication sharedInstance];
    {
-      styleMask = UIWindowStyleMaskDefault & ~UIWindowStyleRetained;
+      styleMask = UIWindowStyleMaskDefault; // & ~UIWindowStyleRetained;
       window    = [UIWindow windowWithFrame:CGRectMake( 0, 0, 800, 600)
                             titleUTF8String:"Demo"
                                   styleMask:styleMask];
@@ -216,13 +234,14 @@ int   main( int argc, char *argv[])
       [view setAutoresizingMask:UIViewAutoresizingScaleToFill];
       [contentPlane addSubview:view];
 
+      perf = [MulleUIPerf object];
+      [window setFrameDelegate:perf];
+
       [app addWindow:window];
    }
 
-   perf = [MulleUIPerf object];
-   [window setFrameDelegate:perf];
 
-   return( [app run]);
+   return( [app runApp]);
 }
 
 

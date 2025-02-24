@@ -15,7 +15,7 @@ static UIView   *demoViewWithFrame( CGRect frame, CGColor a, CGColor b)
    view        = [UIView viewWithFrame:frame];
 
    // MEMO: could also just forward down to layer via view...
-   layer       = (CALayer *) [view layer];
+   layer       = (CGGraphicsLayer *) [view layer];
    gradient    = [CGGradient gradientWithStartColor:a
                                            endColor:b];
    [layer setBackgroundPaint:gradient];
@@ -65,6 +65,6 @@ int   main()
 
    [app addWindow:window];
 
-   return( [app run]);
+   return( [app runApp]);
 }
 

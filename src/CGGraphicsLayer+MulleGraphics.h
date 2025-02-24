@@ -1,7 +1,7 @@
 // prefer a local CALayer over one in import.h
 #ifdef __has_include
-# if __has_include( "CALayer.h")
-#  import "CALayer.h"
+# if __has_include( "CGGraphicsLayer.h")
+#  import "CGGraphicsLayer.h"
 # endif
 #endif
 
@@ -9,7 +9,7 @@
 #import "import.h"
 
 
-@interface CALayer( MulleGraphics) < CGRenderObject>
+@interface CGGraphicsLayer( MulleGraphics) < CGRenderObject>
 
 //
 // renderInContext resets the drawing context with transform and global alpha
@@ -46,12 +46,18 @@
 // if [super drawInContext:] returns NO, do not continue drawing
 //
 // if you don't want do call [super drawInContext:], you should call
-// CALayerExecuteDrawCallback, so that your code can be patched out from C:
+// CGGraphicsLayerExecuteDrawCallback, so that your code can be patched out
+// from C:
 //
-// if( ! CALayerExecuteDrawCallback( self, context))
+// if( ! CGGraphicsLayerExecuteDrawCallback( self, context))
 //    return( NO);
 //
 - (BOOL) drawInContext:(CGContext *) context;
+
+
+// immediately called before and after drawInContext: default does nothing
+- (void) willDrawInContext:(CGContext *) context;
+- (void) didDrawInContext:(CGContext *) context;
 
 //
 // these two methods draw "frame". Bounds and canvas are to be ignored.
@@ -78,14 +84,4 @@
 
 
 @end
-
-static inline BOOL   CALayerExecuteDrawCallback( CALayer *self,
-                                                 CGContext *context)
-{
-   if( ! self)
-      return( NO);
-   return( ((struct { @defs( CALayer); } *) self)->_drawCallback
-           ? (*((struct { @defs( CALayer); } *) self)->_drawCallback)( self, context)
-           : YES);
-}
 

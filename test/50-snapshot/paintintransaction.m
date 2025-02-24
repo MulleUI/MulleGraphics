@@ -1,14 +1,25 @@
+#import <MulleCA/MulleCA.h>
 #import <MulleGraphics/MulleGraphics.h>
 
 
-@interface Foo : CAImplicitlyAnimatableObject
-
+@interface Foo : NSObject  < CAImplicitlyAnimatableObject, CAAnimationStorageObject> // < CAImplicitlyAnimatableObject, CAAnimationStorage>
+{
+   CAImplicitlyAnimatableObjectIvars;
+   CAAnimationStorageObjectIvars;
+}
 @property( observable, copy) CGPaint   *paint;
+
+CAImplicitlyAnimatableObjectInterface;
+CAAnimationStorageObjectInterface;
 
 @end 
 
 
 @implementation Foo 
+
+CAImplicitlyAnimatableObjectImplementation;
+CAAnimationStorageObjectImplementation;
+
 @end 
 
 

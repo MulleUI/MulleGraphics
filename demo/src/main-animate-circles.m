@@ -3,7 +3,7 @@
 #import <string.h>
 
 
-@interface CircleLayer : CALayer
+@interface CircleLayer : CGGraphicsLayer
 
 @property( observable) CGFloat   scale;
 @property( observable) CGColor   color;
@@ -28,7 +28,7 @@
 @end
 
 
-static BOOL   drawStuff( CALayer *aLayer, void *_context)
+static BOOL   drawStuff( CGGraphicsLayer *aLayer, CGContext *_context)
 {
    CGContext           *context = _context;
    CircleLayer         *layer = (CircleLayer *) aLayer;

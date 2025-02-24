@@ -66,9 +66,9 @@ struct hexagon_options  opts =
 @end
 
 
-@interface HexagonLayer : CALayer
+@interface HexagonLayer : CGGraphicsLayer
 {
-   NSMutableArray  *lines;
+   NSMutableArray  *_lines;
 }
 
 @property( assign) NSUInteger   tick;
@@ -206,6 +206,7 @@ static void   drawBoxWithDropShadow( CGContext *context,
    }
 }
 
+
 @end
 
 
@@ -214,15 +215,32 @@ static void   drawBoxWithDropShadow( CGContext *context,
 - (instancetype) init
 {
    [super init];
-   self->lines = [NSMutableArray new];
+   self->_lines = [NSMutableArray new];
+   // to access this private array we make it thread safe as access is
+   // in the CALayer, which is a MulleObject with autolocking
+   [self->_lines mulleSetThreadSafe:YES];
    return( self);
 }
 
 
 - (void) dealloc
 {
-   [self->lines release];
+   [self->_lines release];
    [super dealloc];
+}
+
+
+- (void) mulleGainAccess
+{
+   [super mulleGainAccess];
+   [_lines mulleGainAccess];
+}
+
+
+- (void) mulleRelinquishAccess
+{
+   [_lines mulleRelinquishAccess];
+   [super mulleRelinquishAccess];
 }
 
 
@@ -237,8 +255,8 @@ static void   drawBoxWithDropShadow( CGContext *context,
    ++self->_tick;
 
    canvas = [self canvas];
-   if( [lines count] < opts.count && CGFloatMakeRandom() < opts.spawnChance)
-      [lines addObject:[[[Line alloc] initWithHexagonLayer:self] autorelease]];
+   if( [_lines count] < opts.count && CGFloatMakeRandom() < opts.spawnChance)
+      [_lines addObject:[[[Line alloc] initWithHexagonLayer:self] autorelease]];
 
    vg = CGContextGetNVGContext( context);
    nvgSave( vg);
@@ -251,7 +269,7 @@ static void   drawBoxWithDropShadow( CGContext *context,
 
       nvgGlobalCompositeOperation( vg, NVG_LIGHTER);
       nvgTranslate( vg, canvas.size.width / 2.0, canvas.size.height / 2.0);
-      for( line in lines)
+      for( line in _lines)
          [line stepInHexagonLayer:self
                           context:context];
    }
@@ -295,13 +313,13 @@ int   main( int argc, char *argv[])
       [view setAutoresizingMask:UIViewAutoresizingScaleToFill];
       [contentPlane addSubview:view];
 
+      perf = [MulleUIPerf object];
+      [window setFrameDelegate:perf];
+
       [app addWindow:window];
    }
 
-   perf = [MulleUIPerf object];
-   [window setFrameDelegate:perf];
-
-   return( [app run]);
+   return( [app runApp]);
 }
 
 

@@ -3,7 +3,7 @@
 
 #define STEP  30.0
 
-@interface LSystemLayer : CALayer
+@interface LSystemLayer : CGGraphicsLayer
 {
    CGPoint   center;
    CGFloat   angle;
@@ -184,6 +184,6 @@ int   main( int argc, char *argv[])
    }
    [app addWindow:window];
 
-   return( [app run]);   
+   return( [app runApp]);
 }
 

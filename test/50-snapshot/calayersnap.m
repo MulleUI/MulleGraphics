@@ -3,11 +3,11 @@
 
 int   main( int argc, char *argv[])
 {
-   CALayer            *layer;
+   CGGraphicsLayer    *layer;
    CATransaction      *transaction;
    CAAnimationGroup   *group;
 
-   layer = [CALayer object];
+   layer = [CGGraphicsLayer object];
    [layer setBorderColor:CGColorMakeBlue()];
 
    transaction = [CATransaction object];

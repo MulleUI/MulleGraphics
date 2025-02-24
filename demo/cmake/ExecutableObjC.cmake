@@ -34,18 +34,21 @@ cmake_minimum_required( VERSION 3.13)
             PUBLIC
                "SHELL:LINKER:--export-dynamic"
          )
+         message( STATUS "added --export-dynamic")
       else()
          message( STATUS "but not in link")
       endif()
    else()
          message( STATUS "but right system")
    endif()
+
    if( APPLE AND MULLE_OBJC)
       if( LINK_PHASE)
          target_link_options( "${EXECUTABLE_LINK_TARGET}"
             PUBLIC
                "SHELL:LINKER:-exported_symbol,___register_mulle_objc_universe"
          )
+         message( STATUS "added -exported_symbol")
 
          if( MULLE_TEST)
             target_link_options( "${EXECUTABLE_LINK_TARGET}"
@@ -53,6 +56,7 @@ cmake_minimum_required( VERSION 3.13)
                   "SHELL:LINKER:-exported_symbol,__mulle_atinit"
                   "SHELL:LINKER:-exported_symbol,_mulle_atexit"
             )
+            message( STATUS "added two more -exported_symbol")
          endif()
       endif()
    endif()

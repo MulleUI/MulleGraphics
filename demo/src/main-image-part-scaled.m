@@ -1,7 +1,5 @@
 #import "import-private.h"
 
-#include <unistd.h>
-
 
 @interface View : UIView
 @end
@@ -95,7 +93,6 @@ int   main( int argc, char *argv[])
    int             w;
 
    w = 1024;
-
    if( argc >= 2)
    {
       w = atoi( argv[ 1]);
@@ -111,7 +108,7 @@ int   main( int argc, char *argv[])
       [window setBackgroundColor:CGColorMakeBlack()];
       [app addWindow:window];
    }
-   return( [app run]);
+   return( [app runApp]);
 }
 
 

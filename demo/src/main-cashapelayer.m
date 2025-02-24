@@ -84,7 +84,7 @@ int   main( int argc, char *argv[])
       setupSceneInWindow( window);
       [app addWindow:window];
    }
-   return( [app run]);
+   return( [app runApp]);
 }
 
 

@@ -5,7 +5,7 @@
 
 #import "import-private.h"
 
-#import "CALayer+MulleGraphics.h"
+#import "CGGraphicsLayer+MulleGraphics.h"
 
 
 @implementation CAShadowLayer( nanovg)

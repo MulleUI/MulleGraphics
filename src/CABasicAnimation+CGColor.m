@@ -5,8 +5,6 @@
 
 #import "import.h"
 
-#import "CGColor+MulleObjC.h"
-
 
 //#define ANIMATION_DEBUG
 
@@ -30,7 +28,7 @@ static void   CABasicAnimationSetInterpolatedColor( CABasicAnimation *self,
       mulle_metaabi_union_void_return( CGColor)   param;
 
       param.p = color;
-      mulle_objc_object_call_variablemethodid( object,
+      mulle_objc_object_call_variable( object,
                                                self->_property->setter,
                                                &param);
    }
@@ -55,7 +53,7 @@ void   CABasicAnimationSetInterpolatedColorAdditive( CABasicAnimation *self,
    {
       mulle_metaabi_union_void_parameter( CGColor)   param;
 
-      mulle_objc_object_call_variablemethodid( object, self->_property->getter, &param);
+      mulle_objc_object_call_variable( object, self->_property->getter, &param);
       color = param.r;
    }
 
@@ -78,7 +76,7 @@ void   CABasicAnimationSetInterpolatedColorAdditive( CABasicAnimation *self,
 #endif
 
       param.p = newColor;
-      mulle_objc_object_call_variablemethodid( object, self->_property->setter, &param);
+      mulle_objc_object_call_variable( object, self->_property->setter, &param);
    }
 }
 

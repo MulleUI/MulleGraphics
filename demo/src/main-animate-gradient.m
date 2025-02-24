@@ -10,7 +10,7 @@
 #define END_COLOR     CGColorMakeBlue()
 
 
-@interface CircleLayer : CALayer
+@interface CircleLayer : CGGraphicsLayer
 
 @property( observable, copy) CGPaint      *paint;
 @property( observable, assign) CGFloat    strokeWidth;

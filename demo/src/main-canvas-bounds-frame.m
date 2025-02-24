@@ -7,8 +7,9 @@
 // We draw little rectangles exactly 20x20
 // as much as we can fit into the canvas
 //
-static void  drawStuff( CALayer *layer, CGContext *context)
+static BOOL   drawStuff( CGGraphicsLayer *layer, CGContext *_context)
 {
+   CGContext           *context = _context;
    NSUInteger          x;
    NSUInteger          y;
    NSUInteger          w;
@@ -42,6 +43,8 @@ static void  drawStuff( CALayer *layer, CGContext *context)
          nvgRect( vg, x * 20.0, y * 20.0, 20.0, 20.0);
          nvgFill( vg);
       }
+
+   return( YES);
 }
 
 
@@ -74,12 +77,12 @@ void   setupSceneInContentPlane( UIWindowPlane *plane)
          frame = CGRectInset( frames[ row][ column], 5, 5);
 
          view  = [UIView viewWithFrame:frame];
-         [view setDrawCallback:(CALayerDrawCallback_t *) drawStuff];
+         [view setDrawCallback:drawStuff];
          [view setBorderWidth:1.0];
          [view setBorderColor:CGColorMakeWithHexColor( 0x00FF00FF)];
          [plane addSubview:view];
 
-         layer = (CALayer *) [view layer];
+         layer = (CGGraphicsLayer *) [view layer];
          // on its own just reduces or enlarges the checkerboard to be
          // drawn, nothing will scale.
          canvas = [layer canvas];
@@ -147,6 +150,6 @@ int   main()
 
    [app addWindow:window];
 
-   return( [app run]);
+   return( [app runApp]);
 }
 

@@ -15,7 +15,7 @@
 
 }
 
-@property( assign) struct MulleIntegerSize   bitmapSize;
+@property( assign) CGPixelSize   bitmapSize;
 
 @end
 
@@ -88,7 +88,7 @@ static uint8_t   palette[][ 4] =
 #define N_PALETTE_COLORS  (sizeof( palette) / 4)
 
 
-- (instancetype) initWithBitmapSize:(struct MulleIntegerSize) size
+- (instancetype) initWithBitmapSize:(CGPixelSize) size
 {
    if( size.width < 2 || size.height < 2)
    {
@@ -252,7 +252,7 @@ static inline uint8_t   effect( uint8_t left, uint8_t middle, uint8_t right, int
 - (void) renderToRGBA:(void *) bytes
            bitmapInfo:(struct CGBitmapInfo) info
 {
-   struct MulleIntegerPoint   point;
+   CGPixelPoint   point;
    uint8_t                *dst;
    uint8_t                *src;
    uint8_t                *dst_sentinel;
@@ -337,7 +337,7 @@ static inline uint8_t   effect( uint8_t left, uint8_t middle, uint8_t right, int
    if( ! _water)
    {
       canvas = [self canvas];
-      _water = [[Water alloc] initWithBitmapSize:MulleIntegerSizeMakeWithSize( canvas.size)];
+      _water = [[Water alloc] initWithBitmapSize:CGPixelSizeMakeWithSize( canvas.size)];
    }
 
    // perform the water flow animation. We could run this elsewhere...
@@ -360,7 +360,7 @@ static inline uint8_t   effect( uint8_t left, uint8_t middle, uint8_t right, int
 
    // need a new water effect with a different size
    [_water autorelease];
-   _water = [[Water alloc] initWithBitmapSize:MulleIntegerSizeMakeWithSize( canvas.size)];
+   _water = [[Water alloc] initWithBitmapSize:CGPixelSizeMakeWithSize( canvas.size)];
 }
 
 @end
@@ -400,11 +400,11 @@ int   main( int argc, char *argv[])
 
    [window setBackgroundColor:CGColorMakeWithRGBA( 0.0, 0.0, 0.0, 1.0)];
    [window setFrameRateHz:30.0];
-   [app addWindow:window];
 
    setupSceneInWindow( window);
 
-   return( [app run]);
+   [app addWindow:window];
+   return( [app runApp]);
 }
 
 

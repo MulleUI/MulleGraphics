@@ -27,7 +27,7 @@ static uint8_t   imagedata[ 8][ 8][ 4] =
 // active context, so that's perfect. We can't create a CGImage in "main"
 // though.
 //
-static BOOL   drawStuff( CALayer *layer, void *_context)
+static BOOL   drawStuff( CGGraphicsLayer *layer, CGContext *_context)
 {
    CGContext     *context = _context;
    CAImageLayer  *imageLayer = (CAImageLayer *) layer;
@@ -36,7 +36,7 @@ static BOOL   drawStuff( CALayer *layer, void *_context)
    if( ! [imageLayer image])
    {
       image = [[[CGImage alloc] initWithRGBABytes:imagedata
-                                       bitmapSize:MulleIntegerSizeMake( 8, 8)
+                                       bitmapSize:CGPixelSizeMake( 8, 8)
                                      textureFlags:NVG_IMAGE_REPEATX|NVG_IMAGE_REPEATY
                                           context:context] autorelease];
       [imageLayer setImage:image];
@@ -60,7 +60,7 @@ int   main( int argc, char *argv[])
                          titleUTF8String:NULL];
       [app addWindow:window];
    }
-   return( [app run]);
+   return( [app runApp]);
 }
 
 

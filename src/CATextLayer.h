@@ -1,6 +1,6 @@
 #ifdef __has_include
-# if __has_include( "CALayer.h")
-#  import "CALayer.h"
+# if __has_include( "CGGraphicsLayer.h")
+#  import "CGGraphicsLayer.h"
 # endif
 #endif
 
@@ -101,7 +101,7 @@ static inline void   CATextLayerRowGlyphsDone( struct CATextLayerRowGlyphs *p)
 // because it has no scrolling smarts and because it expensively recalculates
 // all the glyphs of the text.
 //
-@interface CATextLayer : CALayer
+@interface CATextLayer : CGGraphicsLayer
 {
    struct mulle_utf8data              _data;
    
@@ -173,7 +173,7 @@ static inline void   CATextLayerRowGlyphsDone( struct CATextLayerRowGlyphs *p)
 //
 @property( observable) NSRange                      selection;
 
-@property( assign) struct MulleIntegerPoint         cursorPosition;
+@property( assign) CGPixelPoint         cursorPosition;
 @property( assign) CATextLayerAlignmentMode         alignmentMode;
 @property( assign) NSLineBreakMode                  lineBreakMode;
 

@@ -9,10 +9,11 @@
  *
  *      mulle-sde environment set MULLE_MATCH_TO_C_RUN DISABLE
  */
-#ifndef mulle_graphics_export_h__
-#define mulle_graphics_export_h__
+#ifndef _mulle_graphics__export_h__
+#define _mulle_graphics__export_h__
 
 
+#import "CAAccumulationLayer.h"
 #import "CAAnimation+CGPaint.h"
 #import "CABasicAnimation+CGColor.h"
 #import "CABasicAnimation+CGGradient.h"
@@ -21,16 +22,14 @@
 #import "CAGradientLayer.h"
 #import "CAImageLayer+Cursor.h"
 #import "CAImageLayer.h"
-#import "CALayer+MulleGraphics.h"
-#import "CALayer.h"
 #import "CAOpenGLLayer.h"
 #import "CAShadowLayer.h"
 #import "CAShapeLayer.h"
 #import "CATextLayer+Cursor.h"
 #import "CATextLayer+Selection.h"
 #import "CATextLayer.h"
-#import "CGColor+MulleObjC.h"
-#import "CGColor+UTF8String.h"
+#import "CGGraphicsLayer+MulleGraphics.h"
+#import "CGGraphicsLayer.h"
 #import "MulleEdgeInsets+UTF8String.h"
 #import "MulleObjCLoader+MulleGraphics.h"
 

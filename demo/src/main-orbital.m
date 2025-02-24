@@ -5,15 +5,15 @@
 
 @interface Orb : NSObject
 
-@property( assign) CGPoint         origin;
-@property( assign) CGPoint         lastOrigin;
-@property( assign) CGFloat         colorAngle;
-@property( assign) CGFloat         angle;
-@property( assign) CGFloat         lastAngle;
-@property( assign) CGFloat         size;
-@property( assign) CGFloat         radius;
-@property( assign) CGFloat         speed;
-@property( assign) CGFloat         alpha;
+@property( assign) CGPoint   origin;
+@property( assign) CGPoint   lastOrigin;
+@property( assign) CGFloat   colorAngle;
+@property( assign) CGFloat   angle;
+@property( assign) CGFloat   lastAngle;
+@property( assign) CGFloat   size;
+@property( assign) CGFloat   radius;
+@property( assign) CGFloat   speed;
+@property( assign) CGFloat   alpha;
 
 @end
 
@@ -97,7 +97,7 @@
 @end
 
 
-@interface OrbLayer : CALayer
+@interface OrbLayer : CGGraphicsLayer
 {
    NSMutableArray  *_orbs;
 }
@@ -120,6 +120,7 @@
    [super initWithFrame:frame];
 
    self->_orbs  = [NSMutableArray new];
+   [self->_orbs mulleSetThreadSafe:YES];
    self->_trail = YES;
 
    canvas = [self canvas];
@@ -128,6 +129,7 @@
       orb = [[[Orb alloc] initWithCanvas:canvas
                                   origin:CGPointMake( canvas.size.width / 2,
                                                       canvas.size.height / 2 + y)] autorelease];
+      [orb mulleSetThreadSafe:YES];
       [self->_orbs addObject:orb];
    }
 
@@ -204,13 +206,14 @@ int   main( int argc, char *argv[])
       [view setAutoresizingMask:UIViewAutoresizingScaleToFill];
       [contentPlane addSubview:view];
 
+      perf = [MulleUIPerf object];
+      [window setFrameDelegate:perf];
+
       [app addWindow:window];
    }
 
-   perf = [MulleUIPerf object];
-   [window setFrameDelegate:perf];
 
-   return( [app run]);
+   return( [app runApp]);
 }
 
 

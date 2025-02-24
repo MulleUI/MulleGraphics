@@ -33,7 +33,7 @@
 //   ***********'-----------'************
 //                    2
 
-static void  drawStuff( CALayer *layer, void *_context)
+static BOOL   drawStuff( CGGraphicsLayer *aLayer, CGContext *_context)
 {
    CGContext           *context = _context;
    struct NVGcontext   *vg;
@@ -44,9 +44,9 @@ static void  drawStuff( CALayer *layer, void *_context)
    CGFloat             canvasExtent;
    CGFloat             frameExtent;
 
-   canvas       = [layer canvas];
+   canvas       = [aLayer canvas];
    canvasExtent = CGRectGetMinimumSize( canvas);
-   frame        = [layer frame];
+   frame        = [aLayer frame];
    frameExtent  = CGRectGetMinimumSize( frame);
    strokeWidth  = canvasExtent / frameExtent;
 
@@ -58,6 +58,7 @@ static void  drawStuff( CALayer *layer, void *_context)
                                            radius),
                              strokeWidth,
                              CGColorMakeRed());
+   return( YES);
 }
 
 
@@ -79,7 +80,7 @@ int   main( int argc, char *argv[])
       [view setMargins:UIEdgeInsetsMake( 50, 100, 50, 100)];
       [view setBackgroundColor:CGColorMakeWithRGBA( 0.33, 0.33, 0.33, 1.0)];
 
-      layer = (CALayer *) [view layer];
+      layer = (CGGraphicsLayer *) [view layer];
       assert( layer);
 
       [layer setDrawCallback:drawStuff];
@@ -116,7 +117,7 @@ int   main( int argc, char *argv[])
       [window setBackgroundColor:CGColorMakeWhite()];
       [app addWindow:window];
    }
-   return( [app run]);
+   return( [app runApp]);
 }
 
 

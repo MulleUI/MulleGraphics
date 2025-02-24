@@ -43,7 +43,7 @@
 
 - (MulleCursorPosition) cursorPosition
 {
-   return( MulleIntegerPointMake(_image ? 1 : 0, 0));
+   return( CGPixelPointMake(_image ? 1 : 0, 0));
 }
 
 
@@ -57,7 +57,7 @@
 - (MulleCursorPosition) cursorPositionForPoint:(CGPoint) mouseLocation
 {
    // TODO: HACK!!!
-   return( MulleIntegerPointMake( _image ? 1 : 0, 0));
+   return( CGPixelPointMake( _image ? 1 : 0, 0));
 }
 
 
@@ -69,7 +69,7 @@
 
 - (MulleCursorPosition) maxCursorPosition
 {
-   return( MulleIntegerPointMake( _image ? 1 : 0, 0));
+   return( CGPixelPointMake( _image ? 1 : 0, 0));
 }
 
 @end
