@@ -264,53 +264,21 @@ static float cpData[][3] = {
 {
    CAAnimationGroup   *group;
 
+   MulleUIDebugLog( "");
+
    group = [self bounceAnimationWithFrame:frame];
    assert( [group animationObject] != nil);
 
    if( ! animator)
+   {
       animator = [(UIWindow *) [self window] postLayoutAnimator];
+      assert( animator);
+   }
    [animator removeAnimationsForAnimationObject:self];
    [animator addAnimation:group];
 }
 
 @end
-
-
-static UIView   *setupTeapotView( UIWindow *window, CGColor color, int grid)
-{
-   CAAnimationGroup                 *group;
-   CAAnimator                       *animator;
-   CABasicAnimation                 *animation;
-   CATransaction                    *ta;
-   CGRect                           frame;
-   OpenGLTeapotLayer                *layer;
-   OpenGLTeapotView                 *view;
-   struct CABasicAnimationOptions   options;
-   struct _mulle_objc_property      *property;
-
-   //frame.origin.x = CGRectGetMaxX( rect) - frame.size.width;
-//   view  = [UIView viewWithFrame:CGRectZero];
-   view  = [OpenGLTeapotView viewWithFrame:CGRectZero];
-   [view setBackgroundColor:[UIColor darkGrayColor]];
-   [view setBorderColor:color];
-   [view setBorderWidth:6.0];
-
-   options = CABasicAnimationOptionsMakeCurve( mulle_relativetimerange_make( 0, 3.0),
-                                               CAAnimationCurveLinear,
-                                               INFINITY,
-                                               NO);
-
-   layer     = (OpenGLTeapotLayer *) [view layer];
-   property  = MulleObjCInstanceSearchProperty( layer, @selector( rotation));
-   animation = [[[CABasicAnimation alloc] initWithProperty:property
-                                           startPointValue:CGPointMake( 0, 0)
-                                             endPointValue:CGPointMake( 360, 720)
-                                                   options:&options] autorelease];
-   [layer addAnimation:animation];
-   [layer setGrid:grid];
-
-   return( view);
-}
 
 
 static BOOL   layoutRedView( UIView *view)
@@ -351,6 +319,43 @@ static BOOL   layoutRedView( UIView *view)
    [yellowView setFrame:frame];
 
    return( NO); // default code should not run
+}
+
+
+static UIView   *setupTeapotView( UIWindow *window, CGColor color, int grid)
+{
+   CAAnimationGroup                 *group;
+   CAAnimator                       *animator;
+   CABasicAnimation                 *animation;
+   CATransaction                    *ta;
+   CGRect                           frame;
+   OpenGLTeapotLayer                *layer;
+   OpenGLTeapotView                 *view;
+   struct CABasicAnimationOptions   options;
+   struct _mulle_objc_property      *property;
+
+   //frame.origin.x = CGRectGetMaxX( rect) - frame.size.width;
+//   view  = [UIView viewWithFrame:CGRectZero];
+   view  = [OpenGLTeapotView viewWithFrame:CGRectZero];
+   [view setBackgroundColor:[UIColor darkGrayColor]];
+   [view setBorderColor:color];
+   [view setBorderWidth:6.0];
+
+   options = CABasicAnimationOptionsMakeCurve( mulle_relativetimerange_make( 0, 3.0),
+                                               CAAnimationCurveLinear,
+                                               INFINITY,
+                                               NO);
+
+   layer     = (OpenGLTeapotLayer *) [view layer];
+   property  = MulleObjCInstanceSearchProperty( layer, @selector( rotation));
+   animation = [[[CABasicAnimation alloc] initWithProperty:property
+                                           startPointValue:CGPointMake( 0, 0)
+                                             endPointValue:CGPointMake( 360, 720)
+                                                   options:&options] autorelease];
+   [layer addAnimation:animation];
+   [layer setGrid:grid];
+
+   return( view);
 }
 
 

@@ -270,17 +270,22 @@
 @implementation CABasicAnimation( CGGradient)
 
 + (CABasicAnimation *) animationWithProperty:(struct _mulle_objc_property *) property
-                             startCGGradient:(CGGradient *) startGradient
-                               endCGGradient:(CGGradient *) endGradient
-                                     options:(struct CABasicAnimationOptions *) options
+                            startCGGradient:(CGGradient *) startGradient
+                              endCGGradient:(CGGradient *) endGradient
+                                    options:(struct CABasicAnimationOptions *) options
 {
+   CABasicAnimation *obj;
+
    assert( ! startGradient || [startGradient isKindOfClass:[CGGradient class]]);
    assert( ! endGradient   || [endGradient isKindOfClass:[CGGradient class]]);
 
-   return( [[[self alloc] initWithProperty:property
-                          startObjectValue:startGradient
-                            endObjectValue:endGradient
-                                  options:options] autorelease]);
+   obj = [self alloc];
+   obj = [obj initWithProperty:property
+                startObjectValue:startGradient
+                  endObjectValue:endGradient
+                        options:options];
+   obj = [obj autorelease];
+   return(obj);
 }
 
 @end

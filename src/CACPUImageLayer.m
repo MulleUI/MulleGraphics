@@ -96,6 +96,7 @@
       image = [[[CGImage alloc] initWithRGBABytes:_texture
                                        bitmapSize:_bitmapInfo.size
                                      textureFlags:0
+                                   nameUTF8String:"CACPUImageLayer"
                                           context:context] autorelease];
       [self setImage:image];
    }

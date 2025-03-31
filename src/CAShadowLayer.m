@@ -10,6 +10,13 @@
 
 @implementation CAShadowLayer
 
+#ifdef DEBUG
++ (instancetype) alloc
+{
+   return( [super alloc]);
+}
+#endif
+
 - (instancetype) init
 {
    self = [super init];

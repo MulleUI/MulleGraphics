@@ -264,7 +264,7 @@ static inline uint8_t   effect( uint8_t left, uint8_t middle, uint8_t right, int
 
    assert( info.size.width == _bitmapSize.width);
    assert( info.size.height == _bitmapSize.height);
-   assert( info.encoding = CGBitmapEncodingRGBABytes);
+   assert( info.encoding == CGBitmapEncodingRGBABytes);
 
    dst_sentinel = CGBitmapInfoGetLineBytes( info, _bitmapSize.height, bytes);
 

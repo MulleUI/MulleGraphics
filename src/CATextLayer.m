@@ -41,7 +41,7 @@ NS_ENUM_TABLE( NSLineBreakMode, 2) =
 @implementation CATextLayer
 
 // will also be used by copy
-- (void) _init
+- (void) _initRowGlyphs
 {
    _mulle_structarray_init( &_rowArray, sizeof( NVGtextRow),
                                         alignof( NVGtextRow),
@@ -57,26 +57,6 @@ NS_ENUM_TABLE( NSLineBreakMode, 2) =
 
    // just cleanliness
    memset( &_glyphData, 0, sizeof( _glyphData));
-}
-
-
-- (instancetype) init
-{
-   [super init];
-
-   _textPaint           = nil;  // default, depend on backgroundColor
-   _suggestedTextPaint  = [[CGPaint paintWithHexColor:CGHexColorBlack] copy];
-   _selectionPaint      = [[CGPaint paintWithHexColor:0x7FFF7F7F] copy];
-   _textRange           = NSRangeMake( NSNotFound, 0);
-
-   // because Fonts are crap and don't adhere to size requests properly, it's
-   // usually better to overdraw than to clip.
-   _masksToBounds       = NO;
-   _clearTypeEnabled    = YES;
-
-   [self _init];
-
-   return( self);
 }
 
 
@@ -100,6 +80,26 @@ NS_ENUM_TABLE( NSLineBreakMode, 2) =
    }
 
    _mulle_structarray_done( &_rowGlyphArray);
+}
+
+
+- (instancetype) initWithFrame:(CGRect) frame
+{
+   self = [super initWithFrame:frame];
+
+   _textPaint           = nil;  // default, depend on backgroundColor
+   _suggestedTextPaint  = [[CGPaint paintWithHexColor:CGHexColorBlack] copy];
+   _selectionPaint      = [[CGPaint paintWithHexColor:0x7FFF7F7F] copy];
+   _textRange           = NSRangeMake( NSNotFound, 0);
+
+   // because Fonts are crap and don't adhere to size requests properly, it's
+   // usually better to overdraw than to clip.
+   _masksToBounds       = NO;
+   _clearTypeEnabled    = YES;
+
+   [self _initRowGlyphs];
+
+   return( self);
 }
 
 

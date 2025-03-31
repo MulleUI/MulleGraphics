@@ -46,7 +46,7 @@
    self = [super init];
    if( self)
    {
-      _decay               = 0.0;
+      _decay                     = 0.0;
       _previousFramebufferInsets = MulleEdgeInsetsMake( -1, 0.0, INFINITY, 0.0);
    }
    return( self);
@@ -192,10 +192,10 @@ static inline double   computeDecayFactor( double y, int n)
 
 - (void) willDrawInContext:(CGContext *) context
 {
-   CGFramebuffer              *drawFramebuffer;
-   CGFramebuffer              *previousFramebuffer;
-   CGRect                     canvas;
-   CGPixelSize    bitmapSize;
+   CGFramebuffer   *drawFramebuffer;
+   CGFramebuffer   *previousFramebuffer;
+   CGRect          canvas;
+   CGPixelSize     bitmapSize;
 
    canvas     = [self canvas];
    bitmapSize = CGPixelSizeMakeWithSize( canvas.size);
@@ -204,11 +204,12 @@ static inline double   computeDecayFactor( double y, int n)
    // changed we junk it and build a-new
    drawFramebuffer  = [self currentFramebuffer];
    if( ! CGPixelSizeEqualToPixelSize( [drawFramebuffer bitmapSize],
-                                             bitmapSize))
+                                      bitmapSize))
    {
       drawFramebuffer = [CGFramebuffer framebufferWithBitmapSize:bitmapSize
-                                  textureFlags:0
-                                       context:context];
+                                                    textureFlags:0
+                                                  nameUTF8String:"CAAccumulationLayer (curr)"
+                                                         context:context];
       [self setCurrentFramebuffer:drawFramebuffer];
    }
 
@@ -219,8 +220,9 @@ static inline double   computeDecayFactor( double y, int n)
    if( ! previousFramebuffer)
    {
       previousFramebuffer = [CGFramebuffer framebufferWithBitmapSize:bitmapSize
-                                      textureFlags:0
-                                           context:context];
+                                                        textureFlags:0
+                                                      nameUTF8String:"CAAccumulationLayer (prev)"
+                                                             context:context];
       // init it with black
       [previousFramebuffer beginFBRenderWithBackgroundColor:CGColorMakeBlack()
                                            devicePixelRatio:1.0
@@ -256,8 +258,8 @@ static inline double   computeDecayFactor( double y, int n)
    canvas = [self canvas];
    // now render into "our" context
    [drawFramebuffer drawRect:canvas
-               options:NULL
-               context:context];
+                     options:NULL
+                     context:context];
    [self swapFramebuffers];
 }
 

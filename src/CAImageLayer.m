@@ -10,12 +10,15 @@
 
 @implementation CAImageLayer
 
-
 + (instancetype) layerWithImage:(NSObject <CGDrawable> *)  image
 {
-   return( [[[self alloc] initWithImage:image] autorelease]);
-}
+   CAImageLayer *obj;
 
+   obj = [self alloc];
+   obj = [obj initWithImage:image];
+   obj = [obj autorelease];
+   return(obj);
+}
 
 - (id) init
 {

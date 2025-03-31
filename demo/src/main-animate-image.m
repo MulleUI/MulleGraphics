@@ -13,7 +13,29 @@
 //#define DEBUG_WRITE_IMAGE_PNG
 //#define DEBUG_NO_ANIMATION
 //#define DEBUG_NO_SCENE
-#define FPS               60.0
+// #define FPS               60.0
+#define FPS               0.5
+
+@interface MyFramebuffer : CGFramebuffer
+@end
+
+
+@implementation MyFramebuffer
+
+- (void) finalize
+{
+   MulleUILog( "now finalize");
+   [super finalize];
+}
+
+- (void) dealloc
+{
+   MulleUILog( "now gone");
+   [super dealloc];
+}
+
+@end
+
 
 
 @interface ImageLayer : CGGraphicsLayer
@@ -28,6 +50,8 @@
 - (BOOL) drawInContext:(CGContext *) context
 {
    struct NVGcontext   *vg;
+
+   MulleUILog( "drawing %s with %#@", CGRectUTF8String( [self canvas]), [self paint]);
 
    vg = CGContextGetNVGContext( context);
    mvgFillRectWithPaint( vg, [self canvas], [self paint]);
@@ -124,14 +148,17 @@ void   setupSceneAndAnimation( UIWindow *window, CGContext *context)
    UIView          *view;
    UIWindowPlane   *contentPlane;
 
+   MulleUICLog( "%#@", context);
+
    contentPlane = [window contentView];
 
    frame = [contentPlane contentRect];
    frame = CGRectInset( frame, 20, 20);
-   image = [CGFramebuffer framebufferWithBitmapSize:CGPixelSizeMakeWithSize( frame.size)
+   image = [MyFramebuffer framebufferWithBitmapSize:CGPixelSizeMakeWithSize( frame.size)
                                     backgroundColor:CGColorMakeWhite()
                                        drawFunction:drawGradientCircle
                                            userInfo:&circleOne
+                                     nameUTF8String:"l1"
                                             context:context];
 #ifdef DEBUG_WRITE_IMAGE_PNG
    [image writeToPNGUTF8String:"l1.png"];
@@ -143,14 +170,15 @@ void   setupSceneAndAnimation( UIWindow *window, CGContext *context)
    [contentPlane addSubview:view];
 
 #ifndef DEBUG_NO_ANIMATION
-   image2 = [CGFramebuffer framebufferWithBitmapSize:CGPixelSizeMakeWithSize( frame.size)
+   image2 = [MyFramebuffer framebufferWithBitmapSize:CGPixelSizeMakeWithSize( frame.size)
                                      backgroundColor:CGColorMakeWhite()
                                         drawFunction:drawGradientCircle
                                             userInfo:&circleTwo
+                                     nameUTF8String:"l2"
                                              context:context];
-# ifdef DEBUG_WRITE_IMAGE_PNG
+#ifdef DEBUG_WRITE_IMAGE_PNG
    [image2 writeToPNGUTF8String:"l2.png"];
-# endif
+#endif
    // UIView -> CAAnimation
    setupAnimation( window, layer, image2);
 #endif
@@ -171,7 +199,8 @@ int   main( int argc, char *argv[])
     * window and app
     */
    styleMask = UIWindowStyleMaskDefault;
-   styleMask = UIWindowsStyleMaskBySetting( styleMask, UIWindowStyleRetainedOnMainThread, YES);
+   styleMask = UIWindowsStyleMaskBySetting( styleMask, UIWindowStyleRetained, YES);
+   styleMask = UIWindowsStyleMaskBySetting( styleMask, UIWindowStyleRetainedOnMainThread, NO);
    styleMask = UIWindowsStyleMaskBySetting( styleMask, UIWindowStylePlanes, NO);
 
    window = [UIWindow windowWithFrame:CGRectMake( 0.0, 0.0, 800.0, 600.0)

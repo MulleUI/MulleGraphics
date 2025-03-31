@@ -66,6 +66,7 @@ int   main( int argc, char *argv[])
 {
    UIWindow        *window;
    UIApplication   *app;
+   UIView          *rootView;
    UIView          *view;
    CGRect          frame;
    CGRect          bounds;
@@ -76,8 +77,12 @@ int   main( int argc, char *argv[])
    {
       frame = CGRectMake( 0, 0, 600, 500);
       
-      view  = [UIView viewWithFrame:frame];
+      rootView = [UIView viewWithFrame:frame];
+      view     = [UIView viewWithFrame:frame];
+      [rootView addSubview:view];
+
       [view setMargins:UIEdgeInsetsMake( 50, 100, 50, 100)];
+      [view setAutoresizingMask:UIViewAutoresizingFlexibleSize];
       [view setBackgroundColor:CGColorMakeWithRGBA( 0.33, 0.33, 0.33, 1.0)];
 
       layer = (CGGraphicsLayer *) [view layer];
@@ -112,7 +117,7 @@ int   main( int argc, char *argv[])
 
       [layer setBounds:bounds];
 
-      window = [UIWindow windowWithView:view
+      window = [UIWindow windowWithView:rootView
                         titleUTF8String:NULL];
       [window setBackgroundColor:CGColorMakeWhite()];
       [app addWindow:window];

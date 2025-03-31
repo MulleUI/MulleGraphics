@@ -14,6 +14,7 @@ set( SOURCES
 src/main-animate-circles.m
 src/main-animate-gradient.m
 src/main-animate-image.m
+src/main-candysmear.m
 src/main-canvas-bounds-frame.m
 src/main-cashadowlayer.m
 src/main-cashapelayer.m

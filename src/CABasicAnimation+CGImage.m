@@ -112,25 +112,29 @@
 @implementation CABasicAnimation( CGImage)
 
 + (CABasicAnimation *) animationWithProperty:(struct _mulle_objc_property *) property
-                                startCGImage:(CGImage *) startImage
-                                  endCGImage:(CGImage *) endImage
-                                     options:(struct CABasicAnimationOptions *) options
+                               startCGImage:(CGImage *) startImage
+                                 endCGImage:(CGImage *) endImage
+                                    options:(struct CABasicAnimationOptions *) options
 {
    CGImagePaint   *startPaint;
    CGImagePaint   *endPaint;
+   CABasicAnimation *obj;
 
    startPaint = [CGImagePaint imagePaintWithImage:startImage
-                                       otherImage:endImage
-                                            blend:0.0f
-                                         rotation:[startImage rotation]];
+                                      otherImage:endImage
+                                           blend:0.0f
+                                        rotation:[startImage rotation]];
    endPaint   = [CGImagePaint imagePaintWithImage:startImage
-                                       otherImage:endImage
-                                            blend:1.0f
-                                         rotation:[endImage rotation]];
-   return( [[[self alloc] initWithProperty:property
-                          startObjectValue:startPaint
-                            endObjectValue:endPaint
-                                   options:options] autorelease]);
+                                      otherImage:endImage
+                                           blend:1.0f
+                                        rotation:[endImage rotation]];
+   obj = [self alloc];
+   obj = [obj initWithProperty:property
+                startObjectValue:startPaint
+                  endObjectValue:endPaint
+                        options:options];
+   obj = [obj autorelease];
+   return(obj);
 }
 
 @end

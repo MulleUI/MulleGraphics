@@ -212,13 +212,15 @@ static void   drawBoxWithDropShadow( CGContext *context,
 
 @implementation HexagonLayer
 
-- (instancetype) init
+- (instancetype) initNoLock
 {
-   [super init];
+   [super initNoLock];
+
    self->_lines = [NSMutableArray new];
    // to access this private array we make it thread safe as access is
    // in the CALayer, which is a MulleObject with autolocking
    [self->_lines mulleSetThreadSafe:YES];
+
    return( self);
 }
 

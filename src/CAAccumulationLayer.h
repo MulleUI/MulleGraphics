@@ -50,8 +50,8 @@
 //
 @interface CAAccumulationLayer : CGGraphicsLayer
 {
-   CGFramebuffer              *_framebuffer[ 2];
-   NSUInteger                 _currentFramebufferIndex;
+   CGFramebuffer                    *_framebuffer[ 2];
+   NSUInteger                       _currentFramebufferIndex;
 
    struct CGFramebufferRenderInfo   _memo;
 }
