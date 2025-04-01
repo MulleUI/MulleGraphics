@@ -25,6 +25,11 @@ typedef BOOL   CGGraphicsLayerDrawCallback_t( CGGraphicsLayer *layer,
 @property( observable) CGFloat             borderWidth;
 @property( observable, copy) CGPaint       *borderPaint;
 @property( observable, copy) CGPaint       *backgroundPaint;
+// colors are "conveniences" for borderPaint and backgroundPaint
+// they are properties, so we can animate them
+@property( observable, dynamic) CGColor    borderColor;
+@property( observable, dynamic) CGColor    backgroundColor;
+
 @property( observable) CGPoint             pixelCenter;
 
 // draw [layer canvas]
@@ -33,8 +38,6 @@ typedef BOOL   CGGraphicsLayerDrawCallback_t( CGGraphicsLayer *layer,
 
 - (void) setCornerRadius:(CGFloat) cornerRadius;
 
-- (void) setBorderColor:(CGColor) color;
-- (void) setBackgroundColor:(CGColor) color;
 
 @end
 

@@ -33,5 +33,17 @@
    [self setBackgroundPaint:[CGPaint paintWithColor:color]];
 }
 
+
+- (CGColor) borderColor
+{
+   return( [_borderPaint mainColor]);
+}
+
+
+- (CGColor) backgroundColor
+{
+   return( [_backgroundPaint mainColor]);
+}
+
 @end
 
