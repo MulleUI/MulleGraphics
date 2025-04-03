@@ -6,9 +6,9 @@
 
 
 //
-// if the callback returns NO, then the drawInContext: method preempts
-// if you return YES, then the drawing will be underneath whatever the
-// CGGraphicsLayer will draw
+// if the callback returns NO, then the drawInContext: method preempts.
+// If you return YES, then the drawing will be underneath whatever the
+// CGGraphicsLayer will draw. YES should be the default.
 //
 typedef BOOL   CGGraphicsLayerDrawCallback_t( CGGraphicsLayer *layer,
                                               CGContext *context);

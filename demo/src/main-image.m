@@ -54,7 +54,7 @@ static BOOL   drawStuff( CGGraphicsLayer *aLayer, CGContext *_context)
    if( ! image || modeIndex == 0)
    {
       filename = filenames[ frameNumber / (100 * N_CGContentModes) & 1];
-      image    = [[[CGImage alloc] initWithContentsOfFileCString:filename
+      image    = [[[CGImage alloc] initWithContentsOfFileUTF8String:filename
                                                    textureFlags:0
                                                         context:context] autorelease];
       if( ! image)

@@ -1116,8 +1116,9 @@ static NSUInteger  count_newlines( mulle_utf8_t *s)
          else
          {
             // coloring with gradients not possible, not super sure why not
-            // but it is what it is
+            // but it is what it is (cleartype probably not looking good)
             nvgPaint = [textPaint NVGpaintWithBounds:rect
+                                               alpha:1.0f
                                           NVGcontext:vg];
 
             mvgFillPaint( vg, nvgPaint);

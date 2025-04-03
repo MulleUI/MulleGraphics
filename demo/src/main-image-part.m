@@ -19,7 +19,7 @@ static BOOL   drawStuff( CGGraphicsLayer *layer, CGContext *_context)
    image = [context resourceForKey:MulleUIResourceStorageKey( tardbeaver)];
    if( ! image)
    {
-      image = [[[CGImage alloc] initWithContentsOfFileCString:"tardbeaver.png"
+      image = [[[CGImage alloc] initWithContentsOfFileUTF8String:"tardbeaver.png"
                                                  textureFlags:0 //NVG_IMAGE_REPEATX|NVG_IMAGE_REPEATY
                                                       context:context] autorelease];
       if( ! image)

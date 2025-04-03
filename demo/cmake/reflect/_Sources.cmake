@@ -33,6 +33,7 @@ src/main-opengl-mix.m
 src/main-opengl-texture2.m
 src/main-opengl-texture.m
 src/main-orbital.m
+src/main-paint-interpolate.m
 src/main-panned-canvas.m
 src/main-plasma-cpu.m
 src/main-plasma-opengl.m

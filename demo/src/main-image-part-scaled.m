@@ -63,7 +63,7 @@ static void   setupSceneInWindow( UIWindow *window)
    frame       = [contentView contentRect];
 
    frame = UIEdgeInsetsInsetRect( frame, UIEdgeInsetsMake( 4, 4, 4, 4));
-   image = [UIImage imageWithContentsOfFileCString:"Outdoors.png"];
+   image = [UIImage imageWithContentsOfFileUTF8String:"Outdoors.png"];
    if( ! image)
    {
       mulle_fprintf( stderr, "\"Outdoors.png\" not found\n");

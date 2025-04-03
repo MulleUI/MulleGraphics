@@ -2,8 +2,9 @@
 
 #import "import-private.h"
 
-#import "CABasicAnimation+CGImage.h"
 #import "CABasicAnimation+CGGradient.h"
+#import "CABasicAnimation+CGImage.h"
+#import "CABasicAnimation+CGPaint.h"
 
 
 
@@ -17,16 +18,15 @@
                              property:(struct _mulle_objc_property *) property
                               options:(struct CABasicAnimationOptions *) options
 {
-   Class   gradientClass;
+   if( ! startObject && ! endObject)
+      return( nil);
 
-   assert( ! startObject || [startObject isKindOfClass:[CGPaint class]]);
-   assert( ! endObject   || [endObject isKindOfClass:[CGPaint class]]);
-   assert( startObject || endObject);
+   startObject = MULLE_OBJC_CLASS_CAST( CGPaint, startObject);
+   endObject   = MULLE_OBJC_CLASS_CAST( CGPaint, endObject);
 
    // this will also catch monoColor as it is a CGGradient subclass
-   gradientClass = [CGGradient class];
-   if( (! startObject || [startObject isKindOfClass:gradientClass]) &&
-       (! endObject   || [endObject isKindOfClass:gradientClass]))
+   if( (! startObject || [startObject __isCGGradient]) &&
+       (! endObject   || [endObject __isCGGradient]))
    {
       return( [CABasicAnimation animationWithProperty:property
                                       startCGGradient:startObject
@@ -34,15 +34,11 @@
                                               options:options]);
    }
 
-   // could also be two textures (or nil), which is fine
-   if( (! startObject || [startObject isTexture]) && (! endObject || [endObject isTexture]))
-      return( [CABasicAnimation animationWithProperty:property
-                                         startCGImage:startObject
-                                           endCGImage:endObject
-                                              options:options]);
+   return( [CABasicAnimation animationWithProperty:property
+                                      startCGPaint:startObject
+                                        endCGPaint:endObject
+                                           options:options]);
 
-   // we could do nice fades here, if we could (see above)
-   return( nil);
 }
 
 @end

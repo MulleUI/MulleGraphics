@@ -18,6 +18,7 @@
 #import "CABasicAnimation+CGColor.h"
 #import "CABasicAnimation+CGGradient.h"
 #import "CABasicAnimation+CGImage.h"
+#import "CABasicAnimation+CGPaint.h"
 #import "CACPUImageLayer.h"
 #import "CAGradientLayer.h"
 #import "CAImageLayer+Cursor.h"

@@ -125,9 +125,9 @@
                                            blend:0.0f
                                         rotation:[startImage rotation]];
    endPaint   = [CGImagePaint imagePaintWithImage:startImage
-                                      otherImage:endImage
-                                           blend:1.0f
-                                        rotation:[endImage rotation]];
+                                       otherImage:endImage
+                                            blend:1.0f
+                                         rotation:[endImage rotation]];
    obj = [self alloc];
    obj = [obj initWithProperty:property
                 startObjectValue:startPaint

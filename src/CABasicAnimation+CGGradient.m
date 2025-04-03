@@ -85,17 +85,21 @@
    // animation for that)
    assert( count);
 
+   // in colors_buf we make space for all three arrays
    n = startCount + endCount + count;
    mulle_alloca_do( colors_buf, union CGColorOrColorDiff, n)
    {
+      // calculate starts for each array
       start_colors        = colors_buf;
       end_colors          = &start_colors[ startCount];
       dst_colors          = &end_colors[ endCount];
+      // memo: dst_colors start
       interpolated_colors = (CGColor *) dst_colors;
 
       [self getColors:(void *) start_colors];
       [end getColors:(void *) end_colors];
 
+      // make space for all three location arrays
       mulle_alloca_do( locations_buf, float, n)
       {
          start_locations        = locations_buf;
@@ -270,9 +274,9 @@
 @implementation CABasicAnimation( CGGradient)
 
 + (CABasicAnimation *) animationWithProperty:(struct _mulle_objc_property *) property
-                            startCGGradient:(CGGradient *) startGradient
-                              endCGGradient:(CGGradient *) endGradient
-                                    options:(struct CABasicAnimationOptions *) options
+                             startCGGradient:(CGGradient *) startGradient
+                               endCGGradient:(CGGradient *) endGradient
+                                     options:(struct CABasicAnimationOptions *) options
 {
    CABasicAnimation *obj;
 
@@ -283,7 +287,7 @@
    obj = [obj initWithProperty:property
                 startObjectValue:startGradient
                   endObjectValue:endGradient
-                        options:options];
+                         options:options];
    obj = [obj autorelease];
    return(obj);
 }
