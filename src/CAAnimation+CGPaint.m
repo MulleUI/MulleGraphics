@@ -3,7 +3,6 @@
 #import "import-private.h"
 
 #import "CABasicAnimation+CGGradient.h"
-#import "CABasicAnimation+CGImage.h"
 #import "CABasicAnimation+CGPaint.h"
 
 

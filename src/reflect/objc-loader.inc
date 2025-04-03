@@ -1,10 +1,6 @@
-      { @selector( MulleObjCLoader), @selector( MulleCA) },      // 47a9beb6;MulleObjCLoader;3422b8ab;MulleCA
-      { @selector( MulleObjCLoader), @selector( MulleCG) },      // 47a9beb6;MulleObjCLoader;d422218a;MulleCG
-      { @selector( MulleObjCLoader), @selector( MulleUIBase) },      // 47a9beb6;MulleObjCLoader;3ebba954;MulleUIBase
       { @selector( CAAccumulationLayer), MULLE_OBJC_NO_CATEGORYID },      // 8ecd0f35;CAAccumulationLayer;;
       { @selector( CABasicAnimation), @selector( CGColor) },      // 1462ac1b;CABasicAnimation;94e785ef;CGColor
       { @selector( CABasicAnimation), @selector( CGGradient) },      // 1462ac1b;CABasicAnimation;37670335;CGGradient
-      { @selector( CABasicAnimation), @selector( CGImage) },      // 1462ac1b;CABasicAnimation;6ec55940;CGImage
       { @selector( CABasicAnimation), @selector( CGPaint) },      // 1462ac1b;CABasicAnimation;df22fbd2;CGPaint
       { @selector( CACPUImageLayer), MULLE_OBJC_NO_CATEGORYID },      // 3d4aedfb;CACPUImageLayer;;
       { @selector( CAGradientLayer), MULLE_OBJC_NO_CATEGORYID },      // cf9da5a2;CAGradientLayer;;
@@ -22,5 +18,4 @@
       { @selector( CGGradient), @selector( CAInterpolatableValue) },      // 37670335;CGGradient;dfc7766f;CAInterpolatableValue
       { @selector( CGGraphicsLayer), @selector( MulleGraphics) },      // 754a6374;CGGraphicsLayer;d36c3031;MulleGraphics
       { @selector( CGGraphicsLayer), MULLE_OBJC_NO_CATEGORYID },      // 754a6374;CGGraphicsLayer;;
-      { @selector( CGImagePaint), @selector( CAInterpolatableValue) },      // 3e23b783;CGImagePaint;dfc7766f;CAInterpolatableValue
       { @selector( CGPaint), @selector( CAAnimation) },      // df22fbd2;CGPaint;c85bd814;CAAnimation

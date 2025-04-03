@@ -56,7 +56,6 @@ src/CAAccumulationLayer.h
 src/CAAnimation+CGPaint.h
 src/CABasicAnimation+CGColor.h
 src/CABasicAnimation+CGGradient.h
-src/CABasicAnimation+CGImage.h
 src/CABasicAnimation+CGPaint.h
 src/CACPUImageLayer.h
 src/CAGradientLayer.h

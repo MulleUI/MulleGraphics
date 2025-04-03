@@ -15,7 +15,6 @@ src/CAAccumulationLayer.m
 src/CAAnimation+CGPaint.m
 src/CABasicAnimation+CGColor.m
 src/CABasicAnimation+CGGradient.m
-src/CABasicAnimation+CGImage.m
 src/CABasicAnimation+CGPaint.m
 src/CACPUImageLayer.m
 src/CAGradientLayer.m
