@@ -35,7 +35,7 @@ src/include-private.h
 # contents selected with patternfile ??-header--project-only-headers
 #
 set( PROJECT_ONLY_HEADERS
-src/bitmap.inc
+src/bitmap2.inc
 src/blur.frag.glsl.inc
 src/blur.vert.glsl.inc
 src/shader.glsl.inc

@@ -7,6 +7,7 @@
    CAImplicitlyAnimatableObjectIvars;
    CAAnimationStorageObjectIvars;
 }
+CAAnimationStorageObjectProperties;
 @property( observable, copy) CGPaint   *paint;
 
 CAImplicitlyAnimatableObjectInterface;

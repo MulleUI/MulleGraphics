@@ -6,69 +6,6 @@
 
 #import "import.h"
 
-// not a string in MulleUI
-// TODO: rename or at least alias the k constants
-typedef NS_ENUM( NSUInteger, CATextLayerAlignmentMode)
-{
-   CAAlignmentLeft = 0,
-   CAAlignmentRight,
-   CAAlignmentCenter
-
-   // kCAAlignmentJustified,
-   // kCAAlignmentNatural,
-}; 
-
-#define kCAAlignmentLeft    CAAlignmentLeft
-#define kCAAlignmentRight   CAAlignmentRight
-#define kCAAlignmentCenter  CAAlignmentCenter
-
-extern NS_ENUM_TABLE( CATextLayerAlignmentMode, 3);
-
-static inline char   *CATextLayerAlignmentModeUTF8String( CATextLayerAlignmentMode mode)
-{
-   return( NS_ENUM_PRINT( CATextLayerAlignmentMode, mode));
-}
-
-
-typedef NS_ENUM( NSUInteger, CATextLayerVerticalAlignmentMode)
-{
-   MulleTextVerticalAlignmentMiddle = 0,        // default
-   MulleTextVerticalAlignmentBaseline,
-   MulleTextVerticalAlignmentBoundsMiddle,      // only for single line
-   MulleTextVerticalAlignmentVisualMiddle,
-   MulleTextVerticalAlignmentTop,
-   MulleTextVerticalAlignmentBottom
-};
-
-
-extern NS_ENUM_TABLE( CATextLayerVerticalAlignmentMode, 6);
-
-static inline char   *CATextLayerVerticalAlignmentModeUTF8String( CATextLayerVerticalAlignmentMode mode)
-{
-   return( NS_ENUM_PRINT( CATextLayerVerticalAlignmentMode, mode));
-}
-
-
-struct CATextLayerRowGlyphs
-{
-   struct mulle_structarray   glyphArray;
-   struct UIGlyphPosition     *glyphs;
-   NSUInteger                 nGlyphs;
-};
-
-
-typedef NS_ENUM( NSUInteger, NSLineBreakMode)
-{
-   NSLineBreakByClipping,
-   NSLineBreakByWordWrapping
-};
-
-extern NS_ENUM_TABLE( NSLineBreakMode, 2);
-
-static inline char   *NSLineBreakModeUTF8String( NSLineBreakMode mode)
-{
-   return( NS_ENUM_PRINT( NSLineBreakMode, mode));
-}
 
 
 MULLE_C_NONNULL_FIRST

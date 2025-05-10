@@ -38,6 +38,11 @@ typedef BOOL   CGGraphicsLayerDrawCallback_t( CGGraphicsLayer *layer,
 
 - (void) setCornerRadius:(CGFloat) cornerRadius;
 
+// MEMO: initNoLock is actually the designated initializer funneled into by
+// _initWithFrame which is hidden. Subclasses generally want to override
+// initWithFrame: though
+// - (instancetype) initNoLock;                    // designated
+// - (instancetype) initWithFrame:(CGRect) frame;
 
 @end
 

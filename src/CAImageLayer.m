@@ -10,6 +10,9 @@
 
 @implementation CAImageLayer
 
+MulleCursorImplementation;
+
+
 + (instancetype) layerWithImage:(NSObject <CGDrawable> *)  image
 {
    CAImageLayer *obj;
@@ -20,14 +23,6 @@
    return(obj);
 }
 
-- (id) init
-{
-   self = [super init];
-   if( self)
-      _selectionPaint = [[CGPaint paintWithHexColor:0x7FFF7F7F] copy];
-   return( self);
-}
-
 
 - (id) initWithImage:(NSObject <CGDrawable> *)  image
 {
@@ -35,28 +30,60 @@
 
    frame.origin = CGPointZero;
    frame.size   = [image size];
-   
+
    self = [self initWithFrame:frame];
    [self setImage:image];
    return( self);
 }
 
 
+- (id) initNoLock
+{
+   self = [super initNoLock];
+   if( self)
+      _selectionPaint = [[CGPaint paintWithHexColor:0x7FFF7F7F] copy];
+   return( self);
+}
+
+
+
+- (id) copy
+{
+   CAImageLayer  *copy;
+
+   copy = [super copy];
+
+   MulleCursorCopy( copy, self);
+
+   copy->_selected       = self->_selected;
+   copy->_selectionPaint = [self->_selectionPaint copy];
+
+   // the -copy is preferred, the -retain can be questionable if the image
+   // is actually mutable
+   if( [self->_image respondsToSelector:@selector( copy)])
+      copy->_image       = [(id <NSCopying>) self->_image copy];
+   else
+      copy->_image       = [self->_image retain];
+
+   copy->_displayedRect  = self->_displayedRect;
+   copy->_contentMode    = self->_contentMode;
+
+   return( copy);
+}
+
+
 - (void) mulleGainAccess
 {
    [super mulleGainAccess];
-   [self->_image mulleGainAccess];  
-   [self->_selectionPaint mulleGainAccess];  
+   [self->_image mulleGainAccess];
 }
 
 
 - (void) mulleRelinquishAccess
 {
-   [self->_selectionPaint mulleRelinquishAccess];  
-   [self->_image mulleRelinquishAccess];  
+   [self->_image mulleRelinquishAccess];
    [super mulleRelinquishAccess];
 }
-
 
 
 - (void) setSelectionColor:(CGColor) color

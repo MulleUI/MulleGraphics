@@ -41,15 +41,45 @@
 @implementation CAAccumulationLayer
 
 
-- (instancetype) init
+- (instancetype) initNoLock
 {
-   self = [super init];
+   self = [super initNoLock];
    if( self)
    {
       _decay                     = 0.0;
       _previousFramebufferInsets = MulleEdgeInsetsMake( -1, 0.0, INFINITY, 0.0);
    }
    return( self);
+}
+
+- (id) copy
+{
+   CAAccumulationLayer   *copy;
+
+   copy = [super copy];
+
+   copy->_framebuffer[ 0]           = [self->_framebuffer[ 0] mutableCopy];
+   copy->_framebuffer[ 1]           = [self->_framebuffer[ 1] mutableCopy];
+   copy->_decay                     = self->_decay;
+   copy->_previousFramebufferInsets = self->_previousFramebufferInsets;
+
+   return( self);
+}
+
+
+- (void) mulleGainAccess
+{
+   [super mulleGainAccess];
+   [self->_framebuffer[ 0] mulleGainAccess];
+   [self->_framebuffer[ 1] mulleGainAccess];
+}
+
+
+- (void) mulleRelinquishAccess
+{
+   [self->_framebuffer[ 1] mulleRelinquishAccess];
+   [self->_framebuffer[ 0] mulleRelinquishAccess];
+   [super mulleRelinquishAccess];
 }
 
 

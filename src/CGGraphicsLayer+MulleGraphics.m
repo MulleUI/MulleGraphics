@@ -245,7 +245,7 @@
       // _transform as the values are animatable and the _transform may not be
       // set again until the next layout, which hopefully doesn't run every
       // frame
-      // Is this true: the transform is set by the renderQueue:
+      // Is this true: the transform is set by the drawingQueue:
       nvgTransform( vg, localTransform.a,
                         localTransform.b,
                         localTransform.c,

@@ -25,6 +25,8 @@ typedef void   CAOpenGLLayerViewPortCallback_t( CAOpenGLLayer *layer, CGContext 
 }
 
 @property( assign) CAOpenGLLayerViewPortCallback_t  *viewPortDidChangeCallback;
+@property( readonly) CGRect                         viewPort;
+@property( readonly) CGRect                         scissor;
 
 // setup viewport and scissor
 - (void) beginOpenGLWithContext:(CGContext *) context;
@@ -39,8 +41,6 @@ typedef void   CAOpenGLLayerViewPortCallback_t( CAOpenGLLayer *layer, CGContext 
 // this flushes
 - (void) endOpenGLWithContext:(CGContext *) context;
 
-- (CGRect) viewPort;
-- (CGRect) scissor;
 
 // call callback, if you didn't override it
 // this is called from beginOpenGLWithContext, when the viewport and

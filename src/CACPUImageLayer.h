@@ -52,8 +52,7 @@
 //
 @interface CACPUImageLayer : CAImageLayer
 {
-   void                   *_texture;
-   struct CGBitmapInfo    _bitmapInfo;
+   void   *_texture;
 }
 
 // you may choose to keep the CPU texture around, this could be useful

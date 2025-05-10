@@ -22,15 +22,67 @@
 }
 
 
+- (id) copy 
+{
+   CAShapeLayer  *copy;
+
+   copy = [super copy];
+
+   copy->_strokePaint  = [self->_strokePaint copy];   
+   copy->_fillPaint    = [self->_fillPaint copy];   
+   copy->_strokeWidth  = self->_strokeWidth;   
+   copy->_path         = CGPathCopy( self->_path, MulleObjCInstanceGetAllocator( copy));
+   copy->_ownsPath     = YES;   
+
+   return( copy);
+}
+
+
+// MEMO: a paint is usally a value and not mutable i.e. threadsafe no problem
+//       we don't need to gain or relinquish. But! if we have a CGImage it
+//       could be a CGFramebuffer, which is mutable and we would need to
+//       transfer it. But! The CGImage is also part of the resource management
+//       of the CGContext and will be gained/relinquised there. So doing it
+//       twice would be disastrous anyway. So luck has it we don't need to
+//       transfer paints.
+//
+// - (void) mulleGainAccess
+// {
+//    [super mulleGainAccess];
+//    [self->_fillPaint mulleGainAccess];  
+//    [self->_strokePaint mulleGainAccess];  
+// }
+// 
+// 
+// - (void) mulleRelinquishAccess
+// {
+//    [self->_strokePaint mulleRelinquishAccess];  
+//    [self->_fillPaint mulleRelinquishAccess];  
+//    [super mulleRelinquishAccess];
+// }
+
+
 - (void) setStrokeColor:(CGColor) color
 {
    [self setStrokePaint:[CGPaint paintWithColor:color]];
 }
 
 
-- (void) setFillColor:(CGColor) color;
+- (void) setFillColor:(CGColor) color
 {
    [self setFillPaint:[CGPaint paintWithColor:color]];
+}
+
+
+- (CGColor) strokeColor
+{
+   return( [_strokePaint mainColor]);
+}
+
+
+- (CGColor) fillColor
+{
+   return( [_fillPaint mainColor]);
 }
 
 @end

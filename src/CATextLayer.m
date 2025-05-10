@@ -12,32 +12,6 @@
 //#define CATEXTLAYER_DATA_DEBUG
 
 
-NS_ENUM_TABLE( CATextLayerAlignmentMode, 3) =
-{
-   NS_ENUM_ITEM( CAAlignmentLeft),
-   NS_ENUM_ITEM( CAAlignmentRight),
-   NS_ENUM_ITEM( CAAlignmentCenter)
-};
-
-
-NS_ENUM_TABLE( CATextLayerVerticalAlignmentMode, 6) =
-{
-   NS_ENUM_ITEM( MulleTextVerticalAlignmentMiddle),
-   NS_ENUM_ITEM( MulleTextVerticalAlignmentBaseline),
-   NS_ENUM_ITEM( MulleTextVerticalAlignmentBoundsMiddle),
-   NS_ENUM_ITEM( MulleTextVerticalAlignmentVisualMiddle),
-   NS_ENUM_ITEM( MulleTextVerticalAlignmentTop),
-   NS_ENUM_ITEM( MulleTextVerticalAlignmentBottom)
-};
-
-
-NS_ENUM_TABLE( NSLineBreakMode, 2) = 
-{
-   NS_ENUM_ITEM( NSLineBreakByClipping),
-   NS_ENUM_ITEM( NSLineBreakByWordWrapping)
-};
-
-
 @implementation CATextLayer
 
 // will also be used by copy
@@ -122,35 +96,51 @@ NS_ENUM_TABLE( NSLineBreakMode, 2) =
 }
 
 
-// - (id) mutableCopy
+- (id) copy
+{
+   CATextLayer   *copy;
+
+   copy = [super copy];
+
+   //
+   // somewhat tricky code, to make copy fully functional. Properties are
+   // copied by -co
+
+   // this inits _rowArray and
+   [self _initRowGlyphs];
+
+   copy->_textPaint           = [self->_textPaint copy];
+   copy->_suggestedTextPaint  = [self->_suggestedTextPaint copy];
+   copy->_selectionPaint      = [self->_selectionPaint copy];
+
+   // because Fonts are crap and don't adhere to size requests properly, it's
+   // usually better to overdraw than to clip.
+   copy->_masksToBounds       = self->_masksToBounds;
+   copy->_clearTypeEnabled    = self->_clearTypeEnabled;
+
+   MulleObjCObjectSetDuplicatedUTF8String( copy,
+                                           (char **) &copy->_fontNameUTF8String,
+                                           (char *) _fontNameUTF8String);
+   return( copy);
+}
+
+// MEMO: never do this for paints
+//
+// - (void) mulleGainAccess
 // {
-//    CATextLayer              *copy;
-//    struct mulle_allocator   *allocator;
-//    struct mulle_utf8data    data;
+//    [super mulleGainAccess];
+//    [self->_textPaint mulleGainAccess];
+//    [self->_suggestedTextPaint mulleGainAccess];
+//    [self->_selectionPaint mulleGainAccess];
+// }
 //
-//    copy = [super mutableCopy];
 //
-//    //
-//    // somewhat tricky code, to make copy fully functional. Properties are
-//    // copied by -co
-//
-//    // this inits _rowArray and
-//    [self _init];
-//
-//    allocator                 = MulleObjCInstanceGetAllocator( copy);
-//    data                      = copy->_data;
-//    copy->_data               = mulle_utf8data_copy( data, allocator);
-// #ifdef CATEXTLAYER_DATA_DEBUG
-//    if( data.characters)
-//       MulleUILog( "copied %p of to %@ _data %p", data.characters, copy->_data.characters, copy);
-// #endif
-//    copy->_suggestedTextPaint = [copy->_suggestedTextPaint copy];
-//    copy->_fontNameUTF8String = NULL;
-//
-//    MulleObjCObjectSetDuplicatedUTF8String( copy,
-//                                           (char **) &copy->_fontNameUTF8String,
-//                                           (char *) _fontNameUTF8String);
-//    return( copy);
+// - (void) mulleRelinquishAccess
+// {
+//    [self->_selectionPaint mulleRelinquishAccess];
+//    [self->_suggestedTextPaint mulleRelinquishAccess];
+//    [self->_textPaint mulleRelinquishAccess];
+//    [super mulleRelinquishAccess];
 // }
 
 
@@ -242,6 +232,9 @@ NS_ENUM_TABLE( NSLineBreakMode, 2) =
 }
 
 
+//
+// MEMO: whats wrong here is that we don't take lineheight into account
+//
 - (void) getTextVisualBounds:(CGRect *) vbounds
                       insets:(struct MulleEdgeInsets) insets
                      context:(id <UILayoutContext>) context
@@ -697,13 +690,13 @@ static NSUInteger  count_newlines( mulle_utf8_t *s)
 
 - (void) updateRowsAndGlyphsWithContext:(id <UILayoutContext>) context
 {
-   NSUInteger                  max;
-   NSUInteger                  i;
-   CGFloat                     width;
-   CGFloat                     extent;
-   struct mulle_utf8data       data;
-   CGRect                      visualBounds;
-   CGRect                      textBounds;
+   NSUInteger              max;
+   NSUInteger              i;
+   CGFloat                 width;
+   CGFloat                 extent;
+   struct mulle_utf8data   data;
+   CGRect                  visualBounds;
+   CGRect                  textBounds;
 
    data = [self textUTF8DataInTextRange];
 
@@ -714,7 +707,7 @@ static NSUInteger  count_newlines( mulle_utf8_t *s)
    _glyphData = data;
 
    if( _metrics.lineHeight == 0.0f)
-      [context getTextMetrics:&_metrics];
+      _metrics = [context textMetrics];
 
    //
    // calculate max visible rows, which is frame.size.height / _metrics.lineHeight , but
@@ -888,12 +881,12 @@ static NSUInteger  count_newlines( mulle_utf8_t *s)
 //
 - (BOOL) updateGeometryWithContext:(id <UILayoutContext>) context
 {
-   CGFloat                      fontPixelSize;
-   CGRect                       canvas;
-   int                          align;
-   CGRect                       fontBounds;
-   CGFloat                      actualFontHeight;
-   struct MulleEdgeInsets       insets;
+   CGFloat                  actualFontHeight;
+   CGFloat                  fontPixelSize;
+   CGRect                   canvas;
+   CGRect                   fontBounds;
+   int                      align;
+   struct MulleEdgeInsets   insets;
 
    [context useFontWithNameUTF8String:_fontNameUTF8String
                                       ? _fontNameUTF8String
@@ -917,6 +910,7 @@ static NSUInteger  count_newlines( mulle_utf8_t *s)
 
    canvas = MulleEdgeInsetsInsetRect( insets, canvas);
 
+   // fontPixelSize is pixels
    fontPixelSize = [self fontPixelSize];
    if( fontPixelSize == 0.0)
    {
@@ -926,7 +920,9 @@ static NSUInteger  count_newlines( mulle_utf8_t *s)
       // cover the highest and the lowest glyph in a "reasonable" font
       
       [context setTextAlign:NVG_ALIGN_LEFT | NVG_ALIGN_TOP];
-      [context setFontSize:32.0f]; // calculate size for 32
+
+      // fontSize is in points!
+      [context setFontSize:32.0f]; // calculate size for 32 point font
       [context getTextVisualBounds:&fontBounds
                               text:"|_;y´"
                             length:4];
@@ -936,18 +932,19 @@ static NSUInteger  count_newlines( mulle_utf8_t *s)
 
    if( canvas.size.height == 0.0f)
    {
-      // now at least we can assume a canvas height
+      // now at least we can assume a canvas height (if we only draw one
+      // row)
       canvas.size.height = fontPixelSize + _insets.top + _insets.bottom;
    }
 
    _lastFontPixelSize = fontPixelSize;
 
-   [context setFontSize:fontPixelSize]; // calculate size for 32
+   [context setFontSize:fontPixelSize];
 
    // I see no difference with different alignment options, for the metrics
    // likely because these are font (size) properties (duh!)
    // These values are wishful thinking though, the actual glyph can extend this
-   [context getTextMetrics:&_metrics]; // calculate size for 32
+   _metrics = [context textMetrics];
 
    switch( _alignmentMode)
    {
@@ -986,7 +983,6 @@ static NSUInteger  count_newlines( mulle_utf8_t *s)
 {
    CGColor   color;
 
-
    if( ! paint)
    {
       // if we cleared one use the other now
@@ -1024,18 +1020,18 @@ static NSUInteger  count_newlines( mulle_utf8_t *s)
 //  1.) figure out how
 - (BOOL) drawInContext:(CGContext *) context
 {
-   struct NVGcontext       *vg;
+   BOOL                    isCursorDrawn;
+   BOOL                    isSelectionDrawn;
+   BOOL                    useClearType;
+   CGPaint                 *textBackgroundPaint;
+   CGPaint                 *textPaint;
    CGRect                  canvas;
+   CGRect                  rect;
    NSRange                 textRange;
    NSUInteger              i;
    NVGpaint                nvgPaint;
    struct mulle_utf8data   data;
-   BOOL                    useClearType;
-   BOOL                    isSelectionDrawn;
-   BOOL                    isCursorDrawn;
-   CGPaint                 *textPaint;
-   CGPaint                 *textBackgroundPaint;
-   CGRect                  rect;
+   struct NVGcontext       *vg;
 
    if( ! [super drawInContext:context])
       return( NO);
@@ -1232,7 +1228,6 @@ uintptr_t   mulle_utf8_utf32_offset_at_characters( char *data,
       return( NSNotFound);
    return( s - _data.characters);
 }
-
 
 
 

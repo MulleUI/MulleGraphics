@@ -18,16 +18,17 @@
 @property( observable, assign) CGFloat        strokeWidth;
 @property( observable, copy) CGPaint          *strokePaint;
 @property( observable, copy) CGPaint          *fillPaint;
-@property( assign, getter=isOwningPath) BOOL  ownsPath;
+
+// conveniences for above
+@property( dynamic) CGColor                   strokeColor;
+@property( dynamic) CGColor                   fillColor;
 
 //
 // Ownership of CGPath is transferred to the CAShapeLayer and CALayer will call
 // CGPathDestroy on it (unless ownsPath is set to NO)
 //
-@property( assign) struct CGPath  *path;
-
-- (void) setStrokeColor:(CGColor) color;
-- (void) setFillColor:(CGColor) color;
+@property( assign) struct CGPath               *path;
+@property( assign, getter=isOwningPath) BOOL   ownsPath;
 
 @end
 

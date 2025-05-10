@@ -50,6 +50,18 @@
 }
 
 
+- (id) copy 
+{
+   CACPUImageLayer  *copy;
+
+   copy = [super copy];
+
+   copy->_keepsCPUTexture = self->_keepsCPUTexture;   
+
+   return( copy);
+}
+
+
 - (void) drawInBytes:(void *) texture
           bitmapInfo:(struct CGBitmapInfo) bitmapInfo
 {
@@ -66,8 +78,9 @@
 {
    CGImage               *image;
    CGRect                canvas;
-   CGPixelSize   bitmapSize;
-   CGPixelSize   imageSize;
+   CGPixelSize           bitmapSize;
+   CGPixelSize           imageSize;
+   struct CGBitmapInfo   bitmapInfo;
 
    // check to see of we need a new image
    canvas     = [self canvas];
@@ -82,19 +95,19 @@
       image    = nil;
    }
 
-   _bitmapInfo = CGBitmapInfoMake( bitmapSize, 0, CGBitmapEncodingRGBABytes);
+   bitmapInfo = CGBitmapInfoMake( bitmapSize, 0, CGBitmapEncodingRGBABytes);
    if( ! _texture)
       _texture = mulle_allocator_malloc( MulleObjCInstanceGetAllocator( self),
-                                         CGBitmapInfoGetAllocationLength( _bitmapInfo));
+                                         CGBitmapInfoGetAllocationLength( bitmapInfo));
 
    [self drawInBytes:_texture
-          bitmapInfo:_bitmapInfo];
+          bitmapInfo:bitmapInfo];
 
    // Send it off to the GPU
    if( ! image)
    {
       image = [[[CGImage alloc] initWithRGBABytes:_texture
-                                       bitmapSize:_bitmapInfo.size
+                                       bitmapSize:bitmapInfo.size
                                      textureFlags:0
                                    nameUTF8String:"CACPUImageLayer"
                                           context:context] autorelease];
@@ -110,7 +123,6 @@
    {
       mulle_allocator_free( MulleObjCInstanceGetAllocator( self), _texture);
       _texture = NULL;
-      memset( &_bitmapInfo, 0, sizeof( _bitmapInfo));
    }
 
    // TODO: need comment here, why this is last

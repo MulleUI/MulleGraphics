@@ -1,3 +1,6 @@
+      { @selector( MulleObjCLoader), @selector( MulleCA) },      // 47a9beb6;MulleObjCLoader;3422b8ab;MulleCA
+      { @selector( MulleObjCLoader), @selector( MulleCG) },      // 47a9beb6;MulleObjCLoader;d422218a;MulleCG
+      { @selector( MulleObjCLoader), @selector( MulleUIBase) },      // 47a9beb6;MulleObjCLoader;3ebba954;MulleUIBase
       { @selector( CAAccumulationLayer), MULLE_OBJC_NO_CATEGORYID },      // 8ecd0f35;CAAccumulationLayer;;
       { @selector( CABasicAnimation), @selector( CGColor) },      // 1462ac1b;CABasicAnimation;94e785ef;CGColor
       { @selector( CABasicAnimation), @selector( CGGradient) },      // 1462ac1b;CABasicAnimation;37670335;CGGradient

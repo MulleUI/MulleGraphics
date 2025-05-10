@@ -20,6 +20,7 @@ src/main-cashadowlayer.m
 src/main-cashapelayer.m
 src/main-catextlayer-cleartype.m
 src/main-catextlayer.m
+src/main-catextlayer-multiline.m
 src/main-catextlayer-size.m
 src/main-checkerboard.m
 src/main-hexagon.m

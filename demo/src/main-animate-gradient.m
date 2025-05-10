@@ -61,7 +61,7 @@
 //{
 //   [self willChange];
 //
-//   MulleUILog( "%@ -> %@", _paint, paint);
+//   MulleUILog( "%#@ -> %#@", _paint, paint);
 //   [_paint autorelease];
 //   _paint = [paint copy];
 //}

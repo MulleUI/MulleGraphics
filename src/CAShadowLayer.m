@@ -17,9 +17,10 @@
 }
 #endif
 
-- (instancetype) init
+
+- (instancetype) initNoLock
 {
-   self = [super init];
+   self = [super initNoLock];
    if( self)
    {
       _cornerInsets = MulleCornerInsetsMakeWithCornerRadius( fmaxf( SHADOW_HEIGHT, SHADOW_HEIGHT) / 2.0f);
@@ -32,6 +33,21 @@
                                            SHADOW_WIDTH / 2.0f);
    }
    return( self);
+}
+
+
+- (id) copy
+{
+   CAShadowLayer  *copy;
+
+   copy = [super copy];
+
+   copy->_cornerInsets = self->_cornerInsets;
+   copy->_shadowBlur   = self->_shadowBlur;
+   copy->_shadowColor  = self->_shadowColor;
+   copy->_shadowInsets = self->_shadowInsets;
+
+   return( copy);
 }
 
 

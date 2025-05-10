@@ -8,10 +8,11 @@
 
 
 @interface CAImageLayer : CGGraphicsLayer
-
+{
+   MulleCursorIvars;
+}
 // hack for textStorage, so it can be inlined in text
-MULLE_CURSOR_PROPERTIES;
-
+MulleCursorProperties;
 
 @property( assign, getter=isSelected) BOOL   selected;
 @property( observable, copy) CGPaint *       selectionPaint;
@@ -19,12 +20,14 @@ MULLE_CURSOR_PROPERTIES;
 @property( assign) CGRect                    displayedRect;
 
 // contentMode is not in UIView, because only UIImageView supports it (for now)
-@property CGContentMode   contentMode;
+@property( assign) CGContentMode             contentMode;
 
 + (instancetype) layerWithImage:(NSObject <CGDrawable> *)  image;
 - (instancetype) initWithImage:(NSObject <CGDrawable> *)  image;
 
 - (void) setSelectionColor:(CGColor) color;
+
+MulleCursorInterface;
 
 @end
 

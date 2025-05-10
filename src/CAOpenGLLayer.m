@@ -24,12 +24,13 @@
 
 - (instancetype) initWithFrame:(CGRect) frame
 {
-   [super initWithFrame:frame];
+   self = [super initWithFrame:frame];
 
    [self setCanvas:CGRectMake( -1.0, 1.0, 2.0, -2.0)];
 
    return( self);
 }
+
 
 #ifdef MULLE_CG_HAVE_MODERN_OPENGL
 
@@ -48,6 +49,15 @@
     }
     [super finalize];
 }
+
+
+// nothing to copy, yet we need to implement this otherwise we are
+// in world of pain ;)
+- (id) copy
+{
+   return( [super copy]);
+}
+
 
 
 - (void) compileDefaultShaders
@@ -117,9 +127,9 @@
 #endif
 
     GLuint vertexShader = glCreateShader(GL_VERTEX_SHADER);
-    glShaderSource(vertexShader, 1, &vertexShaderSource, NULL);
-    glCompileShader(vertexShader);
-    glGetShaderiv(vertexShader, GL_COMPILE_STATUS, &success);
+    glShaderSource( vertexShader, 1, &vertexShaderSource, NULL);
+    glCompileShader( vertexShader);
+    glGetShaderiv( vertexShader, GL_COMPILE_STATUS, &success);
     if( ! success)
     {
        glGetShaderInfoLog(vertexShader, 512, NULL, infoLog);
@@ -127,9 +137,9 @@
     }
 
     GLuint fragmentShader = glCreateShader(GL_FRAGMENT_SHADER);
-    glShaderSource(fragmentShader, 1, &fragmentShaderSource, NULL);
-    glCompileShader(fragmentShader);
-    glGetShaderiv(vertexShader, GL_COMPILE_STATUS, &success);
+    glShaderSource( fragmentShader, 1, &fragmentShaderSource, NULL);
+    glCompileShader( fragmentShader);
+    glGetShaderiv( vertexShader, GL_COMPILE_STATUS, &success);
     if( ! success)
     {
        glGetShaderInfoLog(vertexShader, 512, NULL, infoLog);
@@ -141,8 +151,8 @@
     glAttachShader( _program, fragmentShader);
     glLinkProgram( _program);
 
-    glDeleteShader(vertexShader);
-    glDeleteShader(fragmentShader);
+    glDeleteShader( vertexShader);
+    glDeleteShader( fragmentShader);
 }
 
 
@@ -378,18 +388,6 @@
    [context resumeRender];
 
    return( YES);
-}
-
-
-- (CGRect) viewPort
-{
-   return( _viewPort);
-}
-
-
-- (CGRect) scissor
-{
-   return( _scissor);
 }
 
 
