@@ -33,26 +33,23 @@
 }
 
 
-- (CGFloat) radius 
+- (CGFloat) radius
 {
    CGFloat   radius;
    CGRect    canvas;
 
    canvas = CGRectInset( [self canvas], _strokeWidth / 2.0, _strokeWidth / 2.0);
    radius = CGFloatMinimum( CGRectGetWidth( canvas), CGRectGetHeight( canvas)) / 2.0;
-   return( radius);   
+   return( radius);
 }
 
 - (BOOL) drawInContext:(CGContext *) context
 {
-   struct NVGcontext   *vg;
-
-   vg = CGContextGetNVGContext( context);
-   mvgSave( vg);
+   CGContextSave( context);
    {
-      mvgStrokeCircleWithPaint( vg, CACircleMake( CGRectGetCenterPoint( [self canvas]), [self radius]), _strokeWidth, [self paint]);
+      CGContextStrokeCircleWithPaintable( context, CACircleMakeWithCenterAndRadius( CGRectGetCenter( [self canvas]), [self radius]), _strokeWidth, [self paint]);
    }
-   mvgRestore( vg);
+   CGContextRestore( context);
    return( YES);
 }
 
@@ -77,18 +74,15 @@
 
 - (BOOL) drawInContext:(CGContext *) context
 {
-   struct NVGcontext   *vg;
-
-   vg = CGContextGetNVGContext( context);
-   mvgSave( vg);
+   CGContextSave( context);
    {
-      mvgStrokeCircleWithGradient( vg, 
-                                   CACircleMake( CGRectGetCenterPoint( [self canvas]),
+      CGContextStrokeCircleWithPaintable( context,
+                                   CACircleMakeWithCenterAndRadius( CGRectGetCenter( [self canvas]),
                                                  [self radius]),
-                                   _strokeWidth, 
-                                   (CGGradient *) [self paint]);
+                                   _strokeWidth,
+                                   [self paint]);
    }
-   mvgRestore( vg);
+   CGContextRestore( context);
    return( YES);
 }
 
@@ -173,7 +167,7 @@ int   main( int argc, char *argv[])
     * window and app
     */
    styleMask = UIWindowStyleMaskDefault;
-   styleMask = UIWindowsStyleMaskBySetting( styleMask, UIWindowStyleRetained, YES);
+   styleMask = UIWindowStyleMaskBySetting( styleMask, UIWindowStyleRetained, YES);
 
    window = [UIWindow windowWithFrame:CGRectMake( 0.0, 0.0, 800.0, 600.0)
                       titleUTF8String:"Demo"
@@ -211,8 +205,8 @@ int   main( int argc, char *argv[])
 // █ "% ,▄▀ ║░╠K█═╣███^   ╛╓█▀      ▐█         ,╓╓═ª╙└   █      ╙█▄▐▌▓######▌╫
 // █║▄▄▄█▄▄▄║H:  "╙▀███▄╓▄,█▌╓▄,,▄∩  ██p$ΦΦ▀▀▀▀▀ΦΦΦR≡≥▄╓ ║▄       ╙j▌` ▄▀╙╗ `╫
 // █"      ╙▐H-═M ▄███████¥█H "^╙    '█, ,«^``     `     ║▌        ▐M▄▀    "Φ█
-// ║        !█▄▄████≤═^`╓█ █▌╓▀╦▄▀█   ╙█⌐               ╓█▌        ▓ `       █
-//  ▌      ,▄██╫██ ▄█═╜" █▌▐█╣Hj⌐ █    █▌╙¥w,           ██▄       ╓▌        ▐M
+// ║        !█▄▄████≤═^`╓█ █▌▐█╣Hj⌐ █    █▌╙¥w,           ██▄       ╓▌        ▐M
+//  ▌      ,▄██╫██ ▄█═╜" █▌▐█╣Hj⌐ █    ██    ╙▀W▄;    ,██  `╙w,   █▄     ,╓ █
 //  ╢"▄▄#▀▀╙╟█Ü███▀`▀█  ║██J█▄▌jH █    ██    ╙▀W▄;    ,██  `╙w,   █▄     ,╓ █
 //   █╙     ▐███▌▀█w ▀█ ╠██████j▌║█▌   ▀██▄       `╙▓██▀w,     ╙╗█'`"▀█▀╙"`║`
 //   ╙▌     Φ████████▄██ ███████████    ═██▀W▄,   ╓█▀└         ╓▀ "    ╙▄ ╓▀
@@ -226,4 +220,6 @@ int   main( int argc, char *argv[])
 //                 "▀╦,       M ╙▌  ▀       `█W▐▌       wæQ▄▀╙
 //                     ╙▀W╥,╓╣   ╙█║        ╫M  █    ,╓▄╝╙`
 //                          ╙╙▀%▄▄▄▌,≤▄_▄≡,▐▓▓▄▄#ª▀"`
+
+
 

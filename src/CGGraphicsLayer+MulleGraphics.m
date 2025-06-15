@@ -2,14 +2,13 @@
 
 #import "import-private.h"
 
-#define USE_SCISSOR 
+#define USE_SCISSOR
 
 @implementation CGGraphicsLayer ( MulleGraphics)
 
 - (void) fillBackgroundInContext:(CGContext *) context
                            paint:(CGPaint *) paint
 {
-   NVGcontext        *vg;
    CGPoint           tl;
    CGPoint           br;
    CGFloat           borderWidth;
@@ -35,8 +34,6 @@
    if( tl.x > br.x && tl.y > br.y)
       return;
 
-   vg = CGContextGetNVGContext( context);
-
    // calc border out from fill, but don't draw
    borderWidth = [self borderWidth];
    if( borderWidth >= 0.1)
@@ -46,13 +43,12 @@
                                     borderWidth / 2,
                                     borderWidth / 2);
       rect  = MulleEdgeInsetsInsetRect( insets, rect);
-      nvgShapeAntiAlias( vg, 0);
+      CGContextShapeAntiAlias( context, 0);
    }
 
    // fill
-   mvgFillRoundedRectVaryingWithPaint( vg, rect, _cornerInsets, paint);
-
-   nvgShapeAntiAlias( vg, 1);
+   CGContextFillRoundedRectVaryingWithPaintable( context, rect, _cornerInsets, paint);
+   CGContextShapeAntiAlias( context, 1);
 }
 
 
@@ -82,17 +78,15 @@
 //
 - (void) drawBorderInContext:(CGContext *) context
 {
-   NVGcontext  *vg;
-   CGFloat     halfBorderWidth;
-   CGPoint     tl;
-   CGPoint     br;
-   CGRect      rect;
+   CGFloat   halfBorderWidth;
+   CGPoint   tl;
+   CGPoint   br;
+   CGRect    rect;
 
    //
    // the strokeWidth isn't scaled in nvg, so we do this now ourselves
    //
-   if( _borderWidth < 0.1)
-      return;
+   assert( _borderWidth >= 0.1);
 
    //
    // if the stroke is alpha, it will have to render over pixels
@@ -108,79 +102,16 @@
    if( ! (tl.x <= br.x || tl.y <= br.y))
       return;
 
-   vg = CGContextGetNVGContext( context);
-
    //
    // the _cornerRadius is computed for a stroke of width 1 (or 0 ?)
    // the strokeWidth is just scaling it out
    //
    rect = CGRectMake( tl.x, tl.y, br.x - tl.x, br.y - tl.y);
 
-   mvgStrokeRoundedRectVaryingWithPaint( vg, rect, _cornerInsets, _borderWidth, _borderPaint);
-
-//      nvgMoveTo( vg, tl.x, tl.y);
-//      nvgLineTo( vg, br.x, tl.y);
-//      nvgLineTo( vg, br.x, br.y);
-//      nvgLineTo( vg, tl.x, br.y);
-//      nvgLineTo( vg, tl.x, tl.y);
-
-   nvgStrokeWidth( vg, 1.0);  // need to reset
+   CGContextStrokeRoundedRectVaryingWithPaintable( context, rect, _cornerInsets, _borderWidth, _borderPaint);
+   CGContextStrokeWidth( context, 1.0);  // need to reset
 }
 
-
-/*
- *
- */
-- (NVGcontext *) setupContext:(CGContext *) context
-               localTransform:(CGAffineTransform *) localTransform
-                        alpha:(CGFloat) alpha
-{
-   NVGcontext   *vg;
-   CGRect        bounds;
-   CGRect        localClipRect;
-
-   vg = CGContextGetNVGContext( context);
-
-   //
-   // as we reset here and set alpha global, we don't need to save state
-   // since each layer will do this.
-   //
-   nvgReset( vg);
-
-#ifdef USE_SCISSOR
-   // these are the bounds in global screen space
-   if( _clipRect.size.width != INFINITY)  // transform set by UIView during layout
-      nvgScissor( vg, _clipRect.origin.x,
-                      _clipRect.origin.y,
-                      _clipRect.size.width,
-                      _clipRect.size.height);
-#endif
-
-   // this is the "inherited" transform from UIView
-   nvgTransform( vg, _transform.a,
-                     _transform.b,
-                     _transform.c,
-                     _transform.d,
-                     _transform.tx,
-                     _transform.ty);
-
-   // we are still in frame space, here so calculate the bounds scissor
-   // somewhat inconveniently
-#ifdef USE_SCISSOR
-   if( _masksToBounds)
-   {
-      bounds        = [self bounds];
-      localClipRect = CGRectApplyAffineTransform( bounds, *localTransform);
-
-      nvgIntersectScissor( vg, localClipRect.origin.x,
-                               localClipRect.origin.y,
-                               localClipRect.size.width,
-                               localClipRect.size.height);
-   }
-#endif
-   nvgGlobalAlpha( vg, alpha);
-   return( vg);
-}
 
 
 - (void) willDrawInContext:(CGContext *) context
@@ -193,89 +124,181 @@
 }
 
 
+
+//static char  *currentTransformUTF8String( CGContext *context)
+//{
+//   CGAffineTransform   transform;
+//   char                *s;
+//
+//   transform = CGContextCurrentTransform( context);
+//   s         = CGAffineTransformUTF8String( &transform);
+//   return( s);
+//}
+
+
+
+- (void) setupContext:(CGContext *) context
+            transform:(CGAffineTransform *) xform
+                alpha:(CGFloat) alpha
+{
+   //
+   // reset from previous CGGraphicsLayer having done renderInContext:
+   //
+   CGContextReset( context);
+   CGContextGlobalAlpha( context, alpha);
+
+   // set UIView clipping rect in "framebuffer" space
+#ifdef USE_SCISSOR
+   if( _clipRect.size.width != INFINITY)
+      CGContextScissor( context, _clipRect);
+#endif
+
+   //
+   // Apply our "origin" transform to get the basic drawing in the right
+   // position
+   //
+   CGContextTransform( context, xform);
+}
+
+
+
+/* So here is a little essay on what is what. A CGGraphicsLayer is supposed
+   to be setup by the UIView so it is ready to be rendered on the UIWindow
+   framebuffer. There is conceptually no transformation we are inheriting from
+   a context. The layers _transform will have been setup for the accumulated
+   transformation by the UIView hierarchy.
+
+   What our local transform is doing is applying the frame.origin as a
+   translation and the frame vs bounds as another scale and translation step.
+
+   Finally the drawing is rotated with _rotation.
+
+   The clipRect is the clipping rectangle of the view, its in the _transform
+   space.
+
+   So points to remember:
+
+   1) The layer frame, bounds.size / frame.size and bounds.origin are all
+      handled in a local transform.
+   2) The UIView translation and scalings are in _transform
+   3) The drawInContext: draws into canvas. The rotation rotates around
+      the center of the canvas (or some other place if anchorPoint is not
+      0.5, 0.5).
+   4) The background and the border are not rotated or scaled.
+ */
 - (void) renderInContext:(CGContext *) context
 {
-   CGAffineTransform   localTransform;
    CGFloat             alpha;
    CGRect              bounds;
-   NVGcontext          *vg;
+   CGRect              canvas;
+   CGPoint             center;
+   CGVector            scale;
+   CGAffineTransform   originTransform;
+   CGAffineTransform   boundsTransform;
+   CGAffineTransform   rotationTransform;
+   CGAffineTransform   scaleTransform;
+   unsigned int        drawBits;
 
    assert( context);
 
-#ifdef RENDER_DEBUG
-   fprintf( stderr, "%s %s (f:%s b:%s)\n",
+#if defined( RENDER_DEBUG)
+   mulle_fprintf( stderr, "%s %s (f:%s b:%s a: %s)\n",
                         __PRETTY_FUNCTION__,
                         [self UTF8String],
                         CGRectUTF8String( _frame),
-                        CGRectUTF8String( [self bounds]));
+                        CGRectUTF8String( [self bounds]),
+                        CGPointUTF8String( _anchorPoint));
 #endif
 
    if( _hidden == YES)
       return;
 
    alpha = _opacity * _alpha;
-
    // this is the "inherited" alpha from UIVIew
    // cull layers which are invisible
    if( CGAlphaIsTransparent( alpha))
       return;
 
    //
-   // if any dimension is zero size, nothing gets painted anyway...
+   // if any dimension is zero size (or very close) nothing gets painted
+   // anyway...
    //
-   if( _frame.size.width == 0.0 || _frame.size.height == 0.0)
+   if( _frame.size.width < 0.1 || _frame.size.height < 0.1)
       return;
 
-   bounds         = [self bounds];
-   localTransform = CGAffineTransformMakeProjection( _frame, bounds);
 
-   vg  = [self setupContext:context
-             localTransform:&localTransform
-                      alpha:alpha];
+   bounds   = [self bounds];
+   //
+   // Figure out what we want to draw, so we don't need to save and restore
+   // graphics state willy nilly. This is a central method and so why not.
+   //
+   drawBits  = [self drawsBackgroundWithAlpha:alpha] ? 0x1 : 0;
+   drawBits |= ( bounds.size.width != 0.0 && bounds.size.height != 0.0) ? 0x2 : 0;
+   drawBits |= (_borderWidth >= 0.1 && ! CGAlphaIsTransparent( [_borderPaint alpha] * alpha)) ? 0x4 : 0;
+   if( ! drawBits)
+      return;
 
-   // TODO: should we use context alpha here ?
-   if( [self drawsBackgroundWithAlpha:alpha])
-      [self drawBackgroundInContext:context];
+   // once for sure
+   [self setupContext:context
+            transform:&_transform
+                alpha:alpha];
 
-   // bounds are dynamically calculated, if there is nothing to snip from
-   // what does it mean ?
-   if( bounds.size.width != 0.0 && bounds.size.height != 0.0)
+   // this draws with _frame coordinates w/o bounds and rotation
+   if( drawBits & 0x1)
    {
-      // now do the frame/bounds transform on top of it. It can't be part of
-      // _transform as the values are animatable and the _transform may not be
-      // set again until the next layout, which hopefully doesn't run every
-      // frame
-      // Is this true: the transform is set by the drawingQueue:
-      nvgTransform( vg, localTransform.a,
-                        localTransform.b,
-                        localTransform.c,
-                        localTransform.d,
-                        localTransform.tx,
-                        localTransform.ty);
+      if( drawBits & (0x2|0x4))
+         CGContextSave( context);
 
-      // Now we have the transform set up for the draw into "global" space
-      // we don't have a scissor yet though
-      // if( _masksToBounds)
-      //    nvgIntersectScissor( vg, bounds.origin.x,
-      //                             bounds.origin.y,
-      //                             bounds.size.width,
-      //                             bounds.size.height);
+      [self drawBackgroundInContext:context];
+   }
 
-      // implementers should restore scissor/transform changes themselves
+   //
+   // bounds are dynamically calculated.
+   // we still draw border and background, even if the content is zoomed to nil
+   //
+   if( drawBits & 0x2)
+   {
+      if( drawBits & 0x1)
+         CGContextRestore( context);
+      if( drawBits & 0x4)
+         CGContextSave( context);
+
+      originTransform = CGAffineTransformMakeTranslationInline( _frame.origin);
+      boundsTransform = CGAffineTransformMakeTranslationInline( CGPointNegate( bounds.origin));
+      scale           = CGVectorMake( _frame.size.width / bounds.size.width,
+                                      _frame.size.height / bounds.size.height);
+      scaleTransform  = CGAffineTransformMakeScaleInline( scale);
+
+      boundsTransform = CGAffineTransformConcatInline( originTransform, boundsTransform);
+      boundsTransform = CGAffineTransformConcatInline( boundsTransform, scaleTransform);
+      CGContextTransform( context, &boundsTransform);
+
+      if( _masksToBounds)
+         CGContextIntersectScissor( context, bounds);
+
+      if( _rotation != 0.0)
+      {
+         canvas            = [self canvas];
+         center            = CGRectGetCenterWithAnchorPoint( canvas, _anchorPoint);
+         rotationTransform = CGAffineTransformMakeRotationAroundPoint( center, _rotation);
+         CGContextTransform( context, &rotationTransform);
+      }
+
       [self willDrawInContext:context];
       [self drawInContext:context];
       [self didDrawInContext:context];
    }
 
-   //
-   // we want to draw the border on top
-   //
-   if( ! CGAlphaIsTransparent( [_borderPaint alpha] * alpha))
+   // this draws with _frame coordinates w/o bounds and rotation again like
+   // background
+   if( drawBits & 0x4)
    {
       // "just" setup the context again, to recover the "frame" transform
-      vg = [self setupContext:context
-               localTransform:&localTransform
-                        alpha:alpha];
+      // we dont want frame/bounds messing with the border width
+      // Second setupContext inline
+      if( drawBits & (0x1|0x2))
+         CGContextRestore( context);
+
       [self drawBorderInContext:context];
    }
 }

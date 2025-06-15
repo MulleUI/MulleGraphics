@@ -95,14 +95,10 @@ MulleCursorImplementation;
 - (void) drawSelectionRect:(CGRect) canvas
                  inContext:(CGContext *) context
 {
-   NVGcontext   *vg;
-
-   vg = CGContextGetNVGContext( context);
-
    // MEMO: wenn man den nvgBeginPath weglaesst, dann klippt das rect gegen
    // den letzten shape, was ev. ganz nuetzlich mal sein kann.
 
-   mvgFillRectWithPaint( vg, canvas, _selectionPaint);
+   CGContextFillRectWithPaintable( context, canvas, _selectionPaint);
 }
 
 
@@ -138,7 +134,7 @@ MulleCursorImplementation;
                                     [_image isRepeating] ? CGScaleNone : CGScaleToFit,
                                     CGFlipNone,
                                     CGRepeatAsIs,
-                                    CGContentModeCenterPoint);
+                                    CGContentModeCenter);
    if( _displayedRect.size.width != 0.0 && _displayedRect.size.height != 0.0 &&
        [_image respondsToSelector:@selector( drawRect:fromRect:options:context:)])
    {

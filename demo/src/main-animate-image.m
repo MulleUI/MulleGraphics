@@ -40,21 +40,36 @@
 
 @interface ImageLayer : CGGraphicsLayer
 
-@property( observable, copy) CGPaint   *paint;
+@property( observable, copy) CGPaint      *paint;
 
 @end
 
 
 @implementation ImageLayer
 
+- (instancetype) initWithFrame:(CGRect) frame
+{
+   [super initWithFrame:frame];
+
+   _paint = [CGPaint paintWithColor:CGColorMakeWhite()];
+
+   return( self);
+}
+
+- (CGFloat) radius
+{
+   CGFloat   radius;
+   CGRect    canvas;
+
+   canvas = CGRectMakeFillRect( [self canvas], _borderWidth, CGInside);
+   radius = CGFloatMinimum( CGRectGetWidth( canvas), CGRectGetHeight( canvas)) / 2.0;
+   return( radius);
+}
+
 - (BOOL) drawInContext:(CGContext *) context
 {
-   struct NVGcontext   *vg;
+   CGContextFillRectWithPaintable( context, [self canvas], [self paint]);
 
-   MulleUILog( "drawing %s with %#@", CGRectUTF8String( [self canvas]), [self paint]);
-
-   vg = CGContextGetNVGContext( context);
-   mvgFillRectWithPaint( vg, [self canvas], [self paint]);
    return( YES);
 }
 
@@ -122,16 +137,14 @@ static void   drawGradientCircle( CGContext *context, CGSize size, void *userinf
 {
    struct DrawContext  *info = userinfo;
    CGGradient          *gradient;
-   NVGcontext          *vg;
    CACircle            circle;
 
    gradient = [CGGradient gradientWithStartColor:info->startColor
                                         endColor:info->endColor
                                         rotation:info->rotation];
-   vg       = CGContextGetNVGContext( context);
-   circle   = CACircleMake( CGSizeGetCenterPoint( size),
+   circle   = CACircleMakeWithCenterAndRadius( CGSizeGetCenter( size),
                             CGSizeGetInnerRadius( size) - info->strokeWidth / 2.0);
-   mvgStrokeCircleWithPaint( vg, circle,
+   CGContextStrokeCircleWithPaintable( context, circle,
                                  info->strokeWidth,
                                  gradient);
 }
@@ -199,9 +212,9 @@ int   main( int argc, char *argv[])
     * window and app
     */
    styleMask = UIWindowStyleMaskDefault;
-   styleMask = UIWindowsStyleMaskBySetting( styleMask, UIWindowStyleRetained, YES);
-   styleMask = UIWindowsStyleMaskBySetting( styleMask, UIWindowStyleRetainedOnMainThread, NO);
-   styleMask = UIWindowsStyleMaskBySetting( styleMask, UIWindowStylePlanes, NO);
+   styleMask = UIWindowStyleMaskBySetting( styleMask, UIWindowStyleRetained, YES);
+   styleMask = UIWindowStyleMaskBySetting( styleMask, UIWindowStyleRetainedOnMainThread, NO);
+   styleMask = UIWindowStyleMaskBySetting( styleMask, UIWindowStylePlanes, NO);
 
    window = [UIWindow windowWithFrame:CGRectMake( 0.0, 0.0, 800.0, 600.0)
                       titleUTF8String:"Demo"
@@ -262,13 +275,13 @@ int   main( int argc, char *argv[])
 //   █  `██▄   ▓. - Φ█═.~     ,≤█▄▀-      `   █└"▀▀▀▀▄╓╓╓╓       ▌    ██▄, █
 //  ║⌐  " ▀   ▓╨⌐   }▀`      ,█  `           █      .█▀▄▄███▄     ▌  ` ▀    ▌
 //  ▌        ▐M A   '┴      ▌                ▀        ╙█▌████▌    ╙▄        ║⌐
-// ║⌐        █⌐'║▄ Γr2«    ║▀                 ▄▄▄      ╙▌▄███      █         ▌
-// █]     ,▄▐H  ██████═ª  ╓` ▄█▀▀▀▀█▄        ████     ╓███` `╙╙║█  ▐H        █
-// █ "% ,▄▀ ║░╠K█═╣███^   ╛╓█▀      ▐█         ,╓╓═ª╙└   █      ╙█▄▐▌▓######▌╫
+// ║⌐        █⌐'║▄ Γr2«    ║▀                 ▄▄▄      ╙███` `╙╙║█  ▐H        █
+// █]     ,▄▐H  ██████═ª  ╓` ▄█▀▀▀▀█▄        ██p$ΦΦ▀▀▀▀▀ΦΦΦR≡≥▄╓ ║▄       ╙j▌` ▄▀╙╗ `╫
+// █"% ,▄▀ ║░╠K█═╣███^   ╛╓█▀      ▐█         ,╓╓═ª╙└   █      ╙█▄▐▌▓######▌╫
 // █║▄▄▄█▄▄▄║H:  "╙▀███▄╓▄,█▌╓▄,,▄∩  ██p$ΦΦ▀▀▀▀▀ΦΦΦR≡≥▄╓ ║▄       ╙j▌` ▄▀╙╗ `╫
 // █"      ╙▐H-═M ▄███████¥█H "^╙    '█, ,«^``     `     ║▌        ▐M▄▀    "Φ█
-// ║        !█▄▄████≤═^`╓█ █▌╓▀╦▄▀█   ╙█⌐               ╓█▌        ▓ `       █
-//  ▌      ,▄██╫██ ▄█═╜" █▌▐█╣Hj⌐ █    █▌╙¥w,           ██▄       ╓▌        ▐M
+// ║        !█▄▄████≤═^`╓█ █▌▐█╣Hj⌐ █    █▌╙¥w,           ██▄       ╓▌        ▐M
+//  ▌      ,▄██╫██ ▄█═╜" █▌▐█╣Hj⌐ █    ██    ╙▀W▄;    ,██  `╙w,   █▄     ,╓ █
 //  ╢"▄▄#▀▀╙╟█Ü███▀`▀█  ║██J█▄▌jH █    ██    ╙▀W▄;    ,██  `╙w,   █▄     ,╓ █
 //   █╙     ▐███▌▀█w ▀█ ╠██████j▌║█▌   ▀██▄       `╙▓██▀w,     ╙╗█'`"▀█▀╙"`║`
 //   ╙▌     Φ████████▄██ ███████████    ═██▀W▄,   ╓█▀└         ╓▀ "    ╙▄ ╓▀
@@ -282,4 +295,3 @@ int   main( int argc, char *argv[])
 //                 "▀╦,       M ╙▌  ▀       `█W▐▌       wæQ▄▀╙
 //                     ╙▀W╥,╓╣   ╙█║        ╫M  █    ,╓▄╝╙`
 //                          ╙╙▀%▄▄▄▌,≤▄_▄≡,▐▓▓▄▄#ª▀"`
-

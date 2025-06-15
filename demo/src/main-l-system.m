@@ -106,8 +106,8 @@ static char   *lindenmayer( char *s)
       oldCenter = center;
        // draw forward
        // polar to cartesian based on step and angle:
-      center.x = oldCenter.x + STEP * cos( CADegreesToRadians( angle));
-      center.y = oldCenter.y + STEP * sin( CADegreesToRadians( angle));
+      center.x = oldCenter.x + STEP * cos( CADegreesToRadiansAsAngle( angle));
+      center.y = oldCenter.y + STEP * sin( CADegreesToRadiansAsAngle( angle));
       [context strokeLineFromPoint:oldCenter
                            toPoint:center
                        strokeWidth:1.0
@@ -139,9 +139,9 @@ static char   *lindenmayer( char *s)
   b = CGFloatMakeRandomMinMax( 0 / 255.0, 50 / 255.0);
   a = CGFloatMakeRandomMinMax( 50 / 255.0, 100 / 255.0);
 
-  [context fillCircle:CACircleMake( center, radius)
+  [context fillCircle:CACircleMakeWithCenterAndRadius( center, radius)
              hexColor:CGHexColorMakeWithRGBA( r, g, b, a)];
-  [context strokeCircle:CACircleMake( center, radius)
+  [context strokeCircle:CACircleMakeWithCenterAndRadius( center, radius)
             strokeWidth:1.0
                hexColor:0x000000FF];
 }

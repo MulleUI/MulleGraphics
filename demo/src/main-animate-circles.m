@@ -35,30 +35,28 @@ static BOOL   drawStuff( CGGraphicsLayer *aLayer, CGContext *_context)
    CGFloat             radius;
    CGRect              box;
    CGRect              canvas;
-   struct NVGcontext   *vg;
 
    canvas = [layer canvas];
-   vg     = CGContextGetNVGContext( context);
 
-   nvgBeginPath( vg);
+   CGContextBeginPath( context);
    {
       radius  = CGFloatMinimum( CGRectGetWidth( canvas), CGRectGetHeight( canvas)) / 2 - 10;
       radius *= [layer scale];
 
-      nvgCircle( vg, CGRectGetMidX( canvas), CGRectGetMidY( canvas), radius);
-      nvgStrokeColor( vg, [layer color]);
-      nvgStrokeWidth( vg, 3.5);
+      CGContextCircle( context, CACircleMakeWithCenterAndRadius( CGRectGetCenter( canvas), radius));
+      CGContextStrokeColor( context, [layer color]);
+      CGContextStrokeWidth( context, 3.5);
    }
-   nvgStroke( vg);
+   CGContextStroke( context);
 
-   nvgBeginPath( vg);
+   CGContextBeginPath( context);
    {
       box = [layer box];
-      nvgRect( vg, CGRectGetMinX( box), CGRectGetMinY( box), CGRectGetWidth( box), CGRectGetHeight( box));
-      nvgStrokeColor( vg, [layer color]);
-      nvgStrokeWidth( vg, 3.5);
+      CGContextRect( context, box);
+      CGContextStrokeColor( context, [layer color]);
+      CGContextStrokeWidth( context, 3.5);
    }
-   nvgStroke( vg);
+   CGContextStroke( context);
 
    return( YES);
 }
@@ -123,7 +121,7 @@ int   main( int argc, char *argv[])
     * window and app
     */
    styleMask = UIWindowStyleMaskDefault;
-   styleMask = UIWindowsStyleMaskBySetting( styleMask, UIWindowStyleRetained, YES);
+   styleMask = UIWindowStyleMaskBySetting( styleMask, UIWindowStyleRetained, YES);
 
    window = [UIWindow windowWithFrame:CGRectMake( 0.0, 0.0, 800.0, 600.0)
                       titleUTF8String:"Demo"

@@ -118,7 +118,7 @@
    NSUInteger       i;
 
    diff  = CGPointSubtract( _point, b);
-   deg   = CARadiansToDegrees( CGPointGetPolarRadians( diff));
+   deg   = CARadiansAsRotationToDegrees( CGPointGetPolarRadiansAsAngle( diff));
    angle = fmodf( deg + 180.0, 360.0f);
    angle = CADegreesNormalize( angle);
    i     = (NSUInteger) (floor( angle / 360.0) * _numSegment);
@@ -173,8 +173,8 @@
       overlap = _radius + [b radius] - dist;
 
       diff    = CGPointSubtract( _point, [b point]);
-      direc   = CAPolarPointMakeWithRadians( overlap * overlapFactor,
-                                             CGPointGetPolarRadians( diff));
+      direc   = CAPolarPointMake( overlap * overlapFactor,
+                                             CGPointGetPolarRadiansAsAngle( diff));
       _vector = CAPolarPointAdd( _vector, direc);
       [b setVector:CAPolarPointSubtract( [b vector], direc)];
 
@@ -303,8 +303,8 @@
    {
       r = CGFloatMakeRandom() * (MAX_RADIUS - MIN_RADIUS) + MIN_RADIUS;
       p = CGPointMakeRandomInRect( rect);
-      v = CAPolarPointMakeWithRadians( CGFloatMakeRandom(),
-                                       CADegreesToRadians( CGFloatMakeRandom() * 360));
+      v = CAPolarPointMake( CGFloatMakeRandom(),
+                            CADegreesToRadiansAsAngle( CGFloatMakeRandom() * 360));
 
       base = hues[ hue_index % 6];
       hue_index++;

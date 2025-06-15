@@ -43,14 +43,16 @@
 #import "import.h"
 
 
-@interface CGBlendedPaint( CAInterpolatableValue) < CAInterpolatableValue>
-@end
-
 
 @interface CABasicAnimation( CGPaint)
 
 + (CABasicAnimation *) animationWithProperty:(struct _mulle_objc_property *) property
                                 startCGPaint:(CGPaint *) startPaint
                                   endCGPaint:(CGPaint *) endPaint
+                                     options:(struct CABasicAnimationOptions *) options;
+// just the same as above
++ (CABasicAnimation *) animationWithProperty:(struct _mulle_objc_property *) property
+                                startCGImage:(CGImage *) startImage
+                                  endCGImage:(CGImage *) endImage
                                      options:(struct CABasicAnimationOptions *) options;
 @end

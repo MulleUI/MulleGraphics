@@ -167,7 +167,7 @@ static void   fillCircleWithHoleAndColorStops( NVGcontext *vg,
    NSUInteger                                  i, n;
 
    vg     = CGContextGetNVGContext( context);
-   center = CGRectGetCenterPoint( rect);
+   center = CGRectGetCenter( rect);
 
    nvgShapeAntiAlias( vg, RIDGE != 0.0);
 

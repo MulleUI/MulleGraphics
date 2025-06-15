@@ -55,7 +55,7 @@ struct whirls_options
 - (instancetype) initWithCanvas:(CGRect) canvas
                         hueBase:(CGFloat) base
 {
-   CGPoint  center = CGRectGetCenterPoint( canvas);
+   CGPoint  center = CGRectGetCenter( canvas);
    CGFloat  x      = CGFloatMakeRandomMinMax( 0, canvas.size.width);
    CGFloat  y      = CGFloatMakeRandomMinMax( 0, canvas.size.height);
    CGFloat  hue    = base + atan2( center.x - y, center.y - x) * 180 / M_PI_f;
@@ -75,10 +75,8 @@ struct whirls_options
 
 - (BOOL) drawInContext:(CGContext *) context
 {
-   struct NVGcontext  *vg;
-
-   vg  = CGContextGetNVGContext( context);
-   mvgStrokeLineWithColor( vg, self->_lastOrigin, self->_origin, 1.0f, self->_color);
+   // No need for NVGcontext anymore
+   CGContextStrokeLineWithColor( context, self->_lastOrigin, self->_origin, 1.0f, self->_color);
    return( YES);
 }
 

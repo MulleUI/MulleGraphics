@@ -15,7 +15,7 @@ int   main()
    app = [UIApplication sharedInstance];
    {
       styleMask = UIWindowStyleMaskDefault;
-      styleMask = UIWindowsStyleMaskBySetting( styleMask, UIWindowOpenGLDeprecated, YES);
+      styleMask = UIWindowStyleMaskBySetting( styleMask, UIWindowOpenGLDeprecated, YES);
 
       layer  = [CAOpenGLLayer layerWithFrame:CGRectMake( 0, 0, 300, 300)];
       window = [UIWindow windowWithLayer:layer

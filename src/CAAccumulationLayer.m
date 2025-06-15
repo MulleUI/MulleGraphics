@@ -194,29 +194,28 @@ static inline double   computeDecayFactor( double y, int n)
                        inContext:(CGContext *) context
                           canvas:(CGRect) canvas
 {
-   CGRect              rect;
-   float               alpha;
-   struct NVGcontext   *vg;
-   NVGpaint            paint;
+   CGRect          rect;
+   float           alpha;
+   CGFillOptions   options;
 
    rect   = [self rectForPreviousFramebuffer:layer
                                 canvas:canvas];
    // figure out the alpha decay...
    // rect.size.height / 4 is the number of moves
    alpha = [self alphaForPreviousFramebuffer:layer
-                                inRect:rect
-                                canvas:canvas];
+                                      inRect:rect
+                                      canvas:canvas];
 
 // Hack alpha like this
 //   [previousFramebuffer setAlpha:alpha];
 //   mvgFillRectWithPaint( vg, rect, previousFramebuffer);
-   vg  = CGContextGetNVGContext( context);
+   CGContextBeginPath( context);
+   CGContextRect( context, rect);
 
-   mvgBeginPath( vg);
-   mvgRect( vg, rect);
-   paint = mvgImagePattern( vg, rect, 0.0, [layer textureID], alpha);
-   mvgFillPaint( vg, paint);
-   mvgFill( vg);
+   options             = CGFillOptionsDefault;
+   options.paint.alpha = alpha;
+   CGContextFillPaintableOptions( context, layer, rect, &options);
+   CGContextFill( context);
 }
 
 

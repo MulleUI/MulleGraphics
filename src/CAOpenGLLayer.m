@@ -279,25 +279,22 @@
 
 - (void) drawNonOpenGLInContext:(CGContext *) context
 {
-   NVGcontext   *vg;
-   CGRect       canvas;
-
-   vg     = CGContextGetNVGContext( context);
+   CGRect   canvas;
 
    // our "canvas" is kinda weird
    canvas = CGRectMakeWithOriginAndSize( CGPointZero, [self frame].size);
-   mvgFillRectWithColor( vg, canvas, CGColorMakeDarkGray());
-   mvgTextColor( vg, CGColorMakeWhite());
-   mvgTextBackgroundColor( vg, CGColorMakeDarkGray());
-   mvgClearType( vg, 1);
+   CGContextFillRectWithColor( context, canvas, CGColorMakeDarkGray());
+   CGContextTextColor( context, CGColorMakeWhite());
+   CGContextTextBackgroundColor( context, CGColorMakeDarkGray());
+   CGContextClearType( context, 1);
 
    [context useDefaultFont];
-   mvgFontSize( vg, 16.0);
-   mvgTextInRect( vg, "No compatible GL version available",
-                      (size_t) -1,
-                      canvas,
-                      CGContentModeCenterPoint,
-                      0);
+   CGContextFontSize( context, 16.0);
+   CGContextTextInRect( context, "No compatible GL version available",
+                                 (size_t) -1,
+                                 canvas,
+                                 CGContentModeCenter,
+                                 0);
 }
 
 

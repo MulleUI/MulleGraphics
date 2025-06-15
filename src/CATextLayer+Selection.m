@@ -10,9 +10,9 @@
 
 @implementation CATextLayer ( Selection)
 
-- (BOOL) drawSelectionWithNVGContext:(NVGcontext *) vg
-                           textRange:(NSRange) textRange
-                                 row:(NSUInteger) i
+- (BOOL) drawSelectionWithContext:(CGContext *) context
+                        textRange:(NSRange) textRange
+                              row:(NSUInteger) i
 {
    NSInteger                     x;
    CGRect                        canvas;
@@ -43,7 +43,7 @@
    if( rect.size.width < 0.1)
       return( NO);
 
-   mvgFillRectWithPaint( vg, rect, _selectionPaint);
+   CGContextFillRectWithPaintable( context, rect, _selectionPaint);
 
 
    // Der nvgTextBounds code ist zum einen langsamer, zum anderen (wegen)

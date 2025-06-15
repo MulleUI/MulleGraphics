@@ -12,28 +12,26 @@
 - (BOOL) drawInContext:(CGContext *) context
 {
    CGRect                      vbounds;
-   NVGcontext                  *vg;
    struct MulleEdgeInsets      insets;
 
-   //
+    //
    // draw visual bounds on top of what CATextLayer drew
    //
    [super drawInContext:context];
    [self getTextVisualBounds:&vbounds
                      context:context];
 
-   MulleUICLog( "%s", CGRectUTF8String( vbounds));
+    MulleUICLog( "%s", CGRectUTF8String( vbounds));
 
-   insets = [self insets];
+    insets = [self insets];
 
-   vg = CGContextGetNVGContext( context);
-   nvgSave( vg);
+    CGContextSave( context);
    {
-      mvgResetScissor( vg);
-      nvgTranslate( vg, insets.left, insets.right);
-      mvgStrokeRectWithColor( vg, vbounds, 1.0, CGColorMakeLime());
+      CGContextResetScissor( context);
+      CGContextTranslate( context, CGPointMake(insets.left, insets.right));
+      CGContextStrokeRectWithColor( context, vbounds, 1.0, CGColorMakeLime());
    }
-   nvgRestore( vg);
+   CGContextRestore( context);
 
    return( YES);
 }

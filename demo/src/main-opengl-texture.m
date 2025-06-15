@@ -189,7 +189,7 @@ static char   texture[ 8 * 8][ 4] =
 
 - (void) window:(UIWindow *) window
     didEndFrame:(struct CGFrameInfo *) info
-graphicsContext:(id <UIGraphicsContext>) context;
+graphicsContext:(id <UIGraphicsContext>) context
 {
    [self update];
 }
@@ -235,7 +235,7 @@ int   main()
 
       // teapot is old code
       styleMask = UIWindowStyleMaskDefault;
-      styleMask = UIWindowsStyleMaskBySetting( styleMask, UIWindowOpenGLDeprecated, YES);
+      styleMask = UIWindowStyleMaskBySetting( styleMask, UIWindowOpenGLDeprecated, YES);
 
       window = [UIWindow windowWithLayer:layer
                          titleUTF8String:"Demo"

@@ -152,7 +152,7 @@ int   main( int argc, char *argv[])
       layer     = [OpenGLTexturedQuadLayer layerWithFrame:CGRectMake( 0, 0, 640, 400)];
 
       styleMask = UIWindowStyleMaskNonRetained;
-      styleMask = UIWindowsStyleMaskBySetting( styleMask, UIWindowOpenGLDeprecated, YES);
+      styleMask = UIWindowStyleMaskBySetting( styleMask, UIWindowOpenGLDeprecated, YES);
 
       window = [UIWindow windowWithLayer:layer
                          titleUTF8String:"Demo"

@@ -49,13 +49,10 @@ static BOOL   drawStuff( CGGraphicsLayer *layer, CGContext *context)
    CGRect                        rects[ ROWS][ COLS];
    Foo                           *foo;
    NSUInteger                    i, j;
-   struct NVGcontext             *vg;
    struct _mulle_objc_property   *property;
    CGPaint                       *value;
    double                        x;
    NSUInteger                    frames;
-
-   vg     = CGContextGetNVGContext( context);
 
    canvas = [layer canvas];
    canvas = CGRectInset( canvas, 5.0, 5.0);
@@ -130,11 +127,11 @@ static BOOL   drawStuff( CGGraphicsLayer *layer, CGContext *context)
                                                         : (i == 0 ? 0.0 : x));
          value = [foo value];
 
-         mvgBeginPath( vg);
-         mvgRect( vg, rects[ j][ i]);
+         CGContextBeginPath( context);
+         CGContextRect( context, rects[ j][ i]);
          [value fillWithBounds:rects[ j][ i]
                          alpha:1.0
-                    NVGcontext:vg];
+                       context:context];
       }
    }
    return( YES);

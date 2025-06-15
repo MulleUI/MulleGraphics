@@ -120,7 +120,7 @@ struct hexagon_options  opts =
    self->added      = CGVectorMake( cosf( self->rad), sinf( self->rad));
 
    canvas = [layer canvas];
-   die    = CGRectGetCenterPoint( canvas);
+   die    = CGRectGetCenter( canvas);
    die    = CGPointScale( die, 1.0 / opts.len);
 
    if( CGFloatMakeRandom() < opts.dieChance || self->position.x > die.x
@@ -140,26 +140,21 @@ static void   drawBoxWithDropShadow( CGContext *context,
                                      CGFloat cornerRadius,
                                      CGFloat shadowBlur)
 {
-   struct NVGcontext    *vg;
    struct CGShadow   shadow;
-   CGColor              innerColor;
+   CGColor          innerColor;
 
-   innerColor       = color;
+    innerColor       = color;
    innerColor.a     = 0.15;
    shadow           = CGShadowMake( CGPointMake( 0, 0), shadowBlur, innerColor);
    shadow.hole      = NO;
-
-   vg = CGContextGetNVGContext( context);
-   mvgFillRoundedShadow( vg, rect, cornerRadius, &shadow);
-   mvgFillRoundedRectWithColor( vg, rect, cornerRadius, color);
+   CGContextFillRoundedShadow( context, rect, cornerRadius, &shadow);
+   CGContextFillRoundedRectWithColor( context, rect, cornerRadius, color);
 }
 
 
 - (void) stepInHexagonLayer:(HexagonLayer *) layer
                     context:(CGContext *) context
 {
-   NVGcontext   *vg;
-   NVGpaint     paint;
    CGColor      color;
    CGFloat      prop;
    CGFloat      shadowBlur;
@@ -249,33 +244,31 @@ static void   drawBoxWithDropShadow( CGContext *context,
 - (BOOL) drawInContext:(CGContext *) context
 {
    Line         *line;
-   NVGcontext   *vg;
    CGRect       canvas;
    CGPoint      die;
    CGColor      fillColor;
 
-   ++self->_tick;
+    ++self->_tick;
 
-   canvas = [self canvas];
+    canvas = [self canvas];
    if( [_lines count] < opts.count && CGFloatMakeRandom() < opts.spawnChance)
       [_lines addObject:[[[Line alloc] initWithHexagonLayer:self] autorelease]];
 
-   vg = CGContextGetNVGContext( context);
-   nvgSave( vg);
+    CGContextSave( context);
    {
-      nvgGlobalCompositeOperation( vg, NVG_SOURCE_OVER);
+      CGContextGlobalCompositeOperation( context, NVG_SOURCE_OVER);
       fillColor = CGColorMakeWithRGBA( 0, 0, 0, self->_tick == 1
-                                                ? 1.0
-                                                : opts.repaintAlpha);
-      mvgFillRectWithColor( vg, canvas, fillColor);
+                                             ? 1.0
+                                             : opts.repaintAlpha);
+   CGContextFillRectWithColor( context, canvas, fillColor);
 
-      nvgGlobalCompositeOperation( vg, NVG_LIGHTER);
-      nvgTranslate( vg, canvas.size.width / 2.0, canvas.size.height / 2.0);
-      for( line in _lines)
-         [line stepInHexagonLayer:self
-                          context:context];
+   CGContextGlobalCompositeOperation( context, NVG_LIGHTER);
+       CGContextTranslate( context, CGPointMake(canvas.size.width / 2.0, canvas.size.height / 2.0));
+   for( line in _lines)
+      [line stepInHexagonLayer:self
+                       context:context];
    }
-   nvgRestore( vg);
+   CGContextRestore( context);
    return( YES);
 }
 

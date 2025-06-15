@@ -30,13 +30,20 @@ typedef BOOL   CGGraphicsLayerDrawCallback_t( CGGraphicsLayer *layer,
 @property( observable, dynamic) CGColor    borderColor;
 @property( observable, dynamic) CGColor    backgroundColor;
 
-@property( observable) CGPoint             pixelCenter;
+@property( observable, assign) CGPoint     anchorPoint;
+@property( observable, assign) CARotation  rotation;
 
 // draw [layer canvas]
 // clip [layer bounds]
 @property CGGraphicsLayerDrawCallback_t    *drawCallback;
 
-- (void) setCornerRadius:(CGFloat) cornerRadius;
+
+
+@property( dynamic, assign) CAPose         pose;
+@property( dynamic) CGPoint                position;
+
+@property( dynamic, assign) CGFloat        cornerRadius;
+
 
 // MEMO: initNoLock is actually the designated initializer funneled into by
 // _initWithFrame which is hidden. Subclasses generally want to override

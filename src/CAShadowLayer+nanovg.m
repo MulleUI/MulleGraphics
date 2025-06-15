@@ -12,8 +12,6 @@
 
 - (BOOL) drawInContext:(CGContext *) context
 {
-   NVGcontext     *vg;
-   NVGpaint       nvgPaint;
    CGRect         canvas;
    CGRect         rect;
    CGRect         hole;
@@ -21,6 +19,7 @@
    unsigned int   j, m;
    CGRect         rects[ 4];
    CGRect         inferiors[ 4];
+   CGPaint        *paint;
 
    if( ! [super drawInContext:context])
       return( NO);
@@ -33,14 +32,12 @@
    if( CGRectEqualToRect( canvas, rect))
       return( NO);
 
-   hole     = MulleEdgeInsetsInsetRect( _shadowInsets, _shadowHole);
-   vg       = CGContextGetNVGContext( context);
-   nvgPaint = mvgBoxGradient( vg,
-                              canvas,
-                              _shadowColor,
-                              _cornerInsets.topLeft,
-                              _shadowBlur,
-                              CGColorBySettingAlpha( _shadowColor, 0.0f));
+   hole  = MulleEdgeInsetsInsetRect( _shadowInsets, _shadowHole);
+   paint = [CGGradient boxGradientWithRoundedRect:canvas
+                                     cornerRadius:_cornerInsets.topLeft
+                                            color:_shadowColor
+                                          feather:_shadowBlur
+                                     featherColor:CGColorBySettingAlpha( _shadowColor, 0.0f)];
 
    n = CGRectSubdivide( canvas, rect, rects);
    for( i = 0; i < n; i++)
@@ -48,7 +45,7 @@
       m = CGRectSubdivide( rects[ i], hole, inferiors);
       for( j = 0; j < m; j++)
       {
-         mvgFillRectWithNVGpaint( vg, inferiors[ j], nvgPaint);
+         CGContextFillRectWithPaintable( context, inferiors[ j], paint);
       }
    }
 

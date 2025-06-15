@@ -56,7 +56,7 @@ static inline void   CATextLayerRowGlyphsDone( struct CATextLayerRowGlyphs *p)
    CGFloat                       _lastFontPixelSize;
    CGSize                        _textSize;
    CGFloat                       _visualFontLineHeight;
-   struct UITextMetrics          _metrics;
+   struct CGTextMetrics          _metrics;
 
 @protected   
    // values exist after a frame is drawn, will change on next redraw possibly
@@ -110,7 +110,7 @@ static inline void   CATextLayerRowGlyphsDone( struct CATextLayerRowGlyphs *p)
 //
 @property( observable) NSRange                      selection;
 
-@property( assign) CGPixelPoint         cursorPosition;
+@property( assign) CGPixelPoint                     cursorPosition;
 @property( assign) CATextLayerAlignmentMode         alignmentMode;
 @property( assign) NSLineBreakMode                  lineBreakMode;
 
@@ -163,17 +163,15 @@ static inline void   CATextLayerRowGlyphsDone( struct CATextLayerRowGlyphs *p)
 - (CGSize) textSizeWithContext:(id <UILayoutContext>) context;
 
 
-- (void) getTextVisualBounds:(CGRect *) vbounds
-                      insets:(struct MulleEdgeInsets) insets
-                     context:(id <UILayoutContext>) context;
-
 // convenience with CATextLayerVisualBoundsInsets as value for insets
 // the -[CALayer insets] are not calculated into the bounds, so for
 // the position in the canvas you have to use
 //
 // boundsInCanvas = UITextVisualBoundsExtrude( vbounds, [layer insets]);
 //
-- (void) getTextVisualBounds:(CGRect *) vbounds
-                     context:(id <UILayoutContext>) context;
+- (CGRect) visualBoundsOfTextWithContext:(id <UILayoutContext>) context;
+
+- (CGRect) visualBoundsOfTextWithContext:(id <UILayoutContext>) context
+                                  insets:(struct MulleEdgeInsets) insets;
 
 @end

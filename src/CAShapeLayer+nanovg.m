@@ -14,10 +14,9 @@
 // needs to restore context if changed
 - (BOOL) drawInContext:(CGContext *) context
 {
-   NVGcontext   *vg;
-   CGRect        frame;
-   CGRect        canvas;
-   CGRect        bounds;
+   CGRect   frame;
+   CGRect   canvas;
+   CGRect   bounds;
 
    if( ! [super drawInContext:context])
       return( NO);
@@ -26,7 +25,6 @@
    if( ! _fillPaint && ! _strokePaint)
       return( YES);
 
-   vg     = CGContextGetNVGContext( context);
    frame  = [self frame];
 
    // scale untested
@@ -35,25 +33,25 @@
             ? CGPathGetBounds( _path)
             : CGRectZero;
 
-   nvgSave( vg);
+   CGContextSave( context);
    {
       if( ! CGSizeEqualToSize( frame.size, canvas.size))
       {
-         nvgScale( vg, canvas.size.width / frame.size.width,
-                       canvas.size.height / frame.size.height);
+         CGContextScale( context, CGVectorMake( canvas.size.width / frame.size.width,
+                                                canvas.size.height / frame.size.height));
       }
 
-      mvgBeginPath( vg);
-      mvgAddCGPath( vg, _path);
+      CGContextBeginPath( context);
+      CGContextAddCGPath( context, _path);
 
       [_fillPaint fillWithBounds:bounds
-                      NVGcontext:vg];
+                         context:context];
 
       [_strokePaint strokeWithBounds:bounds
                          strokeWidth:_strokeWidth
-                          NVGcontext:vg];
+                             context:context];
    }
-   nvgRestore( vg);
+   CGContextRestore( context);
    return( YES);
 }
 @end

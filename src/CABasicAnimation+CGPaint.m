@@ -145,5 +145,17 @@
    return(obj);
 }
 
+
++ (CABasicAnimation *) animationWithProperty:(struct _mulle_objc_property *) property
+                                startCGImage:(CGImage *) startPaint
+                                  endCGImage:(CGImage *) endPaint
+                                     options:(struct CABasicAnimationOptions *) options
+{
+   return( [self animationWithProperty:property
+                          startCGPaint:startPaint
+                            endCGPaint:endPaint
+                               options:options]);
+}
+
 @end
 

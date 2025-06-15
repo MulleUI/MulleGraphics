@@ -65,43 +65,42 @@ static UIMouseMotionEvent  *handleMouseMotionEvent( UIView *contentPlane,
 }
 
 
-static BOOL   drawStuff( CGGraphicsLayer *aLayer, CGContext *_context)
+static BOOL   drawStuff( CGGraphicsLayer *aLayer, CGContext *context)
 {
-   CGContext           *context = _context;
    CGFloat             canvasExtent;
    CGFloat             radius;
    CGFloat             strokeWidth;
    CGRect              canvas;
-   struct NVGcontext   *vg;
 
    canvas       = [aLayer canvas];
    canvasExtent = CGSizeGetMinimum( canvas.size);
    strokeWidth  = 3.0;
    radius       = (canvasExtent - strokeWidth) / 2.0;
 
-   vg = CGContextGetNVGContext( context);
-   mvgStrokeCircleWithColor( vg, CACircleMake( CGRectGetCenterPoint( canvas), radius), strokeWidth, CGColorMakeRed());
+   CGContextStrokeCircleWithColor( context, CACircleMakeWithCenterAndRadius( CGRectGetCenter( canvas), radius),
+                                            strokeWidth,
+                                            CGColorMakeRed());
 
-   [context useDefaultFont];
-   nvgTextColor( vg, CGColorMakeWhite());
-   nvgTextBackgroundColor( vg, CGColorMakeGray());
+   CGContextFontFace( context, NULL);  // default
+   CGContextTextColor( context, CGColorMakeWhite());
+   CGContextTextBackgroundColor( context, CGColorMakeGray());
 
-   mvgTextInRect( vg, "Move mouse to pan",
-                      (size_t) -1,
-                      CGRectMake( 10, 10, 400, 32),
-                      CGContentModeScaleAspectFit,
-                      MVGTextAlignVisually);
+   CGContextTextInRect( context, "Move mouse to pan",
+                                 (size_t) -1,
+                                 CGRectMake( 10, 10, 400, 32),
+                                 CGContentModeCenter,
+                                 CGTextOptionAlignVisually);
    return( YES);
 }
 
 
 static void   setupSceneInView( UIView *contentPlane)
 {
-   CALayer   *layer;
-   CGFloat   aspectFactor;
-   CGRect    bounds;
-   CGRect    frame;
-   UIView    *view;
+   CGGraphicsLayer   *layer;
+   CGFloat           aspectFactor;
+   CGRect            bounds;
+   CGRect            frame;
+   UIView            *view;
 
    frame = CGSizeCenterInRect( CGSizeMake( 600, 400), [contentPlane contentRect]);
 
@@ -109,7 +108,7 @@ static void   setupSceneInView( UIView *contentPlane)
    [view setBackgroundColor:CGColorMakeWithRGBA( 0.33, 0.33, 0.33, 1.0)];
    [contentPlane addSubview:view];
 
-   layer = (CGGraphicsLayer *) [view layer];
+   layer = MULLE_OBJC_CLASS_CAST( CGGraphicsLayer, [view layer]);
    [layer setDrawCallback:drawStuff];
 
    // The canvas is a square where we draw the circle unto.
@@ -153,13 +152,13 @@ int   main( int argc, char *argv[])
 //   █  `██▄   ▓. - Φ█═.~     ,≤█▄▀-      `   █└"▀▀▀▀▄╓╓╓╓       ▌    ██▄, █
 //  ║⌐  " ▀   ▓╨⌐   }▀`      ,█  `           █      .█▀▄▄███▄     ▌  ` ▀    ▌
 //  ▌        ▐M A   '┴      ▌                ▀        ╙█▌████▌    ╙▄        ║⌐
-// ║⌐        █⌐'║▄ Γr2«    ║▀                 ▄▄▄      ╙▌▄███      █         ▌
+// ║⌐        █⌐'║▄ Γr2«    ║▀                 ▄▄▄      ╙███` `╙╙║█  ▐H        █
 // █]     ,▄▐H  ██████═ª  ╓` ▄█▀▀▀▀█▄        ████     ╓███` `╙╙║█  ▐H        █
 // █ "% ,▄▀ ║░╠K█═╣███^   ╛╓█▀      ▐█         ,╓╓═ª╙└   █      ╙█▄▐▌▓######▌╫
 // █║▄▄▄█▄▄▄║H:  "╙▀███▄╓▄,█▌╓▄,,▄∩  ██p$ΦΦ▀▀▀▀▀ΦΦΦR≡≥▄╓ ║▄       ╙j▌` ▄▀╙╗ `╫
 // █"      ╙▐H-═M ▄███████¥█H "^╙    '█, ,«^``     `     ║▌        ▐M▄▀    "Φ█
-// ║        !█▄▄████≤═^`╓█ █▌╓▀╦▄▀█   ╙█⌐               ╓█▌        ▓ `       █
-//  ▌      ,▄██╫██ ▄█═╜" █▌▐█╣Hj⌐ █    █▌╙¥w,           ██▄       ╓▌        ▐M
+// ║        !█▄▄████≤═^`╓█ █▌▐█╣Hj⌐ █    █▌╙¥w,           ██▄       ╓▌        ▐M
+//  ▌      ,▄██╫██ ▄█═╜" █▌▐█╣Hj⌐ █    ██    ╙▀W▄;    ,██  `╙w,   █▄     ,╓ █
 //  ╢"▄▄#▀▀╙╟█Ü███▀`▀█  ║██J█▄▌jH █    ██    ╙▀W▄;    ,██  `╙w,   █▄     ,╓ █
 //   █╙     ▐███▌▀█w ▀█ ╠██████j▌║█▌   ▀██▄       `╙▓██▀w,     ╙╗█'`"▀█▀╙"`║`
 //   ╙▌     Φ████████▄██ ███████████    ═██▀W▄,   ╓█▀└         ╓▀ "    ╙▄ ╓▀
@@ -173,4 +172,3 @@ int   main( int argc, char *argv[])
 //                 "▀╦,       M ╙▌  ▀       `█W▐▌       wæQ▄▀╙
 //                     ╙▀W╥,╓╣   ╙█║        ╫M  █    ,╓▄╝╙`
 //                          ╙╙▀%▄▄▄▌,≤▄_▄≡,▐▓▓▄▄#ª▀"`
-

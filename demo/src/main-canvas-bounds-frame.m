@@ -22,12 +22,6 @@ static BOOL   drawStuff( CGGraphicsLayer *layer, CGContext *_context)
 
    vg = CGContextGetNVGContext( context);
 
-   bounds = [layer bounds];
-   nvgIntersectScissor( vg, bounds.origin.x,
-                            bounds.origin.y,
-                            bounds.size.width,
-                            bounds.size.height);
-
    canvas = [layer canvas];
    w = (NSUInteger) ceil( canvas.size.width / 20.0);
    h = (NSUInteger) ceil( canvas.size.height / 20.0);
@@ -116,6 +110,8 @@ void   setupSceneInContentPlane( UIWindowPlane *plane)
             bounds.size.height *= 0.75;
          }
          [layer setBounds:bounds];
+         [layer setRotation:0.33];
+         [layer setMasksToBounds:YES];
 
          fprintf( stderr, "calc %ld.%ld: c=[%s] b=[%s]\n",
                      column, row,

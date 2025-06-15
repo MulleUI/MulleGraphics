@@ -15,7 +15,7 @@ static CGContentMode   contentModes[ 12] =
    CGContentModeScaleToFill,
    CGContentModeScaleAspectFit,
    CGContentModeScaleAspectFill,
-   CGContentModeCenterPoint,
+   CGContentModeCenter,
 
    CGContentModeTop,
    CGContentModeBottom,

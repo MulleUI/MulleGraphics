@@ -36,7 +36,6 @@
 static BOOL   drawStuff( CGGraphicsLayer *aLayer, CGContext *_context)
 {
    CGContext           *context = _context;
-   struct NVGcontext   *vg;
    CGFloat             radius;
    CGRect              canvas;
    CGRect              frame;
@@ -52,12 +51,12 @@ static BOOL   drawStuff( CGGraphicsLayer *aLayer, CGContext *_context)
 
    radius       = (canvasExtent - strokeWidth) / 2.0;
 
-   vg = CGContextGetNVGContext( context);
-   mvgStrokeCircleWithColor( vg,
-                             CACircleMake( CGRectGetCenterPoint( canvas),
-                                           radius),
-                             strokeWidth,
-                             CGColorMakeRed());
+
+   CGContextStrokeCircleWithColor( context,
+                                   CACircleMakeWithCenterAndRadius( CGRectGetCenter( canvas),
+                                                radius),
+                                   strokeWidth,
+                                   CGColorMakeRed());
    return( YES);
 }
 

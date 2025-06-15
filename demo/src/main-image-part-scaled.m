@@ -39,8 +39,8 @@
    if( radius > bounds.size.height / 2.0)
       radius = bounds.size.height / 2.0;
 
-   center = CGRectGetCenterPoint( bounds);
-   rect   = CGRectMakeWithCenterPointAndInnerRadius( center, radius);
+   center = CGRectGetCenter( bounds);
+   rect   = CGRectMakeWithCenterAndInnerRadius( center, radius);
 
    [self setFrame:rect];
    [self setNeedsLayout];

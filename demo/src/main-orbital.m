@@ -46,19 +46,17 @@
 - (BOOL) drawInContext:(CGContext *) context
                 canvas:(CGRect ) canvas
 {
-   struct NVGcontext  *vg;
    CGFloat            hue;
 
-   vg  = CGContextGetNVGContext( context);
-   hue = fmod( _colorAngle, 360.0) / 360.0;
+    hue = fmod( _colorAngle, 360.0) / 360.0;
 
    CGPoint center   = CGPointMake( canvas.size.width  / 2,
-                                   canvas.size.height / 2);
-   nvgBeginPath( vg);
-   nvgArc( vg, center.x, center.y, _radius, self->_lastAngle, self->_angle, NVG_CW);
-   nvgStrokeColor( vg, CGColorMakeWithHSLA( hue, 1.0, 0.5, 1.0));
-   nvgStrokeWidth( vg, _size);
-   nvgStroke( vg);
+                                    canvas.size.height / 2);
+   CGContextBeginPath( context);
+   CGContextArc( context, CACircleMake(center.x, center.y, _radius), self->_lastAngle, self->_angle);
+   CGContextStrokeColor( context, CGColorMakeWithHSLA( hue, 1.0, 0.5, 1.0));
+   CGContextStrokeWidth( context, _size);
+   CGContextStroke( context);
    return( YES);
 }
 
@@ -147,17 +145,15 @@
 - (BOOL) drawInContext:(CGContext *) context
 {
    Orb          *orb;
-   NVGcontext   *vg;
    CGRect       canvas;
    CGColor      fillColor;
    NSUInteger   i, n;
 
-   canvas    = [self canvas];
+    canvas    = [self canvas];
    fillColor = CGColorMakeWithRGBA( 0, 0, 0, _trail ? 0.1 : 1.0);
-   vg        = CGContextGetNVGContext( context);
-   mvgFillRectWithColor( vg, canvas, fillColor);
+   CGContextFillRectWithColor( context, canvas, fillColor);
 
-   nvgLineCap( vg, NVG_ROUND);
+   CGContextLineCap( context, NVG_ROUND);
    for( orb in _orbs)
       for( i = 0; i < 3; i++)
       {

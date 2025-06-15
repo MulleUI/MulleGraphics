@@ -19,8 +19,8 @@
 //
 // -------------------------------
 
-- (void) drawCursorWithNVGContext:(NVGcontext *) vg
-                              row:(NSUInteger) i
+- (void) drawCursorWithContext:(CGContext *) context
+                           row:(NSUInteger) i
 {
    CGRect                        canvas;
    struct CATextLayerRowGlyphs   *p;
@@ -52,14 +52,15 @@
       }
       offset.y = -(_metrics.lineHeight / 2); // depends on alignment, really, use middle here
 
-      nvgBeginPath( vg);
-      nvgFillColor( vg, nvgRGBA(255,0,0,255));
-      nvgRect( vg,
-               canvas.origin.x + _origin.x + offset.x - 0.5,
-               canvas.origin.y + _origin.y - _metrics.ascender + y,
-               1,
-               h);
-      nvgFill( vg);
+      CGContextBeginPath( context);
+      CGContextRect( context,
+                     CGRectMake( canvas.origin.x + _origin.x + offset.x - 0.5,
+                                 canvas.origin.y + _origin.y - _metrics.ascender + y,
+                                 1,
+                                 h)
+                     );
+      CGContextFillColor( context, CGColorMakeRed());
+      CGContextFill( context);
    }
 }
 

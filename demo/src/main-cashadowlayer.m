@@ -5,9 +5,9 @@
 
 
 static UIWindowDisplayBits   changeShadow( UIWindow *window,
-                                            id <UIGraphicsContext> context,
-                                            struct CGFrameInfo *info,
-                                            UIWindowDisplayBits displayBits)
+                                           id <UIGraphicsContext> context,
+                                           struct CGFrameInfo *info,
+                                           UIWindowDisplayBits displayBits)
 {
    CAShadowLayer      *layer;
    CGRect             frame;
@@ -120,4 +120,3 @@ int   main( int argc, char *argv[])
 //                 "▀╦,       M ╙▌  ▀       `█W▐▌       wæQ▄▀╙
 //                     ╙▀W╥,╓╣   ╙█║        ╫M  █    ,╓▄╝╙`
 //                          ╙╙▀%▄▄▄▌,≤▄_▄≡,▐▓▓▄▄#ª▀"`
-

@@ -235,9 +235,9 @@
 //
 // MEMO: whats wrong here is that we don't take lineheight into account
 //
-- (void) getTextVisualBounds:(CGRect *) vbounds
-                      insets:(struct MulleEdgeInsets) insets
-                     context:(id <UILayoutContext>) context
+
+- (CGRect) visualBoundsOfTextWithContext:(id <UILayoutContext>) context
+                                  insets:(struct MulleEdgeInsets) insets;
 {
    NSUInteger                    i, j;
    struct CATextLayerRowGlyphs   *p;
@@ -248,8 +248,6 @@
    float                         maxy;
    CGFloat                       x;
    CGFloat                       y;
-
-   assert( vbounds);
 
    if( _textSize.height == 0.0f)
    {
@@ -356,17 +354,16 @@ next:
 
    MulleUILog( "%g %g %g %g", minx, miny, maxx, maxy);
 
-   *vbounds = CGRectMake( minx, miny, maxx - minx, maxy - miny);
+   return( CGRectMake( minx, miny, maxx - minx, maxy - miny));
 }
 
 
-- (void) getTextVisualBounds:(CGRect *) vbounds
-                     context:(id <UILayoutContext>) context
+- (CGRect) visualBoundsOfTextWithContext:(id <UILayoutContext>) context;
 {
-   [self getTextVisualBounds:vbounds
-                      insets:CATextLayerVisualBoundsInsets
-                     context:context];
+   return( [self visualBoundsOfTextWithContext:context
+                                        insets:CATextLayerVisualBoundsInsets]);
 }
+
 
 
 - (CGSize) sizeThatFits:(CGSize) max
@@ -720,9 +717,8 @@ static NSUInteger  count_newlines( mulle_utf8_t *s)
    }
    else
    {
-      [context getTextVisualBounds:&visualBounds
-                              text:data.characters
-                            length:data.length];
+      visualBounds = [context visualBoundsOfText:data.characters
+                                          length:data.length];
       _visualFontLineHeight = visualBounds.size.height;
       // calculate this always, as _textBounds can be useful later on as well
       extent = [context getTextBounds:&textBounds
@@ -791,10 +787,10 @@ static NSUInteger  count_newlines( mulle_utf8_t *s)
          origin.y = _metrics.ascender;
          break;
       case MulleTextVerticalAlignmentBottom :
-         origin.y = rect.size.height + _metrics.descender;  // _metrics.descender is neg.!
+         origin.y = rect.size.height - _metrics.descender;
          break;
       case MulleTextVerticalAlignmentMiddle :
-         origin.y = (rect.size.height + _metrics.ascender + _metrics.descender) / 2.0;
+         origin.y = (rect.size.height + _metrics.ascender - _metrics.descender) / 2.0;
          break;
       case MulleTextVerticalAlignmentBaseline :
          origin.y = rect.size.height / 2.0;
@@ -923,9 +919,8 @@ static NSUInteger  count_newlines( mulle_utf8_t *s)
 
       // fontSize is in points!
       [context setFontSize:32.0f]; // calculate size for 32 point font
-      [context getTextVisualBounds:&fontBounds
-                              text:"|_;y´"
-                            length:4];
+      fontBounds = [context visualBoundsOfText:"|_;y´"
+                                        length:4];
       actualFontHeight = fontBounds.size.height;
       fontPixelSize    = (int) (canvas.size.height * 32.0 / actualFontHeight);
    }
@@ -1029,9 +1024,7 @@ static NSUInteger  count_newlines( mulle_utf8_t *s)
    CGRect                  rect;
    NSRange                 textRange;
    NSUInteger              i;
-   NVGpaint                nvgPaint;
    struct mulle_utf8data   data;
-   struct NVGcontext       *vg;
 
    if( ! [super drawInContext:context])
       return( NO);
@@ -1046,8 +1039,6 @@ static NSUInteger  count_newlines( mulle_utf8_t *s)
 
    canvas = [self canvas];
    canvas = MulleEdgeInsetsInsetRect( _insets, canvas);
-
-   vg = CGContextGetNVGContext( context);
 
    // if textPaint is not set, use color derived from :_backgroundPaint
    textPaint = _textPaint ? _textPaint : _suggestedTextPaint;
@@ -1067,7 +1058,7 @@ static NSUInteger  count_newlines( mulle_utf8_t *s)
                    [_selectionPaint isMonochrome];
    useClearType &= [textBackgroundPaint isOpaque];
 
-   nvgClearType( vg, useClearType);
+   CGContextClearType( context, useClearType);
 
    isCursorDrawn = NO;
    for( i = 0; i < _nRows; i++)
@@ -1091,9 +1082,9 @@ static NSUInteger  count_newlines( mulle_utf8_t *s)
       /*
        * Draw selection
        */
-      isSelectionDrawn = [self drawSelectionWithNVGContext:vg
-                                                textRange:textRange
-                                                      row:i];
+      isSelectionDrawn = [self drawSelectionWithContext:context
+                                              textRange:textRange
+                                                    row:i];
 
       // maybe a bit over kill, but I don't want to reset same colors on each
       // line
@@ -1106,23 +1097,19 @@ static NSUInteger  count_newlines( mulle_utf8_t *s)
           */
          if( useClearType)
          {
-            mvgTextColor( vg, [textPaint mainColor]);
-            mvgTextBackgroundColor( vg, [textBackgroundPaint mainColor]);
+            CGContextTextColor( context, [textPaint mainColor]);
+            CGContextTextBackgroundColor( context, [textBackgroundPaint mainColor]);
          }
          else
          {
             // coloring with gradients not possible, not super sure why not
             // but it is what it is (cleartype probably not looking good)
-            nvgPaint = [textPaint NVGpaintWithBounds:rect
-                                               alpha:1.0f
-                                          NVGcontext:vg];
-
-            mvgFillPaint( vg, nvgPaint);
+            CGContextFillPaintableOptions( context, textPaint, rect, NULL);
          }
       }
 
       // redo this since we fill color may have changed
-      nvgText( vg, rect.origin.x, rect.origin.y, _rows[ i].start, _rows[ i].end);
+      CGContextText( context, rect.origin, _rows[ i].start, _rows[ i].end - _rows[ i].start);
 
       /*
        * Draw Cursor
@@ -1130,11 +1117,11 @@ static NSUInteger  count_newlines( mulle_utf8_t *s)
       isCursorDrawn = [self isEditing];
       if( isCursorDrawn)
       {
-         [self drawCursorWithNVGContext:vg
-                                    row:i];
+         [self drawCursorWithContext:context
+                                row:i];
       }
    }
-   nvgClearType( vg, 0);
+   CGContextClearType( context, 0);
 
    return( YES);
 }

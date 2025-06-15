@@ -50,10 +50,7 @@ struct ribbons_options
 
 - (BOOL) drawInContext:(CGContext *) context
 {
-   struct NVGcontext  *vg;
-
-   vg  = CGContextGetNVGContext( context);
-   mvgStrokeLineWithColor( vg, self->_origin, [self->_neighbor origin], -1.0, self->_color);
+   CGContextStrokeLineWithColor( context, self->_origin, [self->_neighbor origin], -1.0, self->_color);
    return( YES);
 }
 
@@ -133,19 +130,17 @@ struct ribbons_options
    CGColor      fillColor;
    CGRect       canvas;
    NSUInteger   i;
-   NVGcontext   *vg;
    Ribbon       *ribbon;
 
-   vg     = CGContextGetNVGContext( context);
-   canvas = [self canvas];
+    canvas = [self canvas];
 
    fillColor = CGColorMakeWithRGBA( 0, 0, 0, 5.0 / 255.0);
-   mvgFillRectWithColor( vg, canvas, fillColor);
+   CGContextFillRectWithColor( context, canvas, fillColor);
 
    if( opts.maxTicks && _ticks > opts.maxTicks)
       return( YES);
 
-   nvgStrokeWidth( vg, 3.5);
+   CGContextStrokeWidth( context, 3.5);
 
    for( i = 0; i < opts.tickSpeed; i++)
    {

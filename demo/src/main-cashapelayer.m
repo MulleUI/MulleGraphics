@@ -20,7 +20,7 @@ static CGPath   *createWheelPath( CGRect rect, NSUInteger numPetals)
    angleIncrement = CA_2xPI / numPetals; // Divide a full circle by the number of petals
 
    path   = CGPathCreateMutable();
-   center = CGRectGetCenterPoint( rect);
+   center = CGRectGetCenter( rect);
    radius = CGRectGetMinimumSize( rect) / 2.0;
 
    for( i = 0; i < numPetals; i++) 
@@ -29,12 +29,12 @@ static CGPath   *createWheelPath( CGRect rect, NSUInteger numPetals)
 
       startRadians = i * angleIncrement;
       endRadians   = (i + 1) * angleIncrement;
-      CGPathAddArcWithCenterPoint( path, 
-                                   center, 
-                                   radius, 
-                                   CARadiansToAngle( startRadians), 
-                                   CARadiansToAngle( endRadians), 
-                                   NVG_CW);
+      CGPathAddArcWithCenterAndAngles( path,
+                                       center,
+                                       radius,
+                                       CARadiansToAngle( startRadians),
+                                       CARadiansToAngle( endRadians),
+                                       NVG_CW);
    }
 
    CGPathCloseSubpath( path);

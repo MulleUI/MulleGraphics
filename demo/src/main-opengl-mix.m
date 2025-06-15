@@ -20,7 +20,7 @@ int   main( void)
    int   _teaList;
 }
 
-@property( observable, assign) CGPoint      rotation;
+@property( observable, assign) CGPoint      rotation2D;
 @property( observable, assign) NSInteger    grid;  // must be signed for animation
 
 @end
@@ -178,8 +178,8 @@ static float cpData[][3] = {
    glLoadIdentity();
 
    glTranslatef(0.0, 0.0, -5.0);
-   glRotatef( _rotation.y, 0.0,1.0,0.0);
-   glRotatef( _rotation.x, 1.0,0.0,0.0);
+   glRotatef( _rotation2D.y, 0.0,1.0,0.0);
+   glRotatef( _rotation2D.x, 1.0,0.0,0.0);
 
    glCallList( _teaList);
 }
@@ -347,7 +347,7 @@ static UIView   *setupTeapotView( UIWindow *window, CGColor color, int grid)
                                                NO);
 
    layer     = (OpenGLTeapotLayer *) [view layer];
-   property  = MulleObjCInstanceSearchProperty( layer, @selector( rotation));
+   property  = MulleObjCInstanceSearchProperty( layer, @selector( rotation2D));
    animation = [[[CABasicAnimation alloc] initWithProperty:property
                                            startPointValue:CGPointMake( 0, 0)
                                              endPointValue:CGPointMake( 360, 720)
@@ -419,7 +419,7 @@ int   main( int argc, char *argv[])
 
    // teapot is old code
    styleMask = UIWindowStyleMaskDefault;
-   styleMask = UIWindowsStyleMaskBySetting( styleMask, UIWindowOpenGLDeprecated, YES);
+   styleMask = UIWindowStyleMaskBySetting( styleMask, UIWindowOpenGLDeprecated, YES);
 
    window = [UIWindow windowWithFrame:CGRectMake( 0.0f, 0.0f, 640.0f, 400.0f)
                       titleUTF8String:"Demo"
