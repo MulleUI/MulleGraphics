@@ -7,10 +7,10 @@ int   main( int argc, char *argv[])
    CATransaction      *transaction;
    CAAnimationGroup   *group;
 
-   layer = [CGGraphicsLayer object];
+   layer = [CGGraphicsLayer instance];
    [layer setBorderColor:CGColorMakeBlue()];
 
-   transaction = [CATransaction object];
+   transaction = [CATransaction instance];
    [transaction begin];
    {
       [transaction setAnimationDuration:1.0];

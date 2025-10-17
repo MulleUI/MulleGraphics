@@ -10,11 +10,11 @@
 
 // #define START_COLOR   CGColorMakeWhite()
 // #define END_COLOR     CGColorMakeBlue()
-//#define DEBUG_WRITE_IMAGE_PNG
-//#define DEBUG_NO_ANIMATION
+#define DEBUG_WRITE_IMAGE_PNG
+#define DEBUG_NO_ANIMATION
 //#define DEBUG_NO_SCENE
 // #define FPS               60.0
-#define FPS               0.5
+//#define FPS               0.5
 
 @interface MyFramebuffer : CGFramebuffer
 @end
@@ -38,9 +38,56 @@
 
 
 
+struct DrawContext
+{
+   CGColor   startColor;
+   CGColor   endColor;
+   CGFloat   strokeWidth;
+   CAAngle   rotation;
+};
+
+
+struct DrawContext   circleOne =
+{
+   CGColorDataYellow,
+   CGColorDataBlue,
+   80.0,
+   CARotationNone
+};
+
+
+struct DrawContext   circleTwo =
+{
+   CGColorDataRed,
+   CGColorDataLime,
+   80.0,
+   CARotation180
+};
+
+
+
+static void   drawGradientCircle( CGContext *context, CGSize size, void *userinfo)
+{
+   struct DrawContext  *info = userinfo;
+   CGGradient          *gradient;
+   CACircle            circle;
+
+   gradient = [CGGradient gradientWithStartColor:info->startColor
+                                        endColor:info->endColor
+                                        rotation:info->rotation];
+   circle   = CACircleMakeWithCenterAndRadius( CGSizeGetCenter( size),
+                                               CGSizeGetInnerRadius( size) - info->strokeWidth / 2.0);
+   CGContextStrokeCircleWithPaintable( context,
+                                       circle,
+                                       info->strokeWidth,
+                                       gradient);
+}
+
+
+
 @interface ImageLayer : CGGraphicsLayer
 
-@property( observable, copy) CGPaint      *paint;
+@property( observable, copy) CGPaint   *paint;
 
 @end
 
@@ -103,52 +150,6 @@ void  setupAnimation( UIWindow *window,
 }
 
 #endif
-
-
-struct DrawContext
-{
-   CGColor   startColor;
-   CGColor   endColor;
-   CGFloat   strokeWidth;
-   CAAngle   rotation;
-};
-
-
-struct DrawContext   circleOne =
-{
-   CGColorDataYellow,
-   CGColorDataBlue,
-   80.0,
-   CARotationNone
-};
-
-
-struct DrawContext   circleTwo =
-{
-   CGColorDataRed,
-   CGColorDataLime,
-   80.0,
-   CARotation180
-};
-
-
-
-static void   drawGradientCircle( CGContext *context, CGSize size, void *userinfo)
-{
-   struct DrawContext  *info = userinfo;
-   CGGradient          *gradient;
-   CACircle            circle;
-
-   gradient = [CGGradient gradientWithStartColor:info->startColor
-                                        endColor:info->endColor
-                                        rotation:info->rotation];
-   circle   = CACircleMakeWithCenterAndRadius( CGSizeGetCenter( size),
-                            CGSizeGetInnerRadius( size) - info->strokeWidth / 2.0);
-   CGContextStrokeCircleWithPaintable( context, circle,
-                                 info->strokeWidth,
-                                 gradient);
-}
-
 
 
 void   setupSceneAndAnimation( UIWindow *window, CGContext *context)
@@ -253,7 +254,7 @@ int   main( int argc, char *argv[])
    [window setKeepOSGraphicsContextActive:flag];
 #endif
 
-   perf = [MulleUIPerf object];
+   perf = [MulleUIPerf instance];
    [window setFrameDelegate:perf];
 
    return( UIApplicationRunWindow( window));

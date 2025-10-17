@@ -3,7 +3,7 @@
 #include <math.h>
 
 #define DO_ANIMATION          1  // Set to 1 to enable animations
-#define ROTATION_ANIMATION    0
+#define ROTATION_ANIMATION    1
 
 
 static CGPath   *createCirclePath(CGPoint center, CGFloat radius)
@@ -95,6 +95,7 @@ static void   setupScene( UIWindow *window)
    layerFrame = CGRectMake(center.x - 10, center.y - 10, 20, 20);
    layer      = [CAShapeLayer layerWithFrame:layerFrame];
    
+   [layer setAnchorPoint:CGPointMake( 0.5, 1.0)];
    [layer setPath:createTrianglePath([layer bounds])];
    [layer setFillColor:CGColorMakeWithRGBA(1.0, 0.0, 0.0, 1.0)];
    [layer setNameUTF8String:"triangle"];

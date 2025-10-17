@@ -7,6 +7,13 @@
 #import "import.h"
 
 
+struct CATextLayerRowGlyphs
+{
+   struct mulle_structarray   glyphArray;
+   struct UIGlyphPosition     *glyphs;
+   NSUInteger                 nGlyphs;
+};
+
 
 MULLE_C_NONNULL_FIRST
 static inline void   _CATextLayerRowGlyphsInit( struct CATextLayerRowGlyphs *p,
@@ -30,6 +37,10 @@ static inline void   CATextLayerRowGlyphsDone( struct CATextLayerRowGlyphs *p)
 
 #define CATextLayerVisualBoundsInsets  \
    MulleEdgeInsetsMake( 1.0f, 2.0f, 1.0f, 2.0f)
+
+// TODO: The CATextLayer does too much. It should be dumbed down and the smarts
+//       moved to either a UITextView or some intermediate object (that for
+//       example would handle (Layout), (Selection), (RowsAndGlyphs).
 //
 // Though the CATextLayer can do multiple lines, the number of lines it
 // can usefully do is restricted. It chiefly does it for the sake of
@@ -40,41 +51,50 @@ static inline void   CATextLayerRowGlyphsDone( struct CATextLayerRowGlyphs *p)
 //
 @interface CATextLayer : CGGraphicsLayer
 {
-   struct mulle_utf8data              _data;
-   
-   CGPoint                            _origin;
-   NSUInteger                         _startSelection;
-  
-   CATextLayerVerticalAlignmentMode   _verticalAlignmentMode;
+   struct mulle_utf8data               _data;
 
-   // derived property
-@protected   
+// derived property
+@protected
    CGPaint                            *_suggestedTextPaint;
 
-@protected   
-   // not zeroed by -copy
-   CGFloat                       _lastFontPixelSize;
-   CGSize                        _textSize;
-   CGFloat                       _visualFontLineHeight;
-   struct CGTextMetrics          _metrics;
 
+// SELECTION
+@protected
+   NSUInteger                          _startSelection;
+
+//
+// LAYOUT
+@protected
+   CGPoint                             _layoutOrigin;  // last
+//
+// ROWS AND GLYPHS
 @protected   
+   BOOL                                _rowsAndGlyphsValid;
    // values exist after a frame is drawn, will change on next redraw possibly
-   struct mulle_structarray      _rowArray;
-   struct UITextRow              *_rows;
-   NSUInteger                    _nRows;
+   struct CGTextMetrics                _metrics;
+   struct mulle_structarray            _rowArray;
+   struct UITextRow                   *_rows;
+   NSUInteger                          _nRows;
 
-   struct mulle_structarray      _rowGlyphArray;
-   struct CATextLayerRowGlyphs   *_rowGlyphs;
+   struct mulle_structarray            _rowGlyphArray;
+
+   // * The UIGlyphPosition is relative to the baseline in the Y direction
+   // * If you have a string "a\na" the UIGlyphPosition for both 'a' in terms
+   //   of minx,maxx,miny,maxy will be identical.
+   // * If your textAlignment is center, x will move from negative to positive
+
+   struct CATextLayerRowGlyphs        *_rowGlyphs;
 
 @private   
-   struct mulle_utf8data         _glyphData;    // don't access it's stale!
+   struct mulle_utf8data               _glyphData;    // don't access: it's stale!
 }
 
-@property( assign) char                 *fontNameUTF8String;
 
-@property( observable) CGFloat          fontPixelSize;
-@property( observable) MulleEdgeInsets  insets;
+//
+// this is a layouting "fummel" factor, its used by -layoutWithContext:
+// to tweak the _layoutOrigin
+//
+@property( observable) CGPoint         textOffset; // in pixels
 
 //
 // if range.location is != NSNotFound (default), this will be used to "cut"
@@ -84,9 +104,9 @@ static inline void   CATextLayerRowGlyphsDone( struct CATextLayerRowGlyphs *p)
 // If you read this property, when location is actually NSNotFound, it will
 // give the proper textRange back. Sometimes useful for animation
 //
-@property( observable) CGPoint         textOffset; // in pixels
 @property( observable) NSRange         textRange;
 @property( observable, copy) CGPaint   *selectionPaint;
+@property( observable, copy) CGPaint   *cursorPaint;
 
 // MEMO: text is drawn with a small font image as the "paint", which is 
 //       colorized with a mono color, so gradients aren't possible
@@ -100,7 +120,7 @@ static inline void   CATextLayerRowGlyphsDone( struct CATextLayerRowGlyphs *p)
 // for cleartype it's important to know the color the text is drawn on
 // if the layer backgroundColor is transparent, use this color to supply
 // the correct color to use
-@property (assign, getter=isClearTypeEnabled) BOOL clearTypeEnabled;
+@property (assign, getter=isClearTypeEnabled) BOOL  clearTypeEnabled;
 
 // cursor position as row/column (!), this is not the textRange or the
 // UTF8 offset.
@@ -111,10 +131,29 @@ static inline void   CATextLayerRowGlyphsDone( struct CATextLayerRowGlyphs *p)
 @property( observable) NSRange                      selection;
 
 @property( assign) CGPixelPoint                     cursorPosition;
-@property( assign) CATextLayerAlignmentMode         alignmentMode;
+
+// properties that invalidate rows and glyphs
+// horizontal alignmnet
+@property( assign) char                             *fontNameUTF8String;
+@property( observable) CGFloat                      fontPixelSize;
+@property( assign) UITextAlignment                  textAlignment;
+@property( observable, assign) float                textLetterSpacing;
+
+// if set to INFINITY (default), this will track fontPixelSize
+// If you set this to 0, all lines will run into each other
+@property( observable, assign) CGFloat              textLineHeight;
 @property( assign) NSLineBreakMode                  lineBreakMode;
 
-@property( assign, getter=isMultiLineEnabled) BOOL  multiLineEnabled;
+// layout properties: textVerticalAlignment should move to UIView and in
+// its layout code, UIView should set the _layoutOrigin and be done with
+// that.
+@property( assign) UITextVerticalAlignment          textVerticalAlignment;
+
+// clashes with UIView padding somewhat or ?
+@property( observable) MulleEdgeInsets              insets;
+
+// unused:
+//@property( assign, getter=isMultiLineEnabled) BOOL  multiLineEnabled;
 
 // if editable and in focus, will draw a caret/cursor
 @property( assign, getter=isEditing) BOOL           editing;
@@ -122,6 +161,7 @@ static inline void   CATextLayerRowGlyphsDone( struct CATextLayerRowGlyphs *p)
 - (void) setTextColor:(CGColor) color;
 - (void) setSelectionColor:(CGColor) color;
 - (void) setTextBackgroundColor:(CGColor) color;
+- (void) setCursorColor:(CGColor) color;
 
 // incoming data need not be zero terminated
 // resets textBounds and textRange
@@ -138,40 +178,13 @@ static inline void   CATextLayerRowGlyphsDone( struct CATextLayerRowGlyphs *p)
 - (void) setTextUTF8String:(char *) s;
 
 
-// not a property, don't think this needs to be animated (?)
-- (void) mulleSetVerticalAlignmentMode:(CATextLayerVerticalAlignmentMode) mode;
-- (CATextLayerVerticalAlignmentMode) mulleVerticalAlignmentMode;
-
-
-- (NSUInteger) characterOffsetForPoint:(CGPoint) point;
-
 // utf32 offset (a la textRange) for offset in bytes into UTF8 string (a la selection)
 // returns NSNotFound if offset is ouf of bounds
 - (NSUInteger) textOffsetForCharacterOffset:(NSUInteger) offset;
-
-// offset in bytes into UTF8 string (a la selection) for utf32 offset (a la textRange)
-// returns NSNotFound if offset is ouf of bounds
-- (NSUInteger) characterOffsetForTextOffset:(NSUInteger) offset;
-
 
 // only valid after layout until font change
 - (CGFloat) fontAscender;
 - (CGFloat) fontDescender;
 - (CGFloat) fontLineHeight;
-
-// this is can be called anytime
-- (CGSize) textSizeWithContext:(id <UILayoutContext>) context;
-
-
-// convenience with CATextLayerVisualBoundsInsets as value for insets
-// the -[CALayer insets] are not calculated into the bounds, so for
-// the position in the canvas you have to use
-//
-// boundsInCanvas = UITextVisualBoundsExtrude( vbounds, [layer insets]);
-//
-- (CGRect) visualBoundsOfTextWithContext:(id <UILayoutContext>) context;
-
-- (CGRect) visualBoundsOfTextWithContext:(id <UILayoutContext>) context
-                                  insets:(struct MulleEdgeInsets) insets;
 
 @end

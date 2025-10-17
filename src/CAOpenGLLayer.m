@@ -293,7 +293,7 @@
    CGContextTextInRect( context, "No compatible GL version available",
                                  (size_t) -1,
                                  canvas,
-                                 CGContentModeCenter,
+                                 CGContentModeCenterPoint,
                                  0);
 }
 

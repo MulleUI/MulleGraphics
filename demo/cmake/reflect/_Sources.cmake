@@ -18,11 +18,17 @@ src/main-candysmear.m
 src/main-canvas-bounds-frame.m
 src/main-cashadowlayer.m
 src/main-cashapelayer.m
+src/main-catextlayer-align.m
 src/main-catextlayer-cleartype.m
 src/main-catextlayer.m
 src/main-catextlayer-multiline.m
+src/main-catextlayer-origin.m
+src/main-catextlayer-origin-multiline.m
 src/main-catextlayer-size.m
 src/main-checkerboard.m
+src/main-graphicslayer-bgborder.m
+src/main-graphicslayer.m
+src/main-graphicslayer-subclass.m
 src/main-hexagon.m
 src/main-image.m
 src/main-image-part.m

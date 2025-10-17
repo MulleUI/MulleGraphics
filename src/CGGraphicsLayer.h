@@ -13,8 +13,16 @@
 typedef BOOL   CGGraphicsLayerDrawCallback_t( CGGraphicsLayer *layer,
                                               CGContext *context);
 
+// A CGGraphicsLayer ideally only contains the necessary information to
+// draw what its supposed to draw and no more. Ideally the CGGraphicsLayer
+// can be serialized, send over a wire, then get deserialized on the other
+// side of the planet and then it draws the same it would draw in this
+// process.
 //
-// inherit all the geometry smarts from CALayer.
+// Try to offload as much as possible especially in regards to layouting
+// and user interaction to UIView. A CGGraphicsLayer should just draw.
+//
+// inherits all the geometry smarts from CALayer.
 //
 @interface CGGraphicsLayer : CALayer
 
@@ -30,17 +38,24 @@ typedef BOOL   CGGraphicsLayerDrawCallback_t( CGGraphicsLayer *layer,
 @property( observable, dynamic) CGColor    borderColor;
 @property( observable, dynamic) CGColor    backgroundColor;
 
-@property( observable, assign) CGPoint     anchorPoint;
 @property( observable, assign) CARotation  rotation;
+
+// anchorPoint is used to determine the position from frame
+@property( observable, assign) CGPoint     anchorPoint;
+
+// pose is position and rotation (its dynamically calculated)
+@property( dynamic, assign) CAPose         pose;
+// position is based on frame and anchorPoint (its dynamically calculated)
+@property( dynamic) CGPoint                position;
 
 // draw [layer canvas]
 // clip [layer bounds]
 @property CGGraphicsLayerDrawCallback_t    *drawCallback;
 
+@property( assign, getter=isTracingDrawCalls) BOOL   traceDrawCalls;
 
 
-@property( dynamic, assign) CAPose         pose;
-@property( dynamic) CGPoint                position;
+
 
 @property( dynamic, assign) CGFloat        cornerRadius;
 

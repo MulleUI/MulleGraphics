@@ -133,7 +133,7 @@ int   main( int argc, char *argv[])
 
    setupSceneAndAnimation( window);
 
-   perf = [MulleUIPerf object];
+   perf = [MulleUIPerf instance];
    [window setFrameDelegate:perf];
 
    return( UIApplicationRunWindow( window));

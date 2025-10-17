@@ -227,20 +227,6 @@ static void   drawBoxWithDropShadow( CGContext *context,
 }
 
 
-- (void) mulleGainAccess
-{
-   [super mulleGainAccess];
-   [_lines mulleGainAccess];
-}
-
-
-- (void) mulleRelinquishAccess
-{
-   [_lines mulleRelinquishAccess];
-   [super mulleRelinquishAccess];
-}
-
-
 - (BOOL) drawInContext:(CGContext *) context
 {
    Line         *line;
@@ -308,7 +294,7 @@ int   main( int argc, char *argv[])
       [view setAutoresizingMask:UIViewAutoresizingScaleToFill];
       [contentPlane addSubview:view];
 
-      perf = [MulleUIPerf object];
+      perf = [MulleUIPerf instance];
       [window setFrameDelegate:perf];
 
       [app addWindow:window];

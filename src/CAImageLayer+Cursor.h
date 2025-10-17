@@ -48,9 +48,11 @@
 
 
 - (MulleCursorPosition) cursorPosition;
-- (NSUInteger) characterOffsetForPoint:(CGPoint) point;
+- (NSUInteger) characterOffsetAtPoint:(CGPoint) point;
 - (MulleCursorPosition) cursorPositionForPoint:(CGPoint) mouseLocation;
 - (CGFloat) offsetNeededToMakeCursorVisible;
 - (MulleCursorPosition) maxCursorPosition;
+
+- (CGFloat) offsetNeededToMakeCursorVisible;
 
 @end

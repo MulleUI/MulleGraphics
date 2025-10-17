@@ -11,7 +11,7 @@ static CATextLayer   *textLayer( CGPaint *textPaint,
 {
    CATextLayer   *layer;
 
-   layer = [CATextLayer object];
+   layer = [CATextLayer instance];
    [layer setFontPixelSize:20.0f];
    [layer setTextUTF8String:"VfL Bochum 1848"];
 

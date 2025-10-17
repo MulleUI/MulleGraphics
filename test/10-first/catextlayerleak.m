@@ -11,7 +11,7 @@ int   main( int argc, char *argv[])
       return( 1);
 #endif
 
-   layer = [CATextLayer object];
+   layer = [CATextLayer instance];
    [layer setTextUTF8String:"VfL Bochum 1848"];
    [layer setTextColor:CGColorMakeOliveDrab()];
    [layer setFontNameUTF8String:"sansibar"];

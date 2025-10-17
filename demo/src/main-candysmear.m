@@ -333,27 +333,28 @@
 }
 
 
-- (void) mulleRelinquishAccess
+
+- (void) mulleGainAccessWithUniquingSet:(struct mulle_pointerset *) uniquing
+{
+   NSUInteger   i;
+
+   [super mulleGainAccessWithUniquingSet:uniquing];
+
+   for( i = 0; i < numBalls; i++)
+      [balls[ i] mulleGainAccessWithUniquingSet:uniquing];
+}
+
+
+- (void) mulleRelinquishAccessWithUniquingSet:(struct mulle_pointerset *) uniquing
 {
    NSUInteger   i;
 
    for( i = 0; i < numBalls; i++)
-      [balls[ i] mulleRelinquishAccess];
+      [balls[ i] mulleRelinquishAccessWithUniquingSet:uniquing];
 
-   [super mulleRelinquishAccess];
+   [super mulleRelinquishAccessWithUniquingSet:uniquing];
 }
 
-
-- (void) mulleGainAccess
-{
-   NSUInteger   i;
-
-   [super mulleGainAccess];
-
-   for( i = 0; i < numBalls; i++)
-      [balls[ i] mulleGainAccess];
-
-}
 
 - (void) renderInContext:(CGContext *) context
 {
@@ -435,7 +436,7 @@ int   main( int argc, char *argv[])
       [window setFrameRateHz:120.0];
       setupSceneInView( [window contentView]);
 
-      perf = [MulleUIPerf object];
+      perf = [MulleUIPerf instance];
       [window setFrameDelegate:perf];
 
       [app addWindow:window];

@@ -55,8 +55,10 @@
 - (BOOL) drawInContext:(CGContext *) context;
 
 
-// immediately called before and after drawInContext: default does nothing
-- (void) willDrawInContext:(CGContext *) context;
+// immediately called before and after drawInContext
+// return YES, to draw. call super in willDrawInContext to setup the
+// proper transforms
+- (BOOL) willDrawInContext:(CGContext *) context;
 - (void) didDrawInContext:(CGContext *) context;
 
 //
@@ -82,6 +84,46 @@
 - (CGSize) sizeThatFits:(CGSize) size
                 context:(id <UILayoutContext>) context;
 
-
 @end
 
+
+MULLE_GRAPHICS_EXTERN_GLOBAL
+void  CGGraphicsLayerSetupDrawTransform( CGGraphicsLayer *self,
+                                         CGContext *context,
+                                         CGRect bounds);
+
+
+
+static inline
+CGAffineTransform  CGGraphicsLayerMakeBoundsTransform( CGRect frame,
+                                                       CGRect bounds)
+{
+   CGAffineTransform   originTransform;
+   CGAffineTransform   boundsTransform;
+   CGAffineTransform   scaleTransform;
+   CGVector            scale;
+
+   originTransform = CGAffineTransformMakeTranslationInline( frame.origin);
+   boundsTransform = CGAffineTransformMakeTranslationInline( CGPointNegate( bounds.origin));
+   scale           = CGVectorMake(frame.size.width / bounds.size.width,
+                                  frame.size.height / bounds.size.height);
+   scaleTransform  = CGAffineTransformMakeScaleInline( scale);
+
+   boundsTransform = CGAffineTransformConcatInline( originTransform, boundsTransform);
+   boundsTransform = CGAffineTransformConcatInline( boundsTransform, scaleTransform);
+   return( boundsTransform);
+}
+
+
+static inline
+CGAffineTransform  CGGraphicsLayerMakeRotationTransform( CGRect canvas,
+                                                         CGPoint anchorPoint,
+                                                         CARotation rotation)
+{
+   CGAffineTransform   rotationTransform;
+   CGPoint             center;
+
+   center            = CGRectGetCenterWithAnchorPoint( canvas, anchorPoint);
+   rotationTransform = CGAffineTransformMakeRotationAroundPoint( center, rotation);
+   return( rotationTransform);
+}

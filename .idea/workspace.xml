@@ -35,46 +35,38 @@
   <component name="ChangeListManager">
     <list default="true" id="4c490e96-7615-4869-b1d1-75f90fa7d097" name="Changes" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/cmake/reflect/_Headers.cmake" beforeDir="false" afterPath="$PROJECT_DIR$/cmake/reflect/_Headers.cmake" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/cmake/reflect/_Sources.cmake" beforeDir="false" afterPath="$PROJECT_DIR$/cmake/reflect/_Sources.cmake" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/demo/cmake/reflect/_Sources.cmake" beforeDir="false" afterPath="$PROJECT_DIR$/demo/cmake/reflect/_Sources.cmake" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/demo/src/main-animate-circles.m" beforeDir="false" afterPath="$PROJECT_DIR$/demo/src/main-animate-circles.m" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/demo/src/main-animate-gradient.m" beforeDir="false" afterPath="$PROJECT_DIR$/demo/src/main-animate-gradient.m" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/demo/src/main-animate-image.m" beforeDir="false" afterPath="$PROJECT_DIR$/demo/src/main-animate-image.m" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/demo/src/main-candysmear.m" beforeDir="false" afterPath="$PROJECT_DIR$/demo/src/main-candysmear.m" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/demo/src/main-canvas-bounds-frame.m" beforeDir="false" afterPath="$PROJECT_DIR$/demo/src/main-canvas-bounds-frame.m" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/demo/src/main-cashadowlayer.m" beforeDir="false" afterPath="$PROJECT_DIR$/demo/src/main-cashadowlayer.m" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/demo/src/main-cashapelayer.m" beforeDir="false" afterPath="$PROJECT_DIR$/demo/src/main-cashapelayer.m" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/demo/src/main-catextlayer-size.m" beforeDir="false" afterPath="$PROJECT_DIR$/demo/src/main-catextlayer-size.m" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/demo/src/main-hexagon.m" beforeDir="false" afterPath="$PROJECT_DIR$/demo/src/main-hexagon.m" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/demo/src/main-image-part-scaled.m" beforeDir="false" afterPath="$PROJECT_DIR$/demo/src/main-image-part-scaled.m" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/demo/src/main-image.m" beforeDir="false" afterPath="$PROJECT_DIR$/demo/src/main-image.m" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/demo/src/main-l-system.m" beforeDir="false" afterPath="$PROJECT_DIR$/demo/src/main-l-system.m" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/demo/src/main-layer-pathanimation.m" beforeDir="false" afterPath="$PROJECT_DIR$/demo/src/main-layer-pathanimation.m" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/demo/src/main-opengl-mix.m" beforeDir="false" afterPath="$PROJECT_DIR$/demo/src/main-opengl-mix.m" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/demo/src/main-opengl-texture.m" beforeDir="false" afterPath="$PROJECT_DIR$/demo/src/main-opengl-texture.m" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/demo/src/main-opengl-texture2.m" beforeDir="false" afterPath="$PROJECT_DIR$/demo/src/main-opengl-texture2.m" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/demo/src/main-opengllayer.m" beforeDir="false" afterPath="$PROJECT_DIR$/demo/src/main-opengllayer.m" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/demo/src/main-orbital.m" beforeDir="false" afterPath="$PROJECT_DIR$/demo/src/main-orbital.m" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/demo/src/main-paint-interpolate.m" beforeDir="false" afterPath="$PROJECT_DIR$/demo/src/main-paint-interpolate.m" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/demo/src/main-panned-canvas.m" beforeDir="false" afterPath="$PROJECT_DIR$/demo/src/main-panned-canvas.m" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/demo/src/main-radial-rainbows.m" beforeDir="false" afterPath="$PROJECT_DIR$/demo/src/main-radial-rainbows.m" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/demo/src/main-ribbons.m" beforeDir="false" afterPath="$PROJECT_DIR$/demo/src/main-ribbons.m" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/demo/src/main-scaled-canvas.m" beforeDir="false" afterPath="$PROJECT_DIR$/demo/src/main-scaled-canvas.m" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/demo/src/main-whirl.m" beforeDir="false" afterPath="$PROJECT_DIR$/demo/src/main-whirl.m" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/CAAccumulationLayer.m" beforeDir="false" afterPath="$PROJECT_DIR$/src/CAAccumulationLayer.m" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/CABasicAnimation+CGPaint.h" beforeDir="false" afterPath="$PROJECT_DIR$/src/CABasicAnimation+CGPaint.h" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/CABasicAnimation+CGPaint.m" beforeDir="false" afterPath="$PROJECT_DIR$/src/CABasicAnimation+CGPaint.m" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/CAGradientLayer.m" beforeDir="false" afterPath="$PROJECT_DIR$/src/CAGradientLayer.m" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/CAImageLayer+Cursor.h" beforeDir="false" afterPath="$PROJECT_DIR$/src/CAImageLayer+Cursor.h" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/CAImageLayer.m" beforeDir="false" afterPath="$PROJECT_DIR$/src/CAImageLayer.m" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/CAOpenGLLayer.m" beforeDir="false" afterPath="$PROJECT_DIR$/src/CAOpenGLLayer.m" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/CAShadowLayer+nanovg.m" beforeDir="false" afterPath="$PROJECT_DIR$/src/CAShadowLayer+nanovg.m" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/CAShapeLayer+nanovg.m" beforeDir="false" afterPath="$PROJECT_DIR$/src/CAShapeLayer+nanovg.m" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/CAShapeLayer.m" beforeDir="false" afterPath="$PROJECT_DIR$/src/CAShapeLayer.m" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/CATextLayer+Cursor.h" beforeDir="false" afterPath="$PROJECT_DIR$/src/CATextLayer+Cursor.h" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/CATextLayer+Cursor.m" beforeDir="false" afterPath="$PROJECT_DIR$/src/CATextLayer+Cursor.m" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/CATextLayer+Selection.h" beforeDir="false" afterPath="$PROJECT_DIR$/src/CATextLayer+Selection.h" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/CATextLayer+Selection.m" beforeDir="false" afterPath="$PROJECT_DIR$/src/CATextLayer+Selection.m" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/CATextLayer.h" beforeDir="false" afterPath="$PROJECT_DIR$/src/CATextLayer.h" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/CATextLayer.m" beforeDir="false" afterPath="$PROJECT_DIR$/src/CATextLayer.m" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/CGGraphicsLayer+MulleGraphics.h" beforeDir="false" afterPath="$PROJECT_DIR$/src/CGGraphicsLayer+MulleGraphics.h" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/CGGraphicsLayer+MulleGraphics.m" beforeDir="false" afterPath="$PROJECT_DIR$/src/CGGraphicsLayer+MulleGraphics.m" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/CGGraphicsLayer.h" beforeDir="false" afterPath="$PROJECT_DIR$/src/CGGraphicsLayer.h" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/CGGraphicsLayer.m" beforeDir="false" afterPath="$PROJECT_DIR$/src/CGGraphicsLayer.m" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/reflect/_MulleGraphics-export.h" beforeDir="false" afterPath="$PROJECT_DIR$/src/reflect/_MulleGraphics-export.h" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/reflect/objc-loader.inc" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/test/.mulle/etc/env/environment-global.sh" beforeDir="false" afterPath="$PROJECT_DIR$/test/.mulle/etc/env/environment-global.sh" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -117,6 +109,7 @@
     &quot;cf.first.check.clang-format&quot;: &quot;false&quot;,
     &quot;cidr.known.project.marker&quot;: &quot;true&quot;,
     &quot;git-widget-placeholder&quot;: &quot;develop&quot;,
+    &quot;last_opened_file_path&quot;: &quot;/home/src/srcO/MulleUI/MulleGraphics&quot;,
     &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
     &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,
     &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
@@ -182,17 +175,17 @@
       </method>
     </configuration>
     <list>
-      <item itemvalue="CMake Application._3_MulleGraphics" />
+      <item itemvalue="CMake Application.MulleGraphics" />
       <item itemvalue="CMake Application.MulleGraphics__objc_loader_inc__" />
+      <item itemvalue="CMake Application._1_MulleGraphics" />
+      <item itemvalue="CMake Application._2_MulleGraphics" />
+      <item itemvalue="CMake Application._3_MulleGraphics" />
       <item itemvalue="CMake Application.mulle_sde_clean_all" />
       <item itemvalue="CMake Application.mulle_sde_clean_target" />
       <item itemvalue="CMake Application.mulle_sde_clean_tidy" />
       <item itemvalue="CMake Application.mulle_sde_craft_craftorder" />
       <item itemvalue="CMake Application.mulle_sde_reflect" />
       <item itemvalue="CMake Application.mulle_sde_upgrade" />
-      <item itemvalue="CMake Application._1_MulleGraphics" />
-      <item itemvalue="CMake Application._2_MulleGraphics" />
-      <item itemvalue="CMake Application.MulleGraphics" />
     </list>
   </component>
   <component name="SpellCheckerSettings" RuntimeDictionaries="0" Folders="0" CustomDictionaries="0" DefaultDictionary="application-level" UseSingleDictionary="true" transferred="true" />
@@ -212,6 +205,8 @@
       <workItem from="1749632879302" duration="3264000" />
       <workItem from="1749636162621" duration="2090000" />
       <workItem from="1749894286936" duration="2867000" />
+      <workItem from="1760446539035" duration="78000" />
+      <workItem from="1760446628823" duration="4000" />
     </task>
     <servers />
   </component>

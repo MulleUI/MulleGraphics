@@ -5,73 +5,60 @@
 #import "CGGraphicsLayer+MulleGraphics.h"
 #import "CATextLayer+Cursor.h"
 #import "CATextLayer+Selection.h"
+#import "CATextLayer+RowsAndGlyphs.h"
 
 #include <ctype.h>
 
 
+
+@interface CGGraphicsLayer( Private)
+
+- (id) _initWithFrame:(CGRect) frame;
+
+@end
+
+
 //#define CATEXTLAYER_DATA_DEBUG
+
+@interface CATextLayer ( LayoutPrivate)
+
+// will also be used by copy
+- (void) _initRowsAndGlyphs;
+- (void) _doneRowsAndGlyphs;
+
+@end
+
 
 
 @implementation CATextLayer
 
-// will also be used by copy
-- (void) _initRowGlyphs
+// also used by copy!
+- (instancetype) _initWithFrame:(CGRect) frame
 {
-   _mulle_structarray_init( &_rowArray, sizeof( NVGtextRow),
-                                        alignof( NVGtextRow),
-                                        0,
-                                        MulleObjCInstanceGetAllocator( self));
-   _mulle_structarray_init( &_rowGlyphArray, sizeof( struct CATextLayerRowGlyphs),
-                                             alignof( struct CATextLayerRowGlyphs),
-                                             0,
-                                             MulleObjCInstanceGetAllocator( self));
+   self = [super _initWithFrame:frame];
 
-   _rows      = NULL;
-   _nRows     = 0;
+   _textPaint           = nil;  // default, depend on backgroundColor
+   _textRange           = NSRangeMake( NSNotFound, 0);
 
-   // just cleanliness
-   memset( &_glyphData, 0, sizeof( _glyphData));
-}
+   // because Fonts are crap and don't adhere to size requests properly, it's
+   // usually better to overdraw than to clip.
+   _clearTypeEnabled    = YES;
+   _masksToBounds       = NO;
+   _textLineHeight      = INFINITY;
 
+   [self _initRowsAndGlyphs];
 
-- (void) _doneRowGlyphs
-{
-   struct CATextLayerRowGlyphs   *p;
-   struct CATextLayerRowGlyphs   *sentinel;
-   unsigned int                     n;
-
-   n = _mulle_structarray_get_count( &_rowGlyphArray);
-   if( n)
-   {
-      p        = _mulle_structarray_get( &_rowGlyphArray, 0);
-      sentinel = &p[ n];
-      do
-      {
-         CATextLayerRowGlyphsDone( p);
-         ++p;
-      }
-      while( p < sentinel);
-   }
-
-   _mulle_structarray_done( &_rowGlyphArray);
+   return( self);
 }
 
 
 - (instancetype) initWithFrame:(CGRect) frame
 {
-   self = [super initWithFrame:frame];
+   self = [self _initWithFrame:frame];
 
-   _textPaint           = nil;  // default, depend on backgroundColor
    _suggestedTextPaint  = [[CGPaint paintWithHexColor:CGHexColorBlack] copy];
    _selectionPaint      = [[CGPaint paintWithHexColor:0x7FFF7F7F] copy];
-   _textRange           = NSRangeMake( NSNotFound, 0);
-
-   // because Fonts are crap and don't adhere to size requests properly, it's
-   // usually better to overdraw than to clip.
-   _masksToBounds       = NO;
-   _clearTypeEnabled    = YES;
-
-   [self _initRowGlyphs];
+   _cursorPaint         = [[CGPaint paintWithHexColor:0x7F2F2FCF] copy];
 
    return( self);
 }
@@ -79,8 +66,7 @@
 
 - (void) dealloc
 {
-   [self _doneRowGlyphs];
-   _mulle_structarray_done( &_rowArray);
+   [self _doneRowsAndGlyphs];
 
    [_suggestedTextPaint release];
 
@@ -102,46 +88,38 @@
 
    copy = [super copy];
 
+   // copy will have called _initWithFrame: !
+   // So this is somewhat tricky code, to make copy fully functional
+   // and not leak
    //
-   // somewhat tricky code, to make copy fully functional. Properties are
-   // copied by -co
-
-   // this inits _rowArray and
-   [self _initRowGlyphs];
-
    copy->_textPaint           = [self->_textPaint copy];
    copy->_suggestedTextPaint  = [self->_suggestedTextPaint copy];
    copy->_selectionPaint      = [self->_selectionPaint copy];
 
    // because Fonts are crap and don't adhere to size requests properly, it's
    // usually better to overdraw than to clip.
-   copy->_masksToBounds       = self->_masksToBounds;
    copy->_clearTypeEnabled    = self->_clearTypeEnabled;
+   copy->_masksToBounds       = self->_masksToBounds;
+   copy->_textLineHeight      = self->_textLineHeight;
+
+   //
+   copy->_fontPixelSize       = self->_fontPixelSize;
+   copy->_lineBreakMode       = self->_lineBreakMode;
+   copy->_textOffset          = self->_textOffset;
+   copy->_textAlignment       = self->_textAlignment;
+   copy->_textLetterSpacing   = self->_textLetterSpacing;
+
+   //
+   copy->_textVerticalAlignment = self->_textVerticalAlignment;
+   copy->_insets              = self->_insets;
+//   copy->_multiLineEnabled    = self->_multiLineEnabled;
 
    MulleObjCObjectSetDuplicatedUTF8String( copy,
                                            (char **) &copy->_fontNameUTF8String,
-                                           (char *) _fontNameUTF8String);
+                                           (char *)   self->_fontNameUTF8String);
    return( copy);
 }
 
-// MEMO: never do this for paints
-//
-// - (void) mulleGainAccess
-// {
-//    [super mulleGainAccess];
-//    [self->_textPaint mulleGainAccess];
-//    [self->_suggestedTextPaint mulleGainAccess];
-//    [self->_selectionPaint mulleGainAccess];
-// }
-//
-//
-// - (void) mulleRelinquishAccess
-// {
-//    [self->_selectionPaint mulleRelinquishAccess];
-//    [self->_suggestedTextPaint mulleRelinquishAccess];
-//    [self->_textPaint mulleRelinquishAccess];
-//    [super mulleRelinquishAccess];
-// }
 
 
 - (CGFloat) fontAscender
@@ -179,209 +157,18 @@
    [self setTextBackgroundPaint:[CGPaint paintWithColor:color]];
 }
 
+- (void) setCursorColor:(CGColor) color
+{
+   [self setCursorPaint:[CGPaint paintWithColor:color]];
+}
+
+
 
 - (void) setSelectionColor:(CGColor) color
 {
    [self setSelectionPaint:[CGPaint paintWithColor:color]];
 }
 
-
-- (CGSize) textSizeWithContext:(id <UILayoutContext>) context
-{
-   NSUInteger                    i;
-   struct CATextLayerRowGlyphs   *p;
-   struct UIGlyphPosition        *glyph;
-   float                         minx;
-   float                         maxx;
-
-   if( _textSize.height == 0.0f)
-   {
-      [self updateGeometryWithContext:context];
-
-//      MulleUILog( "%td rows a: %g d: %g h: %g", _nRows, _metrics.ascender, _metrics.descender, _metrics.lineHeight);
-
-      assert( _metrics.lineHeight);
-
-      // the height don't change, and our virtual start is always zero
-      _textSize.width  = 0.0f;
-      _textSize.height = _metrics.lineHeight * _nRows;
-
-      minx = INFINITY;
-      maxx = -INFINITY;
-
-      for( i = 0; i < _nRows; i++)
-      {
-         p = &_rowGlyphs[ i];
-         if( ! p->nGlyphs)
-            continue;
-
-         // get last
-         glyph = &p->glyphs[ 0];
-         minx  = fminf( minx, glyph->minx);
-         glyph = &p->glyphs[ p->nGlyphs - 1];
-         maxx  = fmaxf( maxx, glyph->maxx - 2.0f);  // fummel
-      }
-
-      if( ! isinf( maxx))
-         _textSize.width = maxx - minx;
-   }
-
-//   MulleUILog( "s: %s", CGSizeUTF8String( _textSize));
-
-   return( _textSize);
-}
-
-
-//
-// MEMO: whats wrong here is that we don't take lineheight into account
-//
-
-- (CGRect) visualBoundsOfTextWithContext:(id <UILayoutContext>) context
-                                  insets:(struct MulleEdgeInsets) insets;
-{
-   NSUInteger                    i, j;
-   struct CATextLayerRowGlyphs   *p;
-   struct UIGlyphPosition        *glyph;
-   float                         minx;
-   float                         miny;
-   float                         maxx;
-   float                         maxy;
-   CGFloat                       x;
-   CGFloat                       y;
-
-   if( _textSize.height == 0.0f)
-   {
-      [self updateGeometryWithContext:context];
-   }
-
-   MulleUILog( "a: %g d: %g h: %g", _metrics.ascender, _metrics.descender, _metrics.lineHeight);
-
-   assert( _metrics.lineHeight);
-
-   // get x and width, then redo Y
-   minx = INFINITY;
-   miny = INFINITY;
-   maxx = -INFINITY;
-   maxy = -INFINITY;
-
-   for( j = 0; j < _nRows; j++)
-   {
-      p = &_rowGlyphs[ j];
-
-      // get last
-      i = 0;
-      for(;;)
-      {
-         if( i >= p->nGlyphs)
-            goto next;
-
-         glyph = &p->glyphs[ i];
-         // if this is true, assume glyph produces no ink
-         if( UIGlyphPositionHasStrokes( glyph))
-         {
-            x    = glyph->minx + insets.left;
-            minx = fminf( minx, x);
-            break;
-         }
-      }
-
-      // p->nGlyphs know to be > 0 by above loop
-      for( i = p->nGlyphs - 1;; --i)
-      {
-         glyph = &p->glyphs[ i];
-         if( UIGlyphPositionHasStrokes( glyph))
-         {
-            x    = glyph->maxx - insets.right;
-            maxx = fmaxf( maxx, x);
-            break;
-         }
-         if ( ! i)
-            break;
-      }
-next:
-      ;
-   }
-
-
-   // get top y of first row with visible characters
-   // we have to
-   j = 0;
-   for(;;)
-   {
-      if( j >= _nRows)
-         break;
-
-      p = &_rowGlyphs[ j];
-      for( i = 0; i < p->nGlyphs; i++)
-      {
-         glyph = &p->glyphs[ i];
-         if( UIGlyphPositionHasStrokes( glyph))
-         {
-            // converted from baseline
-            y    = glyph->miny + insets.top;
-            y   += _metrics.ascender + j * _metrics.lineHeight;
-            miny = fminf( miny, y);
-         }
-      }
-
-      if( ! isinf( miny))
-         break;
-      ++j;
-   }
-
-   j = _nRows;
-   for(;;)
-   {
-      if( ! j)
-         break;
-      --j;
-
-      p = &_rowGlyphs[ j];
-      for( i = 0; i < p->nGlyphs; i++)
-      {
-         glyph = &p->glyphs[ i];
-         if( UIGlyphPositionHasStrokes( glyph))
-         {
-            y    = glyph->maxy - insets.bottom;
-            y   += _metrics.ascender + j * _metrics.lineHeight;
-            maxy = fmaxf( maxy, y);
-         }
-      }
-
-      if( ! isinf( maxy))
-         break;
-   }
-
-   MulleUILog( "%g %g %g %g", minx, miny, maxx, maxy);
-
-   return( CGRectMake( minx, miny, maxx - minx, maxy - miny));
-}
-
-
-- (CGRect) visualBoundsOfTextWithContext:(id <UILayoutContext>) context;
-{
-   return( [self visualBoundsOfTextWithContext:context
-                                        insets:CATextLayerVisualBoundsInsets]);
-}
-
-
-
-- (CGSize) sizeThatFits:(CGSize) max
-                context:(id <UILayoutContext>) context
-{
-   CGRect   bounds;
-   CGSize   size;
-
-   bounds.origin = CGPointZero;
-   bounds.size   = [self textSizeWithContext:context];
-
-   // should be calculated in already
-   // bounds        = MulleEdgeInsetsExtrudeRect( _insets, bounds);
-
-   size.width  = CGFloatClamp( bounds.size.width, 0, max.width);
-   size.height = CGFloatClamp( bounds.size.height, 0, max.height);
-   return( size);
-}
 
 
 - (void) _setTextUTF8Data:(struct mulle_utf8data) data
@@ -405,10 +192,8 @@ next:
    MulleUILog( "set %p for _data", data.characters);
 #endif
    _data       = data;
-   // clear this to be recomputed later
-   _textSize   = CGSizeZero;
-   // reset
-   _textRange  = NSRangeMake( NSNotFound, 0);
+
+   [self invalidateRowsAndGlyphs];
 }
 
 
@@ -475,18 +260,7 @@ static void   assert_sane_font_name( char *s)
    assert_sane_font_name( s);
 
    MulleObjCObjectSetDuplicatedUTF8String( self, &_fontNameUTF8String, s);
-}
-
-
-- (CATextLayerVerticalAlignmentMode)  mulleVerticalAlignmentMode
-{
-   return( _verticalAlignmentMode);
-}
-
-
-- (void) mulleSetVerticalAlignmentMode:(CATextLayerVerticalAlignmentMode) mode
-{
-   _verticalAlignmentMode = mode;
+   [self invalidateRowsAndGlyphs];
 }
 
 
@@ -516,461 +290,73 @@ static void   assert_sane_font_name( char *s)
 }
 
 
-#if 0
-static NSUInteger  count_newlines( mulle_utf8_t *s)
+
+- (void) setFontPixelSize:(CGFloat) fontPixelSize
 {
-   mulle_utf32_t    c;
-   mulle_utf32_t    d;
-   NSUInteger       lf;
-
-   // use code from nvg
-   c  = 0;
-   lf = 0;
-   for(;*s;)
+   [self willChange];
+   if( fontPixelSize != _fontPixelSize)
    {
-      d = c;
-      c = mulle_utf8_next_utf32character( &s);
-      switch( c)
-      {
-      case '\n':
-          if( d != '\r')
-            ++lf;
-         break;
-
-      case 0x85:
-      case '\r':
-         ++lf;
-         break;
-      }
+      [self invalidateRowsAndGlyphs];
+      _fontPixelSize = fontPixelSize;
    }
-   return( lf);
-}
-#endif
-
-
-/* MEMO: Font/Glyph scaling
- *
- * Truetype is a font format (we just care about truetype fonts)
- * Freetype is a font library that reads truetype fonts.
- *
- * Freetype has no dependency on opengl. Freetype returns a glyph either as a
- * vector or a bitmap (possibly rasterized from a vector font). We just care
- * about vector fonts though.
- *
- * This bitmap is transferred to a font atlas, basically a mega-texture.
- * This is done in the fons__ stuff. Confusingly, there is also an atlas in
- * nvg. But it does not seem to be used, at least as long as the fons__
- * stuff supplies glyphs ?
- *
- * Size conversion: A freetype/truetye  vector font has a height, that's fixed at 2048.
- * this is distributed to an ascender and a descender. So ascender - descender = 2048.
- * (Actually <= 2048, but we ignore that for now) https://www.freetype.org/freetype2/docs/tutorial/step2.html
- * `fons__tt_getPixelHeightScale` for example is defined as ` size / (font->font->ascender - font->font->descender)`
- * so basically `size / 2048`.
- *
- * The texture you get from freetype is upside down. So a d actually looks
- * like a q (sort of).
- *
- * The pipe glyph has a vertical overshoot of one pixel for Anonymous Pro.
- *
- * Even if you request LCD from a freetype front, you may get monochrome
- * instead. The fontstash library will correct this.
- *
- * By experiment, if running cleartype it makes no use to turn of cleartype
- * for monochrome or grayscale only fonts.
- *
- * Since emojis could be used from a fallback font, it maybe necessary to
- * split the string for multiple nvgText calls, setting the correct font
- * everytime.
- */
-- (void) resizeRowsTo:(NSUInteger) max
-{
-   NSUInteger   size;
-   NSUInteger   diff;
-
-   assert( max >= 1);
-
-   size = _mulle_structarray_get_size( &_rowArray);
-   if( max > size)
-   {
-      diff = max - size;
-      _mulle_structarray_advance( &_rowArray, diff);
-   }
-
-   _rows  = _mulle_structarray_get( &_rowArray, 0);
-   _nRows = 0;
 }
 
 
-- (void) resizeRowGlyphsArrayTo:(NSUInteger) max
+- (void) setTextAlignment:(UITextAlignment) textAlignment
 {
-   NSUInteger                       size;
-   NSUInteger                       diff;
-   struct CATextLayerRowGlyphs   *p;
-   struct CATextLayerRowGlyphs   *sentinel;
-
-   assert( max);
-
-   //
-   // The contents of _rowGlyphArray will be reused, as they contain
-   // other mulle_structarrays.
-   //
-   size = _mulle_structarray_get_size( &_rowGlyphArray);
-   if( max > size)
+   if( textAlignment != _textAlignment)
    {
-      diff     = max - size;
-      p        = _mulle_structarray_advance( &_rowGlyphArray, diff);
-      sentinel = &p[ diff];
-      while( p < sentinel)
-      {
-         _CATextLayerRowGlyphsInit( p, MulleObjCInstanceGetAllocator( self));
-         ++p;
-      }
+      [self invalidateRowsAndGlyphs];
+      _textAlignment = textAlignment;
    }
-   _rowGlyphs = _mulle_structarray_get( &_rowGlyphArray, 0);
 }
 
 
-- (void) updateRowGlyphsAtIndex:(NSUInteger) i
-                        context:(id <UILayoutContext>) context
+// Does not affect vertical rows and glyphs
+//- (void) setTextVerticalAlignment:(UITextVerticalAlignment) textVerticalAlignment
+//{
+//   if( textVerticalAlignment != _textVerticalAlignment)
+//   {
+//      [self invalidateRowsAndGlyphs];
+//      _textVerticalAlignment = textVerticalAlignment;
+//   }
+//}
+
+
+- (void) setTextLetterSpacing:(float) textLetterSpacing
 {
-   NSUInteger                    nGlyphs;
-   NSUInteger                    newSize;
-   NSUInteger                    diff;
-   NSUInteger                    sGlyphs;
-   struct CATextLayerRowGlyphs   *p;
-
-   p       = &_rowGlyphs[ i];
-   nGlyphs = 100 / 2; // start with assumed 100 glyphs for each row
-
-   // our assumed size, the buffer should be larger than this, so we can
-   // figure out if we get truncated due to small a buffer also we need
-   // one extra space for the sentinel node
-   for(;;)
+   [self willChange];
+   if( textLetterSpacing != _textLetterSpacing)
    {
-      sGlyphs = _mulle_structarray_get_size( &p->glyphArray);
-      if( sGlyphs <= nGlyphs + 1) // add sentinel node
-      {
-         newSize = nGlyphs + nGlyphs;
-         if( newSize < 100)
-            newSize = 100;
-         diff     = newSize - sGlyphs;
-         _mulle_structarray_advance( &p->glyphArray, diff);
-         p->glyphs = _mulle_structarray_get( &p->glyphArray, 0);
-         sGlyphs   = newSize;
-      }
-
-      p->nGlyphs = [context getGlyphPositions:p->glyphs
-                                        count:sGlyphs
-                                         text:_rows[ i].start
-                                       length:_rows[ i].end - _rows[ i].start];
-      if( p->nGlyphs < sGlyphs - 1) // subtract sentinel node
-         break;
-
-      nGlyphs = p->nGlyphs;
+      [self invalidateRowsAndGlyphs];
+      _textLetterSpacing = textLetterSpacing;
    }
+}
 
-   // put in a node at the sentinel position
-   if( p->nGlyphs)
-      p->glyphs[ p->nGlyphs].x = p->glyphs[ p->nGlyphs - 1].maxx;
-   else
-      p->glyphs[ p->nGlyphs].x = 0;
-
-   p->glyphs[ p->nGlyphs].minx = 0;
-   p->glyphs[ p->nGlyphs].maxx = 0;
-   p->glyphs[ p->nGlyphs].str  = _rows[ i].end;
-   // ''   nglyphs == 0, _cursorPositon=={ 0 - 0 }
-   // 'A'  nglyphs == 1, _cursorPositon=={ 0 - 1 }  |A or A|
-   // 'AB' nglyphs == 2, _cursorPositon=={ 0 - 2 }  |AB or A|B or AB|
+- (void) setLineBreakMode:(NSLineBreakMode) lineBreakMode
+{
+   if( lineBreakMode != _lineBreakMode)
+   {
+      [self invalidateRowsAndGlyphs];
+      _lineBreakMode = lineBreakMode;
+   }
 }
 
 
-- (void) updateRowsAndGlyphsWithContext:(id <UILayoutContext>) context
+- (CGFloat) textLineHeight
 {
-   NSUInteger              max;
-   NSUInteger              i;
-   CGFloat                 width;
-   CGFloat                 extent;
-   struct mulle_utf8data   data;
-   CGRect                  visualBounds;
-   CGRect                  textBounds;
-
-   data = [self textUTF8DataInTextRange];
-
-   // so when editing the text, we will likely realloc the data. But
-   // glyphs contain a pointer to the data. When you change the text
-   // the glyph->str is stale. We can still use glyph->str for address
-   // calculation though
-   _glyphData = data;
-
-   if( _metrics.lineHeight == 0.0f)
-      _metrics = [context textMetrics];
-
-   //
-   // calculate max visible rows, which is frame.size.height / _metrics.lineHeight , but
-   // because of partially visible rows we add + 2
-   //
-   if( _metrics.lineHeight == 0.0)
-   {
-      max                   = 2;
-      _visualFontLineHeight = 0.0;
-   }
-   else
-   {
-      visualBounds = [context visualBoundsOfText:data.characters
-                                          length:data.length];
-      _visualFontLineHeight = visualBounds.size.height;
-      // calculate this always, as _textBounds can be useful later on as well
-      extent = [context getTextBounds:&textBounds
-                                 text:data.characters
-                               length:data.length];
-
-      max = (NSUInteger) ceilf( textBounds.size.height / _metrics.lineHeight) + 2;
-      // produce row information
-      switch( _lineBreakMode)
-      {
-      case NSLineBreakByWordWrapping :
-         // the width can produce more lines, we assume worst case
-         // we have a string of "max" number of linefeeds, followed by
-         // a last line as one large string without linefeed
-         // We will have to divide this by width to get the extra lengths
-         // also when word wrapping how big can the biggest word be ?
-
-         width  = textBounds.size.width;
-         // TODO check this is true, probably need to fuzz it
-         max   += ceil( extent / width) + 1;
-         break;
-
-      default :
-         width = INFINITY;
-         break;
-      }
-   }
-
-   [self resizeRowsTo:max];
-   [self resizeRowGlyphsArrayTo:max];
-
-   //
-   // Calculate actual amount of rows available
-   // Here the problem is, that we always calculate from the start though
-   // which doesn't work well for middle/bottom...
-   //
-   if( _metrics.lineHeight == 0.0)
-      _nRows = 0;
-   else
-   {
-
-      _nRows = [context getTextRows:_rows
-                              count:max
-                               text:data.characters
-                             length:data.length
-                      breakRowWidth:width];
-   }
-
-   // produce glyph information for each row
-   for( i = 0; i < _nRows; i++)
-      [self updateRowGlyphsAtIndex:i
-                           context:context];
+   return( isinf( _textLineHeight) ? _fontPixelSize : _textLineHeight);
 }
 
 
-- (CGPoint) textOriginInRect:(CGRect) rect
+- (void) setTextLineHeight:(CGFloat) textLineHeight
 {
-   CGPoint   origin;
-   CGFloat   rowsHeight;
-
-   if( _nRows <= 1)
+   [self willChange];
+   if( textLineHeight != _textLineHeight)
    {
-      switch( _verticalAlignmentMode)
-      {
-      case MulleTextVerticalAlignmentTop :
-         origin.y = _metrics.ascender;
-         break;
-      case MulleTextVerticalAlignmentBottom :
-         origin.y = rect.size.height - _metrics.descender;
-         break;
-      case MulleTextVerticalAlignmentMiddle :
-         origin.y = (rect.size.height + _metrics.ascender - _metrics.descender) / 2.0;
-         break;
-      case MulleTextVerticalAlignmentBaseline :
-         origin.y = rect.size.height / 2.0;
-         break;
-      // 
-      // w=10
-      // 0123456789
-      // xxxx
-      // 10 / 2.0 + (4 - 0) / 2 = 7 
-      // 20 -> 10   rect.size.height - (rect.size.height - _visualBounds[ 3])
-      case MulleTextVerticalAlignmentVisualMiddle :
-         origin.y = (rect.size.height + - _visualFontLineHeight) / 2.0;
-         break;
-      case MulleTextVerticalAlignmentBoundsMiddle :
-         // the _textBounds values are inverted _metrics.ascender and descender
-         origin.y = (rect.size.height - _metrics.lineHeight) / 2.0;
-         break;
-
-      default :
-         abort();
-      }
+      [self invalidateRowsAndGlyphs];
+      _textLineHeight = textLineHeight;
    }
-   else
-   {
-      // now we know the number of rows,
-      // calculate the height of all rows
-      rowsHeight  = _metrics.lineHeight * _nRows;
-
-      // this is top aligned as default, other alignments use this as well
-      switch( _verticalAlignmentMode)
-      {
-         // set as bottom aligned
-      case MulleTextVerticalAlignmentTop :
-         origin.y = _metrics.ascender;
-         break;
-
-      case MulleTextVerticalAlignmentBottom :
-         origin.y = rect.size.height - rowsHeight + _metrics.ascender;
-         break;
-
-      // the baseline alignment for multiple lines doesn't seem useful,
-      // yet for visual stability we need to produce something
-
-      case MulleTextVerticalAlignmentMiddle :
-         origin.y = (rect.size.height - rowsHeight) / 2.0 + _metrics.ascender;
-         break;
-
-      case MulleTextVerticalAlignmentVisualMiddle   :
-      case MulleTextVerticalAlignmentBoundsMiddle   :
-      case MulleTextVerticalAlignmentBaseline :
-         // if odd rows the baseline of the middle is in the center
-         // otherwise same as "middle"
-         if( _nRows & 1)
-            origin.y = (rect.size.height - rowsHeight + _metrics.lineHeight) / 2.0;
-         else
-            origin.y = (rect.size.height - rowsHeight) / 2.0 + _metrics.ascender;
-      default :
-         abort();
-      }
-   }
-
-   switch( _alignmentMode)
-   {
-   case CAAlignmentLeft   : origin.x = CGRectGetMinX( rect) - rect.origin.x;
-                            break;
-   case CAAlignmentRight  : origin.x = CGRectGetMaxX( rect) - rect.origin.x;
-                            break;
-   case CAAlignmentCenter : origin.x = CGRectGetMidX( rect) - rect.origin.x;
-                            break;
-   default :
-      abort();
-   }
-
-   // If cursor is visible, keep it always visible
-   if( [self isEditing])
-      origin.x += [self offsetNeededToMakeCursorVisible];
-   return( origin);
-}
-
-
-//
-// MEMO: rewriting this to UILayoutContext may have been a mistake
-//       could have kept nvg calls
-//
-- (BOOL) updateGeometryWithContext:(id <UILayoutContext>) context
-{
-   CGFloat                  actualFontHeight;
-   CGFloat                  fontPixelSize;
-   CGRect                   canvas;
-   CGRect                   fontBounds;
-   int                      align;
-   struct MulleEdgeInsets   insets;
-
-   [context useFontWithNameUTF8String:_fontNameUTF8String
-                                      ? _fontNameUTF8String
-                                      : "sans"];
-
-   canvas = [self canvas];
-
-   // allow construction of unknown size canvas
-   insets = MulleEdgeInsetsZero;
-   if( canvas.size.width > 0.0)
-   {
-      insets.left  = _insets.left;
-      insets.right = _insets.right;
-   }
-
-   if( canvas.size.height > 0.0)
-   {
-      insets.top    = _insets.top;
-      insets.bottom = _insets.bottom;
-   }
-
-   canvas = MulleEdgeInsetsInsetRect( insets, canvas);
-
-   // fontPixelSize is pixels
-   fontPixelSize = [self fontPixelSize];
-   if( fontPixelSize == 0.0)
-   {
-      assert( canvas.size.height > 0.0f);  // need a height for fontPixelSize
-
-      // figure out actual space used by font for a string, that should
-      // cover the highest and the lowest glyph in a "reasonable" font
-      
-      [context setTextAlign:NVG_ALIGN_LEFT | NVG_ALIGN_TOP];
-
-      // fontSize is in points!
-      [context setFontSize:32.0f]; // calculate size for 32 point font
-      fontBounds = [context visualBoundsOfText:"|_;y´"
-                                        length:4];
-      actualFontHeight = fontBounds.size.height;
-      fontPixelSize    = (int) (canvas.size.height * 32.0 / actualFontHeight);
-   }
-
-   if( canvas.size.height == 0.0f)
-   {
-      // now at least we can assume a canvas height (if we only draw one
-      // row)
-      canvas.size.height = fontPixelSize + _insets.top + _insets.bottom;
-   }
-
-   _lastFontPixelSize = fontPixelSize;
-
-   [context setFontSize:fontPixelSize];
-
-   // I see no difference with different alignment options, for the metrics
-   // likely because these are font (size) properties (duh!)
-   // These values are wishful thinking though, the actual glyph can extend this
-   _metrics = [context textMetrics];
-
-   switch( _alignmentMode)
-   {
-   case CAAlignmentLeft   : align = NVG_ALIGN_LEFT; break;
-   case CAAlignmentRight  : align = NVG_ALIGN_RIGHT; break;
-   case CAAlignmentCenter : align = NVG_ALIGN_CENTER; break;
-   }
-
-   //
-   // We always draw from the top, except if we are just a oneliner. Then
-   // we use nvg vertical text alignment.
-   //
-   // The alignment is needed ASAP, because it changes the origin
-   // and also affects the nvg text calculations for the horizontal plane.
-   //
-   [context setTextAlign:align | NVG_ALIGN_BASELINE];
-
-   [self updateRowsAndGlyphsWithContext:context];
-
-   if( canvas.size.width == 0.0f)
-   {
-      _origin    = CGPointMake( _insets.left, _insets.top);
-   }
-   else
-   {
-      _origin    = [self textOriginInRect:canvas];
-
-      _origin.x += _textOffset.x;
-      _origin.y += _textOffset.y;
-   }
-   return( _metrics.lineHeight != 0.0);
 }
 
 
@@ -1010,121 +396,6 @@ static NSUInteger  count_newlines( mulle_utf8_t *s)
    [self updateSuggestedTextPaintWithBackgroundPaint:paint];
 }
 
-
-// textOffset in CGPoint
-//  1.) figure out how
-- (BOOL) drawInContext:(CGContext *) context
-{
-   BOOL                    isCursorDrawn;
-   BOOL                    isSelectionDrawn;
-   BOOL                    useClearType;
-   CGPaint                 *textBackgroundPaint;
-   CGPaint                 *textPaint;
-   CGRect                  canvas;
-   CGRect                  rect;
-   NSRange                 textRange;
-   NSUInteger              i;
-   struct mulle_utf8data   data;
-
-   if( ! [super drawInContext:context])
-      return( NO);
-
-   // nothing to draw ? then bail
-   data = [self textUTF8DataInTextRange];
-   if( ! data.length)
-      return( YES);
-
-   if( ! [self updateGeometryWithContext:context])
-      return( YES);
-
-   canvas = [self canvas];
-   canvas = MulleEdgeInsetsInsetRect( _insets, canvas);
-
-   // if textPaint is not set, use color derived from :_backgroundPaint
-   textPaint = _textPaint ? _textPaint : _suggestedTextPaint;
-   assert( textPaint);
-
-   // figure out if we can use clearType
-   // as we are a CALayer, we can't walk the ancestors up, so backgroundPaint
-   // has to be the exact color we are painting on
-
-   useClearType        = _clearTypeEnabled;
-   textBackgroundPaint = useClearType && _textBackgroundPaint
-                         ? _textBackgroundPaint
-                         : _backgroundPaint;
-
-   useClearType &= [textBackgroundPaint isMonochrome] &&
-                   [textPaint isMonochrome] &&
-                   [_selectionPaint isMonochrome];
-   useClearType &= [textBackgroundPaint isOpaque];
-
-   CGContextClearType( context, useClearType);
-
-   isCursorDrawn = NO;
-   for( i = 0; i < _nRows; i++)
-   {
-      textRange = NSRangeMake( _rows[ i].start - (char *) data.characters,
-                               _rows[ i].end - _rows[ i].start);
-
-      rect = CGRectMake( canvas.origin.x + _origin.x,
-                         canvas.origin.y + _origin.y + (i * _metrics.lineHeight),
-                         _metrics.lineHeight * 3.0f / 4.0f,  // guess for single char
-                         _metrics.lineHeight);
-
-//      // Draw the first line only
-//      // don't render outside of myself
-//      nvgIntersectScissor( vg, canvas.origin.x,
-//                               canvas.origin.y,
-//                               canvas.size.width,
-//                               canvas.size.height);
-   //   // nvgFillColor( vg, nvgRGBA(127,127,255,255));
-
-      /*
-       * Draw selection
-       */
-      isSelectionDrawn = [self drawSelectionWithContext:context
-                                              textRange:textRange
-                                                    row:i];
-
-      // maybe a bit over kill, but I don't want to reset same colors on each
-      // line
-      if( i == 0 || isSelectionDrawn || isCursorDrawn)
-      {
-         /*
-          * Draw Text
-          * Bug: textBackgroundColor should be selection color, where selection
-          *      is drawn. Or rather a mix of both colors
-          */
-         if( useClearType)
-         {
-            CGContextTextColor( context, [textPaint mainColor]);
-            CGContextTextBackgroundColor( context, [textBackgroundPaint mainColor]);
-         }
-         else
-         {
-            // coloring with gradients not possible, not super sure why not
-            // but it is what it is (cleartype probably not looking good)
-            CGContextFillPaintableOptions( context, textPaint, rect, NULL);
-         }
-      }
-
-      // redo this since we fill color may have changed
-      CGContextText( context, rect.origin, _rows[ i].start, _rows[ i].end - _rows[ i].start);
-
-      /*
-       * Draw Cursor
-       */
-      isCursorDrawn = [self isEditing];
-      if( isCursorDrawn)
-      {
-         [self drawCursorWithContext:context
-                                row:i];
-      }
-   }
-   CGContextClearType( context, 0);
-
-   return( YES);
-}
 
 
 //static size_t   mulle_utf8_utf32length( mulle_utf8_t *s, size_t len)
@@ -1216,56 +487,5 @@ uintptr_t   mulle_utf8_utf32_offset_at_characters( char *data,
    return( s - _data.characters);
 }
 
-
-
-// point is within bounds
-// we find the range in the textUTF8String 8bit characters we do not
-// interpret UTF8
-//
-- (NSUInteger) characterOffsetForPoint:(CGPoint) point
-{
-   NSInteger                     y;
-   NSUInteger                    x;
-   CGFloat                       search;
-   struct CATextLayerRowGlyphs   *p;
-   struct mulle_utf8data         data;
-
-   if( ! _nRows)
-      return( NSNotFound);
-
-   // figure out the row that was hit, a row is _metrics.lineHeight and
-   // drawn at frame.origin.y + _origin.y  + i *_metrics.lineHeight
-   y = (NSInteger) round( (point.y -_origin.y) / _metrics.lineHeight);
-   if( y < 0)
-      y = 0;
-   else
-      if( y >= _nRows)
-         y = _nRows - 1;
-
-   p = &_rowGlyphs[ y];
-
-   // calculate characters up till till this
-
-   search  = point.x;
-   search -= _origin.x;
-
-   x = UIGlyphPositionSearch( p->glyphs, p->nGlyphs, search);
-   if( x == NSNotFound)
-   {
-      if( search >= p->glyphs[ p->nGlyphs].x - 0.5)
-         x = p->nGlyphs;
-      else
-         x = 0;
-   }
-   else
-   {
-      // left side/right side (use third, matter of taste)
-      if( search >= p->glyphs[ x].minx + (p->glyphs[ x].maxx - p->glyphs[ x].minx) / 3.0)
-         x++;
-   }
-
-   data = [self textUTF8DataInTextRange];
-   return( p->glyphs[ x].str - (char *) data.characters);
-}
 
 @end

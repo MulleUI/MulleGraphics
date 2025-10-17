@@ -187,7 +187,7 @@ static float cpData[][3] = {
 @end
 
 
-@interface UIView (AnimateFrame)
+@interface UIView( AnimateFrame)
 
 //
 // If we use setFrame: to reset the animation, it is bad as it will get
@@ -242,7 +242,7 @@ static float cpData[][3] = {
    CATransaction      *ta;
    CAAnimationGroup   *group;
 
-   ta = [CATransaction object];
+   ta = [CATransaction instance];
    [ta begin];
    {
       [ta setAnimationCurve:UIViewAnimationCurveEaseInOut];

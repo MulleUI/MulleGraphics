@@ -1,0 +1,315 @@
+#import "CGGraphicsLayer+MulleGraphics.h"
+
+#import "import-private.h"
+
+#define USE_SCISSOR 
+
+@implementation CGGraphicsLayer ( MulleGraphics)
+
+- (void) fillBackgroundInContext:(CGContext *) context
+                           paint:(CGPaint *) paint
+{
+   CGPoint           tl;
+   CGPoint           br;
+   CGFloat           borderWidth;
+   MulleEdgeInsets   insets;
+   CGRect            rect;
+
+   rect = _frame;
+
+   //
+   // fill and border are drawn as frame
+   //
+   // if there is a border to be drawn, then we use antialias
+   // otherwise we don't and only draw to the middle of the border
+   //
+   // if the stroke is alpha, it will have to render over pixels
+   // otherwise reduce the size of the shape we draw ?
+   //
+   tl.x = rect.origin.x;
+   tl.y = rect.origin.y;
+   br.x = tl.x + rect.size.width;
+   br.y = tl.y + rect.size.height;
+
+   if( tl.x > br.x && tl.y > br.y)
+      return;
+
+   // calc border out from fill, but don't draw
+   borderWidth = [self borderWidth];
+   if( borderWidth >= 0.1)
+   {
+      insets = MulleEdgeInsetsMake( borderWidth / 2,
+                                    borderWidth / 2,
+                                    borderWidth / 2,
+                                    borderWidth / 2);
+      rect  = MulleEdgeInsetsInsetRect( insets, rect);
+      CGContextShapeAntiAlias( context, 0);
+   }
+
+   // fill
+   CGContextFillRoundedRectVaryingWithPaintable( context, rect, _cornerInsets, paint);
+   CGContextShapeAntiAlias( context, 1);
+}
+
+
+- (BOOL) drawsBackgroundWithAlpha:(CGFloat) alpha
+{
+   return( ! CGAlphaIsTransparent( [_backgroundPaint alpha] * alpha));
+}
+
+
+- (void) drawBackgroundInContext:(CGContext *) context
+{
+   [self fillBackgroundInContext:context
+                           paint:_backgroundPaint];
+}
+
+
+- (BOOL) drawInContext:(CGContext *) context
+{
+   return( CGGraphicsLayerExecuteDrawCallback( self, context));
+}
+
+
+//
+// the border is not extending outside of the layer
+// this would break too much stuff, if we need a highlight, either but
+// a highlighter view below or use insets and leave space around
+//
+- (void) drawBorderInContext:(CGContext *) context
+{
+   CGFloat     halfBorderWidth;
+   CGPoint     tl;
+   CGPoint     br;
+   CGRect      rect;
+
+   //
+   // the strokeWidth isn't scaled in nvg, so we do this now ourselves
+   //
+   if( _borderWidth < 0.1)
+      return;
+
+   //
+   // if the stroke is alpha, it will have to render over pixels
+   // otherwise reduce the size of the shape we draw ?
+   //
+   halfBorderWidth = _borderWidth / 2.0;
+
+   tl.x = halfBorderWidth + _frame.origin.x;
+   tl.y = halfBorderWidth + _frame.origin.y;
+   br.x = tl.x + _frame.size.width - halfBorderWidth * 2;
+   br.y = tl.y + _frame.size.height - halfBorderWidth * 2;
+
+   if( ! (tl.x <= br.x || tl.y <= br.y))
+      return;
+
+   //
+   // the _cornerRadius is computed for a stroke of width 1 (or 0 ?)
+   // the strokeWidth is just scaling it out
+   //
+   rect = CGRectMake( tl.x, tl.y, br.x - tl.x, br.y - tl.y);
+
+   CGContextStrokeRoundedRectVaryingWithPaintable( context, rect, _cornerInsets, _borderWidth, _borderPaint);
+   CGContextStrokeWidth( context, 1.0);  // need to reset
+}
+
+
+
+- (void) willDrawInContext:(CGContext *) context
+{
+}
+
+
+- (void) didDrawInContext:(CGContext *) context
+{
+}
+
+
+
+static char  *currentTransformUTF8String( CGContext *context)
+{
+   CGAffineTransform   transform;
+   char                *s;
+
+   transform = CGContextCurrentTransform( context);
+   s         = CGAffineTransformUTF8String( &transform);
+   return( s);
+}
+
+
+static CGAffineTransform   localTransformWithBounds( CGGraphicsLayer *self, CGRect bounds)
+{
+  CGAffineTransform   localTransform;
+
+  // Just the projection transform now - rotation is handled in setupContext
+  localTransform = CGAffineTransformMakeProjection( self->_frame, bounds);
+
+  mulle_fprintf( stderr, "0. localTransform: %s\n", CGAffineTransformUTF8String( &localTransform));
+
+  return( localTransform);
+}
+
+
+- (CGAffineTransform) localTransform
+{
+   CGRect   bounds;
+
+   bounds = [self bounds];
+   return( localTransformWithBounds( self, bounds));
+}
+
+
+
+/*
+ *
+ */
+- (CGAffineTransform) frameRotationTransform
+{
+    if(_rotation == 0.0)
+        return CGAffineTransformIdentity;
+
+    // Center of frame in parent coordinate system
+    CGPoint frameCenter = CGPointMake(_frame.origin.x + _frame.size.width * _anchorPoint.x,
+                                     _frame.origin.y + _frame.size.height * _anchorPoint.y);
+
+    CGAffineTransform transform = CGAffineTransformMakeTranslationInline(CGPointNegate(frameCenter));
+    transform = CGAffineTransformConcatInline(CGAffineTransformMakeRotationInline(_rotation), transform);
+    transform = CGAffineTransformConcatInline(CGAffineTransformMakeTranslationInline(frameCenter), transform);
+
+    return transform;
+}
+
+// Helper method to compute rotation around bounds center (for content)
+- (CGAffineTransform) boundsRotationTransform
+{
+    if(_rotation == 0.0)
+        return CGAffineTransformIdentity;
+
+    CGRect bounds = [self bounds];
+    CGPoint boundsCenter = CGPointMake(bounds.size.width * _anchorPoint.x,
+                                      bounds.size.height * _anchorPoint.y);
+
+    CGAffineTransform transform = CGAffineTransformMakeTranslationInline(CGPointNegate(boundsCenter));
+    transform = CGAffineTransformConcatInline(CGAffineTransformMakeRotationInline(_rotation), transform);
+    transform = CGAffineTransformConcatInline(CGAffineTransformMakeTranslationInline(boundsCenter), transform);
+
+    return transform;
+}
+
+- (void) setupContext:(CGContext *) context
+       localTransform:(CGAffineTransform *) localTransform
+                alpha:(CGFloat) alpha
+{
+   CGRect bounds;
+   CGRect localClipRect;
+
+   CGContextReset(context);
+
+#ifdef USE_SCISSOR
+   if(_clipRect.size.width != INFINITY)
+      CGContextScissor(context, _clipRect);
+#endif
+
+   // Apply frame rotation (for background/border)
+   CGAffineTransform frameRotation = [self frameRotationTransform];
+   if(!CGAffineTransformIsIdentity(frameRotation))
+      CGContextTransform(context, &frameRotation);
+
+   // Apply parent transform
+   CGContextTransform(context, &_transform);
+
+#ifdef USE_SCISSOR
+   if(_masksToBounds)
+   {
+      bounds = [self bounds];
+      localClipRect = CGRectApplyAffineTransform(bounds, *localTransform);
+      CGContextIntersectScissor(context, localClipRect);
+   }
+#endif
+   CGContextGlobalAlpha(context, alpha);
+}
+
+- (void) renderInContext:(CGContext *) context
+{
+   CGFloat             alpha;
+   CGRect              bounds;
+   CGAffineTransform   localTransform;
+
+
+   assert( context);
+
+#if 1 || defined( RENDER_DEBUG)
+   mulle_fprintf( stderr, "%s %s (f:%s b:%s a: %s)\n",
+                        __PRETTY_FUNCTION__,
+                        [self UTF8String],
+                        CGRectUTF8String( _frame),
+                        CGRectUTF8String( [self bounds]),
+                        CGPointUTF8String( _anchorPoint));
+#endif
+
+   if( _hidden == YES)
+      return;
+
+   alpha = _opacity * _alpha;
+
+   // this is the "inherited" alpha from UIVIew
+   // cull layers which are invisible
+   if( CGAlphaIsTransparent( alpha))
+      return;
+
+   //
+   // if any dimension is zero size, nothing gets painted anyway...
+   //
+   if( _frame.size.width == 0.0 || _frame.size.height == 0.0)
+      return;
+
+   bounds         = [self bounds];
+   localTransform = localTransformWithBounds( self, bounds);
+   [self setupContext:context
+       localTransform:&localTransform
+               alpha:alpha];
+
+   // TODO: should we use context alpha here ?
+   if( [self drawsBackgroundWithAlpha:alpha])
+      [self drawBackgroundInContext:context];
+
+   // bounds are dynamically calculated, if there is nothing to snip from
+   // what does it mean ?
+   if( bounds.size.width != 0.0 && bounds.size.height != 0.0)
+   {
+      CGContextTransform( context, &localTransform);
+      mulle_fprintf( stderr, "5 currentTransform: %s\n", currentTransformUTF8String( context));
+
+      // Apply bounds rotation (for content)
+      CGAffineTransform boundsRotation = [self boundsRotationTransform];
+      if(!CGAffineTransformIsIdentity(boundsRotation))
+         CGContextTransform(context, &boundsRotation);
+
+      [self willDrawInContext:context];
+      [self drawInContext:context];
+      [self didDrawInContext:context];
+   }
+
+   //
+   // we want to draw the border on top
+   //
+   if( ! CGAlphaIsTransparent( [_borderPaint alpha] * alpha))
+   {
+      // "just" setup the context again, to recover the "frame" transform
+      // we dont want frame/bounds messing with the border width
+      [self setupContext:context
+          localTransform:&localTransform
+                   alpha:alpha];
+      [self drawBorderInContext:context];
+   }
+}
+
+
+- (CGSize) sizeThatFits:(CGSize) size
+                context:(id <UILayoutContext>) context
+{
+   return( [self canvas].size);
+}
+
+
+@end

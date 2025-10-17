@@ -26,8 +26,6 @@ struct MulleCursorUTF8Data
 @interface CATextLayer( Cursor)
 
 - (CGFloat) offsetNeededToMakeCursorVisible;
-- (void) drawCursorWithContext:(CGContext *) context
-                           row:(NSUInteger) i;
 
 // point is within bounds
 - (MulleCursorPosition) cursorPositionForPoint:(CGPoint) point;

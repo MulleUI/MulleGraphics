@@ -19,11 +19,6 @@
  */
 @interface CATextLayer( Selection)
 
-// NO: no selection was drawn
-- (BOOL) drawSelectionWithContext:(CGContext *) context
-                        textRange:(NSRange) textRange
-                              row:(NSUInteger) i;
-
 - (void) startSelectionAtPoint:(CGPoint) point;
 - (void) adjustSelectionToPoint:(CGPoint) point;
 

@@ -51,7 +51,7 @@ int   main( int argc, char *argv[])
    end       = [CGGradient gradientWithColors:colors
                                     locations:NULL
                                        count:3];
-   foo       = [Foo object];
+   foo       = [Foo instance];
 
    printf( "start:\n");
    [foo setR:start];

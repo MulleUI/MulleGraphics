@@ -26,6 +26,9 @@ src/CAShadowLayer+nanovg.m
 src/CAShapeLayer.m
 src/CAShapeLayer+nanovg.m
 src/CATextLayer+Cursor.m
+src/CATextLayer+Layout.m
+src/CATextLayer+MulleGraphics.m
+src/CATextLayer+RowsAndGlyphs.m
 src/CATextLayer+Selection.m
 src/CATextLayer.m
 src/CGGraphicsLayer+MulleGraphics.m

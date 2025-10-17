@@ -178,7 +178,7 @@ int   main( int argc, char *argv[])
    [window setFrameRateHz:60.0];
    setupSceneAndAnimation( window);
 
-   perf = [MulleUIPerf object];
+   perf = [MulleUIPerf instance];
    [window setFrameDelegate:perf];
 
    return( UIApplicationRunWindow( window));

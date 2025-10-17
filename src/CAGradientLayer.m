@@ -33,23 +33,6 @@
    return( copy);
 }
 
-
-// MEMO: never do this for paints
-//
-// - (void) mulleGainAccess
-// {
-//    [super mulleGainAccess];
-//    [self->_paint mulleGainAccess];
-// }
-//
-//
-// - (void) mulleRelinquishAccess
-// {
-//    [self->_paint mulleRelinquishAccess];
-//    [super mulleRelinquishAccess];
-// }
-
-
 - (void) drawBackgroundInContext:(CGContext *) context
 {
    [self fillBackgroundInContext:context

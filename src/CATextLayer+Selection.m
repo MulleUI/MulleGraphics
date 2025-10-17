@@ -6,130 +6,11 @@
 #import "import-private.h"
 
 #import "CATextLayer+Cursor.h"
+#import "CATextLayer+Layout.h"
+#import "CATextLayer+RowsAndGlyphs.h"
 
 
 @implementation CATextLayer ( Selection)
-
-- (BOOL) drawSelectionWithContext:(CGContext *) context
-                        textRange:(NSRange) textRange
-                              row:(NSUInteger) i
-{
-   NSInteger                     x;
-   CGRect                        canvas;
-   struct CATextLayerRowGlyphs   *p;
-   NSRange                       selectionRange;
-   CGRect                        rect;
-
-   selectionRange = NSIntersectionRange( textRange, _selection);
-   if( ! selectionRange.length)
-      return( NO);
-
-   canvas = [self canvas];
-
-   // draw background for selection, compute area by removing
-   // unselected characters
-   // "a[iiii]a"
-
-   x = selectionRange.location - textRange.location;
-   p = &_rowGlyphs[ i];
-   if( x + selectionRange.length > p->nGlyphs)
-      abort();  // can't happen or ?
-
-   rect.origin.x    = canvas.origin.x + _origin.x + p->glyphs[ x].x;
-   rect.origin.y    = canvas.origin.y + _origin.y + (i * _metrics.lineHeight) - _metrics.ascender; // / 2.0;
-   rect.size.width  = p->glyphs[ x + selectionRange.length].x - p->glyphs[ x].x;
-   rect.size.height = _metrics.lineHeight;
-
-   if( rect.size.width < 0.1)
-      return( NO);
-
-   CGContextFillRectWithPaintable( context, rect, _selectionPaint);
-
-
-   // Der nvgTextBounds code ist zum einen langsamer, zum anderen (wegen)
-   // Kerning ? ist die Selektion auch nicht sonderlich stabil.
-   // Es ist besser die glpyh information zu benutzen..
-#if 0
-   //
-   // TODO: use glyphs info here possible ? Would be much faster
-   //
-   switch( _alignmentMode)
-   {
-   case CAAlignmentLeft   :
-      {
-         float   offset;
-
-         // 1) get number of characters to the left of selection
-         //    then get the offset in pixels
-         nvgTextBounds( vg, frame.origin.x + _origin.x,
-                            frame.origin.y + _origin.y,
-                            _rows[ i].start,
-                            &_rows[ i].start[ leftCharacters],
-                            xyxy);
-         offset = xyxy[ 2];
-
-         nvgTextBounds( vg, offset,
-                            frame.origin.y + _origin.y,
-                            &_rows[ i].start[ leftCharacters],
-                            &_rows[ i].start[ leftCharacters + selectionRange.length],
-                            xyxy);
-         break;
-      }
-
-   case CAAlignmentRight  :
-      {
-         NSUInteger   rightOffset;
-         NSUInteger   rightCharacters;
-         float        offset;
-            // abcdef   0,5  1,3  > 4, 2 ef
-         rightOffset     = selectionRange.location + selectionRange.length;
-         rightCharacters = textRange.length - rightOffset;
-         nvgTextBounds( vg, frame.origin.x + _origin.x,
-                            0,
-                            &_rows[ i].start[ rightOffset],
-                            &_rows[ i].start[ rightOffset + rightCharacters],
-                            xyxy);
-         offset = xyxy[ 0];
-
-          // 2) get offset and width of characters of the selection
-         nvgTextBounds( vg, offset,
-                            frame.origin.y + _origin.y,
-                            &_rows[ i].start[ leftCharacters],
-                            &_rows[ i].start[ leftCharacters + selectionRange.length],
-                            xyxy);
-         break;
-      }
-
-   case CAAlignmentCenter :
-      {
-         float    offset;
-         float    width;
-
-         nvgTextBounds( vg, 0,
-                            0,
-                            _rows[ i].start,
-                            &_rows[ i].start[ leftCharacters],
-                            xyxy);
-         offset = xyxy[ 2] - xyxy[ 0];
-         nvgTextBounds( vg, 0,
-                            0,
-                            &_rows[ i].start[ leftCharacters],
-                            &_rows[ i].start[ leftCharacters + selectionRange.length],
-                            xyxy);
-         width = xyxy[ 2] - xyxy[ 0];
-
-         nvgTextBounds( vg, frame.origin.x + _origin.x,
-                            frame.origin.y + _origin.y,
-                            _rows[ i].start,
-                            _rows[ i].end,
-                            xyxy);
-         xyxy[ 0] += offset;
-         xyxy[ 2]  = xyxy[ 0] + width;
-      }
-   }
-#endif
-   return( YES);
-}
 
 
 
@@ -141,7 +22,7 @@
 {
    NSUInteger   i;
 
-   i = [self characterOffsetForPoint:point];
+   i = [self characterOffsetAtPoint:point];
    if( i == NSNotFound)
       return;
 
@@ -154,7 +35,7 @@
 {
    NSUInteger   i;
 
-   i = [self characterOffsetForPoint:point];
+   i = [self characterOffsetAtPoint:point];
    if( i == NSNotFound)
       return;
 

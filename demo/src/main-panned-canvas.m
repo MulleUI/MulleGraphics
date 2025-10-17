@@ -88,7 +88,7 @@ static BOOL   drawStuff( CGGraphicsLayer *aLayer, CGContext *context)
    CGContextTextInRect( context, "Move mouse to pan",
                                  (size_t) -1,
                                  CGRectMake( 10, 10, 400, 32),
-                                 CGContentModeCenter,
+                                 CGContentModeCenterPoint,
                                  CGTextOptionAlignVisually);
    return( YES);
 }

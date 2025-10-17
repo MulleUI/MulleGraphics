@@ -36,6 +36,7 @@
 
 #import "import-private.h"
 
+#import "CGGraphicsLayer+MulleGraphics.h"
 
 
 @implementation CAAccumulationLayer
@@ -67,19 +68,19 @@
 }
 
 
-- (void) mulleGainAccess
+- (void) mulleGainAccessWithUniquingSet:(struct mulle_pointerset *) uniquing
 {
-   [super mulleGainAccess];
-   [self->_framebuffer[ 0] mulleGainAccess];
-   [self->_framebuffer[ 1] mulleGainAccess];
+   [super mulleGainAccessWithUniquingSet:uniquing];
+   [self->_framebuffer[ 0] mulleGainAccessWithUniquingSet:uniquing];
+   [self->_framebuffer[ 1] mulleGainAccessWithUniquingSet:uniquing];
 }
 
 
-- (void) mulleRelinquishAccess
+- (void) mulleRelinquishAccessWithUniquingSet:(struct mulle_pointerset *) uniquing
 {
-   [self->_framebuffer[ 1] mulleRelinquishAccess];
-   [self->_framebuffer[ 0] mulleRelinquishAccess];
-   [super mulleRelinquishAccess];
+   [self->_framebuffer[ 1] mulleRelinquishAccessWithUniquingSet:uniquing];
+   [self->_framebuffer[ 0] mulleRelinquishAccessWithUniquingSet:uniquing];
+   [super mulleRelinquishAccessWithUniquingSet:uniquing];
 }
 
 
@@ -219,12 +220,15 @@ static inline double   computeDecayFactor( double y, int n)
 }
 
 
-- (void) willDrawInContext:(CGContext *) context
+- (BOOL) willDrawInContext:(CGContext *) context
 {
    CGFramebuffer   *drawFramebuffer;
    CGFramebuffer   *previousFramebuffer;
    CGRect          canvas;
    CGPixelSize     bitmapSize;
+
+   if( ! [super willDrawInContext:context])
+      return( NO);
 
    canvas     = [self canvas];
    bitmapSize = CGPixelSizeMakeWithSize( canvas.size);
@@ -273,6 +277,7 @@ static inline double   computeDecayFactor( double y, int n)
    [self drawPreviousFramebuffer:previousFramebuffer
                        inContext:context
                           canvas:canvas];
+   return( YES);
 }
 
 

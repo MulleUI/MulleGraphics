@@ -31,10 +31,10 @@ int   main( int argc, char *argv[])
    CAAnimationGroup   *group;
    Foo                *foo;
 
-   foo = [Foo object];
+   foo = [Foo instance];
    [foo setPaint:[CGPaint paintWithColor:CGColorMakeIndigo()]];
 
-   transaction = [CATransaction object];
+   transaction = [CATransaction instance];
    assert( transaction);
 
    [transaction begin];

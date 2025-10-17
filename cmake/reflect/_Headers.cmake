@@ -65,6 +65,9 @@ src/CAOpenGLLayer.h
 src/CAShadowLayer.h
 src/CAShapeLayer.h
 src/CATextLayer+Cursor.h
+src/CATextLayer+Layout.h
+src/CATextLayer+MulleGraphics.h
+src/CATextLayer+RowsAndGlyphs.h
 src/CATextLayer+Selection.h
 src/CATextLayer.h
 src/CGGraphicsLayer+MulleGraphics.h

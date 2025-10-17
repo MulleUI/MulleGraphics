@@ -15,6 +15,9 @@
       { @selector( CAShapeLayer), @selector( nanovg) },      // 1effb374;CAShapeLayer;df06d543;nanovg
       { @selector( CAShapeLayer), MULLE_OBJC_NO_CATEGORYID },      // 1effb374;CAShapeLayer;;
       { @selector( CATextLayer), @selector( Cursor) },      // de65b073;CATextLayer;58a502f5;Cursor
+      { @selector( CATextLayer), @selector( Layout) },      // de65b073;CATextLayer;788421ff;Layout
+      { @selector( CATextLayer), @selector( MulleGraphics) },      // de65b073;CATextLayer;d36c3031;MulleGraphics
+      { @selector( CATextLayer), @selector( RowsAndGlyphs) },      // de65b073;CATextLayer;083630ec;RowsAndGlyphs
       { @selector( CATextLayer), @selector( Selection) },      // de65b073;CATextLayer;dea34b5b;Selection
       { @selector( CATextLayer), MULLE_OBJC_NO_CATEGORYID },      // de65b073;CATextLayer;;
       { @selector( CGBlendedPaint), @selector( CAInterpolatableValue) },      // f164885b;CGBlendedPaint;dfc7766f;CAInterpolatableValue

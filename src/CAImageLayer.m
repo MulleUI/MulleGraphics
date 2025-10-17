@@ -72,20 +72,6 @@ MulleCursorImplementation;
 }
 
 
-- (void) mulleGainAccess
-{
-   [super mulleGainAccess];
-   [self->_image mulleGainAccess];
-}
-
-
-- (void) mulleRelinquishAccess
-{
-   [self->_image mulleRelinquishAccess];
-   [super mulleRelinquishAccess];
-}
-
-
 - (void) setSelectionColor:(CGColor) color
 {
    [self setSelectionPaint:[CGPaint paintWithColor:color]];
@@ -134,7 +120,7 @@ MulleCursorImplementation;
                                     [_image isRepeating] ? CGScaleNone : CGScaleToFit,
                                     CGFlipNone,
                                     CGRepeatAsIs,
-                                    CGContentModeCenter);
+                                    CGContentModeCenterPoint);
    if( _displayedRect.size.width != 0.0 && _displayedRect.size.height != 0.0 &&
        [_image respondsToSelector:@selector( drawRect:fromRect:options:context:)])
    {

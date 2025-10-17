@@ -54,7 +54,7 @@ int   main( int argc, char *argv[])
    start     = [CGPaint paintWithColor:CGColorMakeBlack()];
    end       = [CGPaint paintWithStartColor:CGColorMakeRed()
                                   endColor:CGColorMakeBlue()];
-   foo       = [Foo object];
+   foo       = [Foo instance];
    animation = [[[CABasicAnimation alloc] initWithProperty:MulleObjCInstanceSearchProperty( foo, @selector( r))
                                           startObjectValue:start
                                             endObjectValue:end

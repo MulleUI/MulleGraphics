@@ -19,50 +19,6 @@
 //
 // -------------------------------
 
-- (void) drawCursorWithContext:(CGContext *) context
-                           row:(NSUInteger) i
-{
-   CGRect                        canvas;
-   struct CATextLayerRowGlyphs   *p;
-   NSUInteger                    x;
-   CGPoint                       offset;
-   CGFloat                       h;
-   CGFloat                       y;
-
-   if( MulleCursorPositionIsMax( _cursorPosition))
-      _cursorPosition = [self maxCursorPosition];
-
-   if( _cursorPosition.y != i)
-      return;
-
-   canvas = [self canvas];
-
-   // get glyphs
-   p = &_rowGlyphs[ i];
-   x = _cursorPosition.x;
-   if( x <= p->nGlyphs)
-   {
-      offset.x = p->glyphs[ x].x;
-      h = _metrics.lineHeight;
-      y = 0.0f;
-      if( h >= 8.0f)
-      {
-         h -= 2;
-         y  = 1;
-      }
-      offset.y = -(_metrics.lineHeight / 2); // depends on alignment, really, use middle here
-
-      CGContextBeginPath( context);
-      CGContextRect( context,
-                     CGRectMake( canvas.origin.x + _origin.x + offset.x - 0.5,
-                                 canvas.origin.y + _origin.y - _metrics.ascender + y,
-                                 1,
-                                 h)
-                     );
-      CGContextFillColor( context, CGColorMakeRed());
-      CGContextFill( context);
-   }
-}
 
 
 - (CGFloat) offsetNeededToMakeCursorVisible
@@ -97,12 +53,12 @@
    // if text fits in visible don't mess with it
 
    glyph    = &p->glyphs[ 0];
-   offset.x = _origin.x + glyph->x;
+   offset.x = _layoutOrigin.x + glyph->x;
    if( offset.x < CGRectGetMinX( canvas))
       goto scrolling;
    // use sentinel node to our advantage
    glyph    = &p->glyphs[ p->nGlyphs];
-   offset.x = _origin.x + glyph->x - 2.0;  // overshoot of nanovg
+   offset.x = _layoutOrigin.x + glyph->x - 2.0;  // overshoot of nanovg
    if( offset.x > CGRectGetMaxX( canvas))
       goto scrolling;
 
@@ -112,7 +68,7 @@
 scrolling:   
    glyph    = &p->glyphs[ _cursorPosition.x];
 
-   offset.x = _origin.x + glyph->x - 0.5; // why -0.5 ?
+   offset.x = _layoutOrigin.x + glyph->x - 0.5; // why -0.5 ?
    min      = canvas.size.width * 10.0 / 100.0;
 
    diff = (CGRectGetMinX( canvas) + min) - offset.x;
@@ -209,8 +165,8 @@ scrolling:
    if( cursorPosition.x < 0 || cursorPosition.x > p->nGlyphs)
       return( CGPointMake( -1, -1));
 
-   return( CGPointMake( _origin.x + p->glyphs[ cursorPosition.x].x,
-                        _origin.y - 1.0));
+   return( CGPointMake( _layoutOrigin.x + p->glyphs[ cursorPosition.x].x,
+                        _layoutOrigin.y - 1.0));
 }
 
 
@@ -228,8 +184,8 @@ scrolling:
    if( cursorPosition.x < 0 || cursorPosition.x > p->nGlyphs)
       return( CGPointMake( -1, -1));
 
-   return( CGPointMake( _origin.x + p->glyphs[ cursorPosition.x].x,
-                        _origin.y + 0.0));
+   return( CGPointMake( _layoutOrigin.x + p->glyphs[ cursorPosition.x].x,
+                        _layoutOrigin.y + 0.0));
 }
 
 
@@ -241,8 +197,8 @@ scrolling:
    struct CATextLayerRowGlyphs   *p;
 
    // figure out the row that was hit, a row is _metrics.lineHeight and
-   // drawn at frame.origin.y + _origin.y  + i *_metrics.lineHeight
-   y = (NSInteger) round( (point.y -_origin.y) / _metrics.lineHeight);
+   // drawn at frame.origin.y + _layoutOrigin.y  + i *_metrics.lineHeight
+   y = (NSInteger) round( (point.y -_layoutOrigin.y) / _metrics.lineHeight);
    if( y < 0) 
       return( MulleCursorPositionMake( 0, 0));
    if( y >= _nRows)
@@ -252,7 +208,7 @@ scrolling:
    // calculate characters up till till this
 
    // TODO: binary search anyone ?
-   search = point.x - _origin.x;
+   search = point.x - _layoutOrigin.x;
    for( x = 0; x < p->nGlyphs; x++)
    {
       if( search >= p->glyphs[ x].x && search < p->glyphs[ x + 1].x)

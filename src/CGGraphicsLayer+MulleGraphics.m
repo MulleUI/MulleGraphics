@@ -47,14 +47,19 @@
    }
 
    // fill
-   CGContextFillRoundedRectVaryingWithPaintable( context, rect, _cornerInsets, paint);
+   CGContextFillRoundedRectVaryingWithPaintable( context, rect,
+                                                          _cornerInsets,
+                                                          paint);
    CGContextShapeAntiAlias( context, 1);
 }
 
 
 - (BOOL) drawsBackgroundWithAlpha:(CGFloat) alpha
 {
-   return( ! CGAlphaIsTransparent( [_backgroundPaint alpha] * alpha));
+   CGFloat   bgAlpha;
+
+   bgAlpha = [_backgroundPaint alpha];
+   return( ! CGAlphaIsTransparent( bgAlpha * alpha));
 }
 
 
@@ -65,11 +70,17 @@
 }
 
 
-- (BOOL) drawInContext:(CGContext *) context
-{
-   return( CGGraphicsLayerExecuteDrawCallback( self, context));
-}
 
+- (BOOL) drawsBorderWithAlpha:(CGFloat) alpha
+{
+   CGFloat   borderAlpha;
+
+   if( _borderWidth < 0.1)
+      return( NO);
+
+   borderAlpha = [_borderPaint alpha];
+   return( ! CGAlphaIsTransparent( borderAlpha * alpha));
+}
 
 //
 // the border is not extending outside of the layer
@@ -108,20 +119,13 @@
    //
    rect = CGRectMake( tl.x, tl.y, br.x - tl.x, br.y - tl.y);
 
-   CGContextStrokeRoundedRectVaryingWithPaintable( context, rect, _cornerInsets, _borderWidth, _borderPaint);
-   CGContextStrokeWidth( context, 1.0);  // need to reset
+   CGContextStrokeRoundedRectVaryingWithPaintable( context, rect,
+                                                            _cornerInsets,
+                                                            _borderWidth,
+                                                            _borderPaint);
+   // CGContextStrokeWidth( context, 1.0);  // need to reset ? why ?
 }
 
-
-
-- (void) willDrawInContext:(CGContext *) context
-{
-}
-
-
-- (void) didDrawInContext:(CGContext *) context
-{
-}
 
 
 
@@ -162,6 +166,71 @@
 
 
 
+void  CGGraphicsLayerSetupDrawTransform( CGGraphicsLayer *self,
+                                         CGContext *context,
+                                         CGRect bounds)
+{
+   union // a union for fun
+   {
+      CGAffineTransform   bounds;
+      CGAffineTransform   origin;
+      CGAffineTransform   rotation;
+   } transform;
+   CGRect              canvas;
+
+   bounds = [self bounds];
+   if( ! CGSizeEqualToSize( self->_frame.size, bounds.size) ||
+       ! CGPointEqualToPoint( bounds.origin, CGPointZero))
+   {
+      transform.bounds = CGGraphicsLayerMakeBoundsTransform( self->_frame, bounds);
+      CGContextTransform( context, &transform.bounds);
+   }
+   else
+   {
+      transform.origin = CGAffineTransformMakeTranslationInline( self->_frame.origin);
+      CGContextTransform( context, &transform.origin);
+   }
+
+   if( self->_rotation != 0.0)
+   {
+      canvas             = [self canvas];
+      transform.rotation = CGGraphicsLayerMakeRotationTransform( canvas,
+                                                                self->_anchorPoint,
+                                                                self->_rotation);
+      CGContextTransform( context, &transform.rotation);
+   }
+}
+
+
+- (BOOL) willDrawInContext:(CGContext *) context
+{
+   CGRect   bounds;
+
+   bounds = [self bounds];
+   if( bounds.size.width == 0.0 || bounds.size.height == 0.0)
+      return( NO);
+
+   CGGraphicsLayerSetupDrawTransform( self, context, bounds);
+#ifdef USE_SCISSOR
+   if( _masksToBounds)
+      CGContextIntersectScissor( context, bounds);
+#endif
+   return( YES);
+}
+
+
+- (BOOL) drawInContext:(CGContext *) context
+{
+   return( CGGraphicsLayerExecuteDrawCallback( self, context));
+}
+
+
+- (void) didDrawInContext:(CGContext *) context
+{
+}
+
+
+
 /* So here is a little essay on what is what. A CGGraphicsLayer is supposed
    to be setup by the UIView so it is ready to be rendered on the UIWindow
    framebuffer. There is conceptually no transformation we are inheriting from
@@ -184,20 +253,15 @@
    3) The drawInContext: draws into canvas. The rotation rotates around
       the center of the canvas (or some other place if anchorPoint is not
       0.5, 0.5).
-   4) The background and the border are not rotated or scaled.
+   4) The background and the border are not rotated or scaled. They render
+      the frame, not the canvas.
  */
 - (void) renderInContext:(CGContext *) context
 {
-   CGFloat             alpha;
-   CGRect              bounds;
-   CGRect              canvas;
-   CGPoint             center;
-   CGVector            scale;
-   CGAffineTransform   originTransform;
-   CGAffineTransform   boundsTransform;
-   CGAffineTransform   rotationTransform;
-   CGAffineTransform   scaleTransform;
-   unsigned int        drawBits;
+   CGFloat   alpha;
+   BOOL      isDrawing;
+   BOOL      isTracing;
+   FILE      *oldtrace;
 
    assert( context);
 
@@ -226,29 +290,23 @@
    if( _frame.size.width < 0.1 || _frame.size.height < 0.1)
       return;
 
-
-   bounds   = [self bounds];
    //
-   // Figure out what we want to draw, so we don't need to save and restore
-   // graphics state willy nilly. This is a central method and so why not.
+   // MEMO: unfortunately we have to reset the context quite a bit, because
+   // drawing code is free to use nvgBeginFrame for its own nefarious purposes
+   // but that will waste the save/restore stack, so we need to run from a
+   // clean slate for background, then content, and then border
    //
-   drawBits  = [self drawsBackgroundWithAlpha:alpha] ? 0x1 : 0;
-   drawBits |= ( bounds.size.width != 0.0 && bounds.size.height != 0.0) ? 0x2 : 0;
-   drawBits |= (_borderWidth >= 0.1 && ! CGAlphaIsTransparent( [_borderPaint alpha] * alpha)) ? 0x4 : 0;
-   if( ! drawBits)
-      return;
 
-   // once for sure
-   [self setupContext:context
-            transform:&_transform
-                alpha:alpha];
+   isTracing = [self isTracingDrawCalls];
+   if( isTracing)
+      oldtrace = nvgTrace( CGContextGetNVGContext( context), stderr);
 
    // this draws with _frame coordinates w/o bounds and rotation
-   if( drawBits & 0x1)
+   if( [self drawsBackgroundWithAlpha:alpha])
    {
-      if( drawBits & (0x2|0x4))
-         CGContextSave( context);
-
+      [self setupContext:context
+               transform:&_transform
+                   alpha:alpha];
       [self drawBackgroundInContext:context];
    }
 
@@ -256,51 +314,29 @@
    // bounds are dynamically calculated.
    // we still draw border and background, even if the content is zoomed to nil
    //
-   if( drawBits & 0x2)
+   [self setupContext:context
+            transform:&_transform
+                alpha:alpha];
+
+   isDrawing = [self willDrawInContext:context];
+   if( isDrawing)
    {
-      if( drawBits & 0x1)
-         CGContextRestore( context);
-      if( drawBits & 0x4)
-         CGContextSave( context);
-
-      originTransform = CGAffineTransformMakeTranslationInline( _frame.origin);
-      boundsTransform = CGAffineTransformMakeTranslationInline( CGPointNegate( bounds.origin));
-      scale           = CGVectorMake( _frame.size.width / bounds.size.width,
-                                      _frame.size.height / bounds.size.height);
-      scaleTransform  = CGAffineTransformMakeScaleInline( scale);
-
-      boundsTransform = CGAffineTransformConcatInline( originTransform, boundsTransform);
-      boundsTransform = CGAffineTransformConcatInline( boundsTransform, scaleTransform);
-      CGContextTransform( context, &boundsTransform);
-
-      if( _masksToBounds)
-         CGContextIntersectScissor( context, bounds);
-
-      if( _rotation != 0.0)
-      {
-         canvas            = [self canvas];
-         center            = CGRectGetCenterWithAnchorPoint( canvas, _anchorPoint);
-         rotationTransform = CGAffineTransformMakeRotationAroundPoint( center, _rotation);
-         CGContextTransform( context, &rotationTransform);
-      }
-
-      [self willDrawInContext:context];
       [self drawInContext:context];
       [self didDrawInContext:context];
    }
 
-   // this draws with _frame coordinates w/o bounds and rotation again like
-   // background
-   if( drawBits & 0x4)
+   if( [self drawsBorderWithAlpha:alpha])
    {
-      // "just" setup the context again, to recover the "frame" transform
-      // we dont want frame/bounds messing with the border width
-      // Second setupContext inline
-      if( drawBits & (0x1|0x2))
-         CGContextRestore( context);
-
+      // need to reset ?
+      if( isDrawing)
+         [self setupContext:context
+                  transform:&_transform
+                      alpha:alpha];
       [self drawBorderInContext:context];
    }
+
+   if( isTracing)
+      nvgTrace( CGContextGetNVGContext( context), oldtrace);
 }
 
 

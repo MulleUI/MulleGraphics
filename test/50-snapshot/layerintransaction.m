@@ -7,10 +7,10 @@ int   main( int argc, char *argv[])
    CAAnimationGroup   *group;
    CGGraphicsLayer    *layer;
 
-   layer = [CGGraphicsLayer object];
+   layer = [CGGraphicsLayer instance];
    [layer setBorderPaint:[CGPaint paintWithColor:CGColorMakeIndigo()]];
 
-   transaction = [CATransaction object];
+   transaction = [CATransaction instance];
    assert( transaction);
 
    [transaction begin];

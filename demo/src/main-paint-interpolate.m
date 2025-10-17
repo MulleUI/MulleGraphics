@@ -64,7 +64,7 @@ static BOOL   drawStuff( CGGraphicsLayer *layer, CGContext *context)
       frames = 240 - frames;
    x = frames / 120.0;
 
-   foo      = [Foo object];
+   foo      = [Foo instance];
    property = MulleObjCInstanceSearchProperty( foo, @selector( value));
 
    for( j = 0; j < ROWS; j++)

@@ -14,7 +14,7 @@ int   main( int argc, char *argv[])
    [layer setFontNameUTF8String:"sans"];
    [layer setTextColor:CGColorMakeBlue()];
 
-   transaction = [CATransaction object];
+   transaction = [CATransaction instance];
 
    // this calls CATransactionSetCurrentTransaction
    [transaction begin];

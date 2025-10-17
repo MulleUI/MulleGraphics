@@ -16,7 +16,7 @@ int   main( int argc, char *argv[])
    // MEMO: nice demo on how to do font stuff without actually needing
    //       a window (or an OpenGL context)
    //
-   context = [CGLayoutContext object];
+   context = [CGLayoutContext instance];
 
    layer = [CATextLayer layerWithFrame:CGRectMake( 0, 0, 200, 100)];
    [layer setTextUTF8String:"VfL Bochum 1848"];

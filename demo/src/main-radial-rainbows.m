@@ -299,7 +299,7 @@ static void   setupScene( UIWindow *window)
 
    contentRect = [[window contentView] contentRect];
 
-   circle = [RadialGradientCircle object];
+   circle = [RadialGradientCircle instance];
    setupCircle( circle, 900 / 2.0 / N_COLORSTOPS);
 
    layer = [CAImageLayer layerWithFrame:contentRect];
@@ -334,7 +334,7 @@ int   main( int argc, char *argv[])
 
       setupScene( window);
 
-      perf = [MulleUIPerf object];
+      perf = [MulleUIPerf instance];
       [window setFrameDelegate:perf];
 
       [app addWindow:window];

@@ -42,25 +42,10 @@
 //       we don't need to gain or relinquish. But! if we have a CGImage it
 //       could be a CGFramebuffer, which is mutable and we would need to
 //       transfer it. But! The CGImage is also part of the resource management
-//       of the CGContext and will be gained/relinquised there. So doing it
-//       twice would be disastrous anyway. So luck has it we don't need to
-//       transfer paints.
-//
-// - (void) mulleGainAccess
-// {
-//    [super mulleGainAccess];
-//    [self->_fillPaint mulleGainAccess];  
-//    [self->_strokePaint mulleGainAccess];  
-// }
-// 
-// 
-// - (void) mulleRelinquishAccess
-// {
-//    [self->_strokePaint mulleRelinquishAccess];  
-//    [self->_fillPaint mulleRelinquishAccess];  
-//    [super mulleRelinquishAccess];
-// }
-
+//       of the CGContext and will be gained/relinquished there. So doing it
+//       twice would be disastrous. So luck has it, we don't need to
+//       transfer paints. Now with the uniquing done by NSObject this should
+//       all be moot, but the comment is left in, in case not...
 
 - (void) setStrokeColor:(CGColor) color
 {

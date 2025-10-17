@@ -39,6 +39,10 @@
 #import "CAAnimation+CGPaint.h"
 
 
+@interface CGBlendedPaint( CAInterpolatableValue) < CAInterpolatableValue>
+@end
+
+
 @implementation CGBlendedPaint( CAInterpolatableValue)
 
 - (id) interpolateTo:(id) end

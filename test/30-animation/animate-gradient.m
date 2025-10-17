@@ -50,7 +50,7 @@ int   main( int argc, char *argv[])
                                          endColor:CGColorMakeWhite()];
    end       = [CGGradient gradientWithStartColor:CGColorMakeRed()
                                          endColor:CGColorMakeBlue()];
-   foo       = [Foo object];
+   foo       = [Foo instance];
    animation = [[[CABasicAnimation alloc] initWithProperty:MulleObjCInstanceSearchProperty( foo, @selector( r))
                                           startObjectValue:start
                                             endObjectValue:end

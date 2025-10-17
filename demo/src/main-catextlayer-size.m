@@ -18,22 +18,28 @@
    // draw visual bounds on top of what CATextLayer drew
    //
    [super drawInContext:context];
-   [self getTextVisualBounds:&vbounds
-                     context:context];
 
-    MulleUICLog( "%s", CGRectUTF8String( vbounds));
+   vbounds = [self visualBoundsWithContext:context];
 
-    insets = [self insets];
+   MulleUICLog( "%s", CGRectUTF8String( vbounds));
 
-    CGContextSave( context);
+   insets = [self insets];
+
+   CGContextSave( context);
    {
       CGContextResetScissor( context);
-      CGContextTranslate( context, CGPointMake(insets.left, insets.right));
+      CGContextTranslate( context, CGPointMake( insets.left, insets.right));
       CGContextStrokeRectWithColor( context, vbounds, 1.0, CGColorMakeLime());
    }
    CGContextRestore( context);
 
    return( YES);
+}
+
+- (void) didDrawInContext:(CGContext *) context
+{
+   [self dumpLayoutToFILE:stderr];
+   [self dumpRowsAndGlyphsToFILE:stderr];
 }
 
 @end
@@ -43,6 +49,7 @@
 static char   *strings[] =
 {
    "\n  Ahoi! \n \n",
+   "------\nBrause\n------\n",
    "Ohne Descender",
    "______",
    "Interview mit van Duijnhoven:\n„Habe den VfL immer im Blick“",
@@ -106,11 +113,10 @@ static UIView *   setupSceneInWindow( UIWindow *window)
    contentView = [window contentView];
    [contentView setBackgroundColor:CGColorMakeGray()];
 
-   layer = [DemoTextLayer object];
+   layer = [DemoTextLayer instance];
    [layer setFontPixelSize:20.0f];
    [layer setBorderWidth:1.0];
    [layer setBorderColor:CGColorMakeRed()];
-   [layer setTextBackgroundColor:CGColorMakeGray()];
    [layer setTextColor:CGColorMakeBlack()];
    [layer setTextBackgroundColor:CGColorMakeGray()];
 

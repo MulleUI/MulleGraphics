@@ -47,7 +47,7 @@
 }
 
 
-- (NSUInteger) characterOffsetForPoint:(CGPoint) point
+- (NSUInteger) characterOffsetAtPoint:(CGPoint) point
 {
    // TODO: HACK!!!
    return( _image ? 1 : 0);
