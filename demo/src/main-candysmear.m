@@ -338,10 +338,15 @@
 {
    NSUInteger   i;
 
+   assert( mulle_pointerset_get( uniquing, self) == self);
+
    [super mulleGainAccessWithUniquingSet:uniquing];
 
    for( i = 0; i < numBalls; i++)
-      [balls[ i] mulleGainAccessWithUniquingSet:uniquing];
+   {
+      if( mulle_pointerset_insert( uniquing, balls[ i]))
+         [balls[ i] mulleGainAccessWithUniquingSet:uniquing];
+   }
 }
 
 
@@ -349,8 +354,11 @@
 {
    NSUInteger   i;
 
+   assert( mulle_pointerset_get( uniquing, self) == self);
+
    for( i = 0; i < numBalls; i++)
-      [balls[ i] mulleRelinquishAccessWithUniquingSet:uniquing];
+      if( mulle_pointerset_insert( uniquing, balls[ i]))
+         [balls[ i] mulleRelinquishAccessWithUniquingSet:uniquing];
 
    [super mulleRelinquishAccessWithUniquingSet:uniquing];
 }

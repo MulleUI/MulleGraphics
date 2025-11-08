@@ -111,7 +111,6 @@
 }
 
 
-
 - (CGPoint) position
 {
    CGPoint   pos;
@@ -150,6 +149,42 @@
    _frame.origin.x = pose.position.x - (_frame.size.width * _anchorPoint.x);
    _frame.origin.y = pose.position.y - (_frame.size.height * _anchorPoint.y);
    _rotation       = CAPoseGetRotation( pose);
+}
+
+
+- (void) layoutWithLayoutInfo:(struct UILayoutInfo *) info
+{
+   [_layouter layoutLayer:self
+                     info:info];
+}
+
+
+
+- (void) dumpWithIndent:(NSUInteger) indent
+                   FILE:(FILE *) fp
+{
+   [super dumpWithIndent:indent
+                    FILE:fp];
+   [_layouter dumpWithIndent:indent + 3
+                        FILE:fp];
+}
+
+
+//
+// forward methods to layouter
+//
+- (void *) forward:(void *) param
+{
+   void   *rval;
+   int    fail = 0;
+
+   rval = _MulleDynamicObjectForward( self, _cmd, param, &fail);
+   if( ! fail)
+      return( rval);
+
+   return( mulle_objc_object_call_variable_inline( _layouter,
+                                                   (mulle_objc_methodid_t) _cmd,
+                                                   param));
 }
 
 @end

@@ -39,7 +39,7 @@ if( NOT ${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
             # intentionally left blank
          else()
             # Disable with: `mulle-sourcetree mark Xi no-require-link`
-            message( SEND_ERROR "XI_LIBRARY was not found")
+            message( SEND_ERROR "XI_LIBRARY was not found in Xi")
          endif()
       endif()
    endif()

@@ -24,7 +24,7 @@ static CATextLayer   *textLayer( CGPaint *textPaint,
 }
 
 
-static void   positionLayerInView( CALayer *layer, UIView *contentView, CGPoint origin)
+static void   positionTextLayerInView( CATextLayer *layer, UIView *contentView, CGPoint origin)
 {
    CGRect   frame;
    UIView   *view;
@@ -110,9 +110,9 @@ static void   setupSceneInWindow( UIWindow *window)
                                  : grayPaints[ 4], 
                                windowBackgroundPaint, 
                                j ? YES : NO);
-            positionLayerInView( layer, 
-                                 contentView, 
-                                 CGPointMake( k * 400 + j * 200 + 20, 200 + i * 30 + 20));
+            positionTextLayerInView( layer,
+                                     contentView,
+                                     CGPointMake( k * 400 + j * 200 + 20, 200 + i * 30 + 20));
          }
 
 }

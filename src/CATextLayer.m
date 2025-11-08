@@ -3,9 +3,8 @@
 #import "import-private.h"
 
 #import "CGGraphicsLayer+MulleGraphics.h"
-#import "CATextLayer+Cursor.h"
-#import "CATextLayer+Selection.h"
-#import "CATextLayer+RowsAndGlyphs.h"
+#import "CATextLayerLayouter+CGGraphicsLayerLayouter.h" // for protocol
+
 
 #include <ctype.h>
 
@@ -18,35 +17,36 @@
 @end
 
 
-//#define CATEXTLAYER_DATA_DEBUG
-
-@interface CATextLayer ( LayoutPrivate)
-
-// will also be used by copy
-- (void) _initRowsAndGlyphs;
-- (void) _doneRowsAndGlyphs;
-
-@end
-
-
 
 @implementation CATextLayer
 
 // also used by copy!
 - (instancetype) _initWithFrame:(CGRect) frame
 {
+   CATextLayerLayouter   *layouter;
+
    self = [super _initWithFrame:frame];
 
-   _textPaint           = nil;  // default, depend on backgroundColor
-   _textRange           = NSRangeMake( NSNotFound, 0);
+   _clearTypeEnabled = YES;
 
    // because Fonts are crap and don't adhere to size requests properly, it's
    // usually better to overdraw than to clip.
-   _clearTypeEnabled    = YES;
-   _masksToBounds       = NO;
-   _textLineHeight      = INFINITY;
+   _textLineHeight                = INFINITY;   // means copy _fontPixelSize
+   _masksToBounds                 = NO;
+   _fontPixelSize                 = INFINITY;   // means height of inset canvas
+   _textAlignment                 = UITextAlignmentCenter;
+   _textVerticalAlignment         = UITextAlignmentVisualMiddle;
+   _textPropertiesGenerationCount = 1; // start initially out of sync with editor
+   _mulle_structarray_init( &_rowArray, sizeof( struct CATextLayerRow),
+                                        alignof( struct CATextLayerRow),
+                                        1,
+                                        NULL);
 
-   [self _initRowsAndGlyphs];
+   // do we always want a layouter ? hmmm
+   layouter = [CATextLayerLayouter new];
+   [layouter setTextLayer:self];
+
+   _layouter = layouter;
 
    return( self);
 }
@@ -56,9 +56,8 @@
 {
    self = [self _initWithFrame:frame];
 
-   _suggestedTextPaint  = [[CGPaint paintWithHexColor:CGHexColorBlack] copy];
-   _selectionPaint      = [[CGPaint paintWithHexColor:0x7FFF7F7F] copy];
-   _cursorPaint         = [[CGPaint paintWithHexColor:0x7F2F2FCF] copy];
+   _selectionPaint = [[CGPaint paintWithHexColor:0x7FFF7F7F] copy];
+   _cursorPaint    = [[CGPaint paintWithHexColor:0x7F2F2FCF] copy];
 
    return( self);
 }
@@ -66,17 +65,15 @@
 
 - (void) dealloc
 {
-   [self _doneRowsAndGlyphs];
-
-   [_suggestedTextPaint release];
+   _mulle_structarray_done( &_rowArray);
 
    MulleObjCInstanceDeallocateMemory( self, _fontNameUTF8String);
 
 #ifdef CATEXTLAYER_DATA_DEBUG
-   if( _data.characters)
-      MulleUILog( "free %p for _data", _data.characters);
+   if( _textData.characters)
+      MulleUILog( "free %p for _textData", _textData.characters);
 #endif
-   mulle_utf8data_done( &_data, MulleObjCInstanceGetAllocator( self));
+   mulle_utf8data_done( &_textData, MulleObjCInstanceGetAllocator( self));
 
    [super dealloc];
 }
@@ -93,56 +90,23 @@
    // and not leak
    //
    copy->_textPaint           = [self->_textPaint copy];
-   copy->_suggestedTextPaint  = [self->_suggestedTextPaint copy];
    copy->_selectionPaint      = [self->_selectionPaint copy];
 
    // because Fonts are crap and don't adhere to size requests properly, it's
    // usually better to overdraw than to clip.
    copy->_clearTypeEnabled    = self->_clearTypeEnabled;
    copy->_masksToBounds       = self->_masksToBounds;
-   copy->_textLineHeight      = self->_textLineHeight;
 
    //
    copy->_fontPixelSize       = self->_fontPixelSize;
-   copy->_lineBreakMode       = self->_lineBreakMode;
-   copy->_textOffset          = self->_textOffset;
    copy->_textAlignment       = self->_textAlignment;
    copy->_textLetterSpacing   = self->_textLetterSpacing;
-
-   //
-   copy->_textVerticalAlignment = self->_textVerticalAlignment;
-   copy->_insets              = self->_insets;
-//   copy->_multiLineEnabled    = self->_multiLineEnabled;
+   copy->_textLineHeight      = self->_textLineHeight;
 
    MulleObjCObjectSetDuplicatedUTF8String( copy,
                                            (char **) &copy->_fontNameUTF8String,
-                                           (char *)   self->_fontNameUTF8String);
+                                           (char *) self->_fontNameUTF8String);
    return( copy);
-}
-
-
-
-- (CGFloat) fontAscender
-{
-   return( _metrics.ascender);
-}
-
-
-- (CGFloat) fontDescender
-{
-   return( _metrics.descender);
-}
-
-
-- (CGFloat) fontLineHeight
-{
-   return( _metrics.lineHeight);
-}
-
-
-- (CGFloat) fontBaseline
-{
-   return( _metrics.lineHeight - _metrics.descender);
 }
 
 
@@ -170,75 +134,71 @@
 }
 
 
-
-- (void) _setTextUTF8Data:(struct mulle_utf8data) data
+- (void) setFontPixelSize:(CGFloat) value
 {
-   struct mulle_allocator   *allocator;
+   [self willChange];
+   if( value != _fontPixelSize)
+   {
+      _fontPixelSize = value;
+      _textPropertiesGenerationCount++;
+   }
+}
 
-   allocator = MulleObjCInstanceGetAllocator( self);
-
-#ifdef CATEXTLAYER_DATA_DEBUG
-   if( data.length)
-      MulleUILog( "free %p for _data", _data.characters);
-#endif
-   mulle_utf8data_done( &_data, allocator);
-
-   // don't want two trailing zeroes in incoming data
-   // need one trailing zero though
-   assert( ! data.length || data.characters[ data.length - 1]);
-   assert( ! data.characters[ data.length]);
-
-#ifdef CATEXTLAYER_DATA_DEBUG
-   MulleUILog( "set %p for _data", data.characters);
-#endif
-   _data       = data;
-
-   [self invalidateRowsAndGlyphs];
+- (void) setFrame:(CGRect) frame
+{
+   [super setFrame:frame];
+   _textPropertiesGenerationCount++;
 }
 
 
-- (void) setTextUTF8Data:(struct mulle_utf8data) data
+- (void) setInsets:(UIEdgeInsets) insets
 {
-   struct mulle_allocator   *allocator;
-   NSUInteger               length;
-   struct mulle_utf8data    copied;
-
-   if( data.characters == _data.characters && data.length == _data.length)
-      return;
-
-   allocator = MulleObjCInstanceGetAllocator( self);
-   length    = data.length;
-
-   // don't want two trailing zeroes in incoming data
-   if( length)
-      if( ! data.characters[ length - 1])
-         --length;
-
-   mulle_utf8data_init( &copied, data.characters, length, allocator);
-   [self _setTextUTF8Data:copied];
+   [self willChange];
+   _insets = insets;
+   _textPropertiesGenerationCount++;
 }
 
 
-- (struct mulle_utf8data) textUTF8Data
+
+- (void) setTextLetterSpacing:(CGFloat) textLetterSpacing
 {
-   return( _data);
+   [self willChange];
+   if( textLetterSpacing != _textLetterSpacing)
+   {
+      _textLetterSpacing = textLetterSpacing;
+      _textPropertiesGenerationCount++;
+   }
 }
 
 
-- (char *) textUTF8String  // will be a copy, if internal data has no trailing zero byte
+- (void) setTextLineHeight:(CGFloat) textLineHeight
 {
-   return( _data.characters ? (char *) _data.characters : "");
+   [self willChange];
+   if( textLineHeight != _textLineHeight)
+   {
+      _textLineHeight = textLineHeight;
+      _textPropertiesGenerationCount++;
+   }
 }
 
 
-- (void) setTextUTF8String:(char *) s
-{
-   if( ! s)
-      s = "";
 
-   // include trailing \0 in data
-   [self setTextUTF8Data:mulle_utf8data_make( s, strlen( s) + 1)];
+- (void) setTextAlignment:(UITextAlignment) textAlignment
+{
+   // not observable
+   if( textAlignment != _textAlignment)
+   {
+      _textAlignment = textAlignment;
+      _textPropertiesGenerationCount++;
+   }
 }
+
+
+- (CGRect) insetCanvas
+{
+   return( CGRectInsetWithInsets( [self canvas], _insets));
+}
+
 
 
 static void   assert_sane_font_name( char *s)
@@ -259,160 +219,124 @@ static void   assert_sane_font_name( char *s)
 {
    assert_sane_font_name( s);
 
-   MulleObjCObjectSetDuplicatedUTF8String( self, &_fontNameUTF8String, s);
-   [self invalidateRowsAndGlyphs];
-}
-
-
-- (NSRange) textRange
-{
-   struct mulle_utf_information   info;
-
-   if( _textRange.location != NSNotFound)
-      return( _textRange);
-
-   if( mulle_utf8_information( _data.characters, _data.length, &info))
-      return( NSRangeMake( NSNotFound, 0));
-
-   _textRange = NSRangeMake( 0, info.utf32len);
-   return( _textRange);
-}
-
-
-//
-// use above textRange to get the to be displayed data
-//
-- (struct mulle_utf8data) textUTF8DataInTextRange
-{
-   if( _textRange.location == NSNotFound)
-      return( _data);
-   return( mulle_utf8data_range_of_utf32_range( _data, _textRange));
-}
-
-
-
-- (void) setFontPixelSize:(CGFloat) fontPixelSize
-{
-   [self willChange];
-   if( fontPixelSize != _fontPixelSize)
+   if( strcmp( _fontNameUTF8String, s))
    {
-      [self invalidateRowsAndGlyphs];
-      _fontPixelSize = fontPixelSize;
+      MulleObjCObjectSetDuplicatedUTF8String( self, &_fontNameUTF8String, s);
+      _textPropertiesGenerationCount++;
    }
 }
 
 
-- (void) setTextAlignment:(UITextAlignment) textAlignment
-{
-   if( textAlignment != _textAlignment)
-   {
-      [self invalidateRowsAndGlyphs];
-      _textAlignment = textAlignment;
-   }
-}
-
-
-// Does not affect vertical rows and glyphs
-//- (void) setTextVerticalAlignment:(UITextVerticalAlignment) textVerticalAlignment
-//{
-//   if( textVerticalAlignment != _textVerticalAlignment)
-//   {
-//      [self invalidateRowsAndGlyphs];
-//      _textVerticalAlignment = textVerticalAlignment;
-//   }
-//}
-
-
-- (void) setTextLetterSpacing:(float) textLetterSpacing
-{
-   [self willChange];
-   if( textLetterSpacing != _textLetterSpacing)
-   {
-      [self invalidateRowsAndGlyphs];
-      _textLetterSpacing = textLetterSpacing;
-   }
-}
-
-- (void) setLineBreakMode:(NSLineBreakMode) lineBreakMode
-{
-   if( lineBreakMode != _lineBreakMode)
-   {
-      [self invalidateRowsAndGlyphs];
-      _lineBreakMode = lineBreakMode;
-   }
-}
-
-
-- (CGFloat) textLineHeight
-{
-   return( isinf( _textLineHeight) ? _fontPixelSize : _textLineHeight);
-}
-
-
-- (void) setTextLineHeight:(CGFloat) textLineHeight
-{
-   [self willChange];
-   if( textLineHeight != _textLineHeight)
-   {
-      [self invalidateRowsAndGlyphs];
-      _textLineHeight = textLineHeight;
-   }
-}
-
-
-- (void) updateSuggestedTextPaintWithBackgroundPaint:(CGPaint *) paint
+- (CGPaint *) suggestedTextPaint
 {
    CGColor   color;
+   CGPaint   *paint;
 
-   if( ! paint)
-   {
-      // if we cleared one use the other now
-      paint = _textBackgroundPaint
-              ? _textBackgroundPaint
-              : _backgroundPaint;
-   }
+   paint = _textBackgroundPaint ? _textBackgroundPaint : _backgroundPaint;
 
    // if we have nothing now, reset to black
    color = paint ? [paint suggestedTextColor] : CGColorMakeBlack();
-
-   [_suggestedTextPaint autorelease];
-   _suggestedTextPaint = [[CGPaint paintWithColor:color] copy];
+   return( [CGPaint paintWithColor:color]);
 }
 
 
-- (void) setBackgroundPaint:(CGPaint *) paint
+- (void) _setTextUTF8Data:(struct mulle_utf8data) data
 {
-   [super setBackgroundPaint:paint];
+   struct mulle_allocator   *allocator;
 
-   [self updateSuggestedTextPaintWithBackgroundPaint:paint];
+   allocator = MulleObjCInstanceGetAllocator( self);
+
+#ifdef CATEXTLAYER_DATA_DEBUG
+   if( data.length)
+      MulleUILog( "free %p for _textData", _textData.characters);
+#endif
+   mulle_utf8data_done( &_textData, allocator);
+
+   // don't want two trailing zeroes in incoming data
+   // need one trailing zero though
+   assert( ! data.length || data.characters[ data.length - 1]);
+   assert( ! data.characters[ data.length]);
+
+#ifdef CATEXTLAYER_DATA_DEBUG
+   MulleUILog( "set %p for _textData", data.characters);
+#endif
+   _textData = data;
+   _textPropertiesGenerationCount++;
+
+   _mulle_structarray_reset( &_rowArray);
 }
 
 
-- (void) setTextBackgroundPaint:(CGPaint *) paint
+- (void) setTextUTF8Data:(struct mulle_utf8data) data
 {
-   [_textBackgroundPaint autorelease];
-   _textBackgroundPaint = [paint copy];
+   struct mulle_allocator   *allocator;
+   NSUInteger               length;
+   struct mulle_utf8data    copied;
 
-   [self updateSuggestedTextPaintWithBackgroundPaint:paint];
+   if( data.characters == _textData.characters && data.length == _textData.length)
+      return;
+
+   allocator = MulleObjCInstanceGetAllocator( self);
+   length    = data.length;
+
+   // don't want two trailing zeroes in incoming data
+   if( length)
+      if( ! data.characters[ length - 1])
+         --length;
+
+   mulle_utf8data_init( &copied, data.characters, length, allocator);
+   [self _setTextUTF8Data:copied];
 }
 
 
+- (struct mulle_utf8data) textUTF8Data
+{
+   return( _textData);
+}
 
-//static size_t   mulle_utf8_utf32length( mulle_utf8_t *s, size_t len)
-//{
-//   mulle_utf8_t   *sentinel;
-//   size_t          n;
-//
-//   sentinel = &s[ len];
-//
-//   n = 0;
-//   while( s < sentinel)
-//   {
-//      mulle_utf8_next_utf32character( &s);
-//      ++n;
-//   }
-//   return( n);
-//}
+
+- (char *) textUTF8String  // will be a copy, if internal data has no trailing zero byte
+{
+   return( _textData.characters ? (char *) _textData.characters : "");
+}
+
+
+- (void) setTextUTF8String:(char *) s
+{
+   if( ! s)
+      s = "";
+
+   // include trailing \0 in data
+   [self setTextUTF8Data:mulle_utf8data_make( s, strlen( s) + 1)];
+}
+
+- (void) removeAllTextLayerRows
+{
+   mulle_structarray_reset( &_rowArray);
+}
+
+
+- (void) addTextLayerRows:(struct CATextLayerRow *) row
+                    count:(NSUInteger) count
+{
+   struct CATextLayerRow   *p;
+
+   p = _mulle_structarray_advance( &_rowArray, count);
+   memcpy( p, row, count * sizeof( struct CATextLayerRow));
+}
+
+
+- (void) addTextLayerRow:(struct CATextLayerRow *) row
+{
+   mulle_structarray_add( &_rowArray, row);
+}
+
+
+- (NSUInteger) numberOfRows
+{
+   return( _mulle_structarray_get_count( &_rowArray));
+}
+
 
 
 char  *mulle_utf8_characters_at_utf32_offset( char *data,
@@ -428,9 +352,9 @@ char  *mulle_utf8_characters_at_utf32_offset( char *data,
    for(;;)
    {
       if( ! offset)
-         return( s);     
+         return( s);
       if( s >= sentinel)
-         return( NULL); 
+         return( NULL);
 
       mulle_utf8_next_utf32character( &s);
    }
@@ -438,7 +362,7 @@ char  *mulle_utf8_characters_at_utf32_offset( char *data,
 
 
 uintptr_t   mulle_utf8_utf32_offset_at_characters( char *data,
-                                                   size_t length, 
+                                                   size_t length,
                                                    char *characters)
 {
    char        *s;
@@ -448,7 +372,7 @@ uintptr_t   mulle_utf8_utf32_offset_at_characters( char *data,
    s        = data;
    sentinel = &s[ length];
    if( characters > sentinel || characters < s)
-      return( NSNotFound); 
+      return( NSNotFound);
 
    for( n = 0;; n++)
    {
@@ -456,8 +380,8 @@ uintptr_t   mulle_utf8_utf32_offset_at_characters( char *data,
       {
          if( s == characters)
             return( n);
-         return( NSNotFound); 
-      } 
+         return( NSNotFound);
+      }
 
       mulle_utf8_next_utf32character( &s);
    }
@@ -467,25 +391,225 @@ uintptr_t   mulle_utf8_utf32_offset_at_characters( char *data,
 // utf32 offset (a la textRange) for offset in bytes into UTF8 string (a la selection)
 - (NSUInteger) textOffsetForCharacterOffset:(NSUInteger) offset
 {
-   uintptr_t   n;
-   char        *s;
+   uintptr_t               n;
+   char                    *s;
+   struct mulle_utf8data   data;
 
-   s = &_data.characters[ offset];   
-   n = mulle_utf8_utf32_offset_at_characters( _data.characters, _data.length, s);
+   data = [self textUTF8Data];
+   s    = &data.characters[ offset];
+   n    = mulle_utf8_utf32_offset_at_characters( data.characters, data.length, s);
    return( n);
 }
 
 
 // offset in bytes into UTF8 string (a la selection) for utf32 offset (a la textRange)
-- (NSUInteger) characterOffsetForTextOffset:(NSUInteger) offset;
+- (NSUInteger) characterOffsetForTextOffset:(NSUInteger) offset
 {
-   char  *s;
-   
-   s = mulle_utf8_characters_at_utf32_offset( _data.characters, _data.length, offset);
+   char                    *s;
+   struct mulle_utf8data   data;
+
+   data = [self textUTF8Data];
+   s    = &data.characters[ offset];
+   s    = mulle_utf8_characters_at_utf32_offset( data.characters, data.length, offset);
    if( ! s)
       return( NSNotFound);
-   return( s - _data.characters);
+   return( s - data.characters);
 }
 
+
+- (CGFloat) suggestedFontPixelSizeWithContext:(id <UILayoutContext>) context
+{
+   CGFloat      actualFontHeight;
+   CGFloat      probe;
+   CGFloat      factor;
+   CGRect       canvas;
+   CGRect       fontBounds;
+   NSUInteger   nRows;
+
+   canvas = [self insetCanvas];
+   if( canvas.size.height <= 0.0f)
+      return( 0.0);
+
+   factor = 1.0;
+   if( _textVerticalAlignment == UITextAlignmentVisualMiddle)
+   {
+      actualFontHeight = canvas.size.height;
+   }
+   else
+   {
+      [context useFontWithNameUTF8String:_fontNameUTF8String];
+      [context setTextAlign:NVG_ALIGN_LEFT | NVG_ALIGN_TOP];
+      [context setTextLetterSpacing:_textLetterSpacing];
+
+      probe = 32.0f;
+      [context setFontSize:probe];
+
+      fontBounds.size.height = 0.0;
+      if( _textVerticalAlignment == UITextAlignmentVisualFill)
+         fontBounds = [context visualBoundsOfText:_textData.characters
+                                           length:_textData.length];
+      // can happen if text is empty or just spaces
+      if(fontBounds.size.height == 0.0)
+         fontBounds = [context visualBoundsOfText:"|_;y\xB4" length:4];
+
+      actualFontHeight = fontBounds.size.height;
+      if( actualFontHeight != 0.0)
+         factor = probe / actualFontHeight;
+   }
+
+   nRows = [self numberOfRows];
+   if( ! nRows)
+      nRows = 1;
+
+   return( (CGFloat) (int) ((canvas.size.height / (CGFloat) nRows) * factor));
+}
+
+
+- (struct CATextLayerFontMetrics) fontMetricsWithLayoutContext:(id <UILayoutContext>) context
+{
+   struct CATextLayerFontMetrics   metrics;
+
+   // these properties can be INFINITY for special values
+   metrics.fontPixelSize = _fontPixelSize;
+   if( isinf( _fontPixelSize))
+      metrics.fontPixelSize = [self suggestedFontPixelSizeWithContext:context];
+
+   assert( ! isinf( metrics.fontPixelSize) && ! isnan( metrics.fontPixelSize));
+
+   metrics.textLineHeight = _textLineHeight;
+   if( isinf( metrics.textLineHeight))
+      metrics.textLineHeight = metrics.fontPixelSize;
+
+   assert( ! isinf( metrics.textLineHeight) && ! isnan( metrics.textLineHeight));
+
+   return( metrics);
+}
+
+
+- (struct CATextLayerFontMetrics) prepareLayoutContext:(id <UILayoutContext>) context
+{
+   struct CATextLayerFontMetrics   metrics;
+
+   [context useFontWithNameUTF8String:_fontNameUTF8String];
+
+   // set this last, depends on text letter spacing and font name
+   metrics = [self fontMetricsWithLayoutContext:context];
+   MulleUILog( "metrics: { %g, %g}", metrics.fontPixelSize, metrics.textLineHeight);
+   [context setFontSize:metrics.fontPixelSize];
+   [context setTextLineHeight:metrics.textLineHeight];
+
+   [context setTextAlign:UITextAlignmentToTextAlign( _textAlignment)];
+   [context setTextLetterSpacing:_textLetterSpacing];
+   [context setLineBreakMode:_lineBreakMode];
+
+   // memo we dont use vertical height, thats used by the layouter only
+   return( metrics);
+}
+
+
+- (BOOL) drawInContext:(CGContext *) context
+{
+   BOOL                    useClearType;
+   CGPaint                 *textBackgroundPaint;
+   CGPaint                 *textPaint;
+   CGPoint                 origin;
+   NSUInteger              i;
+   NSUInteger              nRows;
+   CGColor                 textColor;
+   CGColor                 textBackgroundColor;
+   struct CATextLayerRow   *row;
+   char                    *s;
+
+   if( ! [super drawInContext:context])
+      return( NO);
+
+   nRows = _mulle_structarray_get_count( &_rowArray);
+   // nothing to draw ? then bail
+   if( ! nRows)
+      return( YES);
+
+
+   // set font, size, alignment...
+   _renderedFontMetrics = [self prepareLayoutContext:context];
+
+   origin = _origin;
+
+   // if textPaint is not set, use color derived from :_backgroundPaint
+   textPaint = _textPaint ? _textPaint : [self suggestedTextPaint];
+   assert( textPaint);
+
+   // figure out if we can use clearType
+   // as we are a CALayer, we can't walk the ancestors up, so backgroundPaint
+   // has to be the exact color we are painting on
+
+   useClearType        = _clearTypeEnabled;
+   textBackgroundPaint = useClearType && _textBackgroundPaint
+                         ? _textBackgroundPaint
+                         : _backgroundPaint;
+
+   textColor           = [textPaint mainColor];
+   textBackgroundColor = [textBackgroundPaint mainColor];
+
+
+   useClearType &= [textBackgroundPaint isMonochrome] &&
+                   [textPaint isMonochrome] &&
+                   [_selectionPaint isMonochrome];
+   useClearType &= [textBackgroundPaint isOpaque];
+
+   CGContextClearType( context, useClearType);
+
+   for( i = 0; i < nRows; i++)
+   {
+      row = _mulle_structarray_get( &_rowArray, i);
+
+      /*
+       * Draw selection
+       */
+      if( _selectable)
+         switch( row->selectionStyle)
+         {
+         default :
+            CGContextFillRectWithPaintable( context, row->selectionRect, _selectionPaint);
+         case CATextLayerSelectionStyleNone :
+            break;
+         }
+
+      CGContextTextColor( context, textColor);
+      CGContextTextBackgroundColor( context, textBackgroundColor);
+
+      s = mulle_utf8data_characters_in_range( self->_textData, row->textRange);
+      CGContextText( context, origin, s, row->textRange.length);
+
+      /*
+       * Draw Cursor
+       */
+      if( _editing)
+      {
+         switch( row->cursorStyle)
+         {
+         default :
+            CGContextFillRectWithPaintable( context, row->cursorRect, _cursorPaint);
+         case CATextLayerCursorStyleNone :
+            break;
+         }
+      }
+
+      origin.y += _renderedFontMetrics.textLineHeight;
+
+   }
+   CGContextClearType( context, 0);
+
+   return( YES);
+}
+
+
+- (void) dumpPropertiesToFILE:(FILE *) fp
+{
+   mulle_fprintf( fp, "@fontNameUTF8String : %s\n", _fontNameUTF8String ? _fontNameUTF8String: "NULL");
+   mulle_fprintf( fp, "@fontPixelSize      : %g\n", [self fontPixelSize]);
+   mulle_fprintf( fp, "@textAlignment      : %s\n", UITextAlignmentUTF8String( _textAlignment));
+   mulle_fprintf( fp, "@textLetterSpacing  : %f\n", _textLetterSpacing);
+   mulle_fprintf( fp, "@textLineHeight     : %f\n", [self textLineHeight]);
+}
 
 @end

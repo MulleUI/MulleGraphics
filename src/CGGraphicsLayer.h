@@ -5,6 +5,20 @@
 @class CGGraphicsLayer;
 
 
+
+@protocol CGGraphicsLayerLayouter
+
+- (void) layoutLayer:(CGGraphicsLayer *) layer
+                info:(struct UILayoutInfo *) info;
+
+- (CGSize) layer:(CGGraphicsLayer *) layer
+    sizeThatFits:(CGSize) size
+         context:(id <UILayoutContext>) context;
+
+- (void) dumpWithIndent:(NSUInteger) indent
+                   FILE:(FILE *) fp;
+@end
+
 //
 // if the callback returns NO, then the drawInContext: method preempts.
 // If you return YES, then the drawing will be underneath whatever the
@@ -53,11 +67,9 @@ typedef BOOL   CGGraphicsLayerDrawCallback_t( CGGraphicsLayer *layer,
 @property CGGraphicsLayerDrawCallback_t    *drawCallback;
 
 @property( assign, getter=isTracingDrawCalls) BOOL   traceDrawCalls;
-
-
-
-
 @property( dynamic, assign) CGFloat        cornerRadius;
+
+@property( retain, nonserializable) id <CGGraphicsLayerLayouter>  layouter;
 
 
 // MEMO: initNoLock is actually the designated initializer funneled into by

@@ -37,7 +37,7 @@
 
 //
 // This class is useful for quick hacks and old-school demo effects.
-// Drawing is done to CPU memory and then copies to the CPU (every frame!)
+// Drawing is done to CPU memory and then copies to the GPU (every frame!)
 //
 // This class creates a CPU texture during drawInContext: and calls
 // -drawInBytes:bitmapInfo: to get it filled.

@@ -343,6 +343,10 @@ void  CGGraphicsLayerSetupDrawTransform( CGGraphicsLayer *self,
 - (CGSize) sizeThatFits:(CGSize) size
                 context:(id <UILayoutContext>) context
 {
+   if( _layouter)
+      return( [_layouter layer:self
+                  sizeThatFits:size
+                       context:context]);
    return( [self canvas].size);
 }
 

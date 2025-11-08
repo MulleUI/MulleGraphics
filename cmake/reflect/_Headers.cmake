@@ -64,11 +64,12 @@ src/CAImageLayer.h
 src/CAOpenGLLayer.h
 src/CAShadowLayer.h
 src/CAShapeLayer.h
-src/CATextLayer+Cursor.h
-src/CATextLayer+Layout.h
-src/CATextLayer+MulleGraphics.h
-src/CATextLayer+RowsAndGlyphs.h
-src/CATextLayer+Selection.h
+src/CATextLayerLayouter+CGGraphicsLayerLayouter.h
+src/CATextLayerLayouter+Cursor.h
+src/CATextLayerLayouter+Layout.h
+src/CATextLayerLayouter+RowsAndGlyphs.h
+src/CATextLayerLayouter+Selection.h
+src/CATextLayerLayouter.h
 src/CATextLayer.h
 src/CGGraphicsLayer+MulleGraphics.h
 src/CGGraphicsLayer.h

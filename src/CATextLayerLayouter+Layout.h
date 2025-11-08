@@ -1,5 +1,5 @@
 //
-//  CATextLayer+Drawing.m
+//  CATextLayer+Layout.m
 //  MulleGraphics
 //
 //  Copyright (c) <|YEAR|> Nat! - Mulle kybernetiK.
@@ -32,21 +32,40 @@
 //  ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 //  POSSIBILITY OF SUCH DAMAGE.
 //
-// prefer a local CATextLayer over one in import.h
+// prefer a local CATextLayerLayouter over one in import.h
 #ifdef __has_include
-# if __has_include( "CATextLayer.h")
-#  import "CATextLayer.h"
+# if __has_include( "CATextLayerLayouter.h")
+#  import "CATextLayerLayouter.h"
 # endif
 #endif
 
 // we want "import.h" always anyway
 #import "import.h"
 
-@class CGContext;
+
+@interface CATextLayerLayouter( Layout)
+
+- (CGPoint) textOriginInRect:(CGRect) rect
+                     context:(id <UILayoutContext>) context;
+- (CGPoint) textOriginWithContext:(id <UILayoutContext>) context;
 
 
-@interface CATextLayer( MulleGraphics)
+- (NSUInteger) characterOffsetAtPoint:(CGPoint) point;
 
-- (BOOL) drawInContext:(CGContext *) context;
+- (CGRect) glyphRectAtPoint:(CGPoint) point;
+
+@end
+
+
+@interface CATextLayer( CATextLayerLayouter_Layout_Forward)
+
+- (CGPoint) textOriginInRect:(CGRect) rect
+                     context:(id <UILayoutContext>) context;
+- (CGPoint) textOriginWithContext:(id <UILayoutContext>) context;
+
+
+- (NSUInteger) characterOffsetAtPoint:(CGPoint) point;
+
+- (CGRect) glyphRectAtPoint:(CGPoint) point;
 
 @end

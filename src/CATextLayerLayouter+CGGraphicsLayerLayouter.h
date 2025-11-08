@@ -1,5 +1,5 @@
 //
-//  CATextLayer+Layout.m
+//  CATextLayerLayouter+CGGraphicsLayerLayouter.m
 //  MulleGraphics
 //
 //  Copyright (c) <|YEAR|> Nat! - Mulle kybernetiK.
@@ -32,10 +32,10 @@
 //  ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 //  POSSIBILITY OF SUCH DAMAGE.
 //
-// prefer a local CATextLayer over one in import.h
+// prefer a local CATextLayerLayouter over one in import.h
 #ifdef __has_include
-# if __has_include( "CATextLayer.h")
-#  import "CATextLayer.h"
+# if __has_include( "CATextLayerLayouter.h")
+#  import "CATextLayerLayouter.h"
 # endif
 #endif
 
@@ -43,25 +43,10 @@
 #import "import.h"
 
 
-@interface CATextLayer( Layout)
+@interface CATextLayerLayouter( CGGraphicsLayerLayouter) < CGGraphicsLayerLayouter>
 
-- (CGPoint) textOriginInRect:(CGRect) rect
-                     context:(id <UILayoutContext>) context;
-- (CGPoint) textOriginWithContext:(id <UILayoutContext>) context;
-
-
-- (NSUInteger) characterOffsetAtPoint:(CGPoint) point;
-
-- (CGRect) glyphRectAtPoint:(CGPoint) point;
-
-//
-// given canvas size, calculate fontsize that fits visually.
-//
-- (CGFloat) fontPixelSizeWithContext:(id <UILayoutContext>) context;
-
-
-- (void) dumpLayoutToFILE:(FILE *) fp;
-
+// canvas can be zero and this will still work (given proper max)
+- (CGSize) layer:(CGGraphicsLayer *) layer
+    sizeThatFits:(CGSize) max
+         context:(id <UILayoutContext>) context;
 @end
-
-

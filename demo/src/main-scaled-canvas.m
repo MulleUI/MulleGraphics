@@ -63,14 +63,14 @@ static BOOL   drawStuff( CGGraphicsLayer *aLayer, CGContext *_context)
 
 int   main( int argc, char *argv[])
 {
-   UIWindow        *window;
-   UIApplication   *app;
-   UIView          *rootView;
-   UIView          *view;
-   CGRect          frame;
-   CGRect          bounds;
-   CALayer         *layer;
-   CGFloat         aspectFactor;
+   UIWindow          *window;
+   UIApplication     *app;
+   UIView            *rootView;
+   UIView            *view;
+   CGRect            frame;
+   CGRect            bounds;
+   CGGraphicsLayer   *layer;
+   CGFloat           aspectFactor;
 
    app = [UIApplication sharedInstance];
    {
@@ -84,8 +84,7 @@ int   main( int argc, char *argv[])
       [view setAutoresizingMask:UIViewAutoresizingFlexibleSize];
       [view setBackgroundColor:CGColorMakeWithRGBA( 0.33, 0.33, 0.33, 1.0)];
 
-      layer = (CGGraphicsLayer *) [view layer];
-      assert( layer);
+      layer = MULLE_OBJC_CLASS_CAST_NON_NIL( CGGraphicsLayer, [view layer]);
 
       [layer setDrawCallback:drawStuff];
 

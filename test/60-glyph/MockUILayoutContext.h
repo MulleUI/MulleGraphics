@@ -37,8 +37,10 @@
                           length:(NSUInteger) length;
 
 // Multi-line text handling methods
+// set textRowSize to sizeof( struct UITextRow) or anything larger
 - (NSInteger) getTextRows:(struct UITextRow *) outputRows
                     count:(NSUInteger) maxCount
+              textRowSize:(size_t) textRowSize
                      text:(char *) string
                    length:(NSUInteger) length
             breakRowWidth:(CGFloat) breakRowWidth;

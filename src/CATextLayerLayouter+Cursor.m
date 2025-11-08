@@ -1,64 +1,109 @@
 //
 // Copyright (c) 2020 Nat!, Mulle kybernetiK
 //
-#import "CATextLayer+Cursor.h"
+#import "CATextLayerLayouter+Cursor.h"
 
 #import "import-private.h"
 
-#import "CATextLayer+Selection.h"
+#import "CATextLayerLayouter+Selection.h"
+#import "CATextLayer.h"
 
 
+@implementation CATextLayerLayouter( Cursor)
 
-@implementation CATextLayer ( Cursor)
 
-// ------------------------------
-//
-//
-//
-// -------------------------------
-//
-// -------------------------------
+- (CGRect) cursorRectInRow:(NSUInteger) i
+{
+   CGFloat                       h;
+   CGFloat                       y;
+   CGPoint                       offset;
+   NSUInteger                    nGlyphs;
+   NSUInteger                    x;
+   struct CATextLayerLayouterRow   *row;
+   struct UIGlyphPosition        *glyphs;
+
+   if( MulleCursorPositionIsMax( _cursorPosition))
+      _cursorPosition = [self maxCursorPosition];
+
+   if( _cursorPosition.y != i)
+      return( CGRectZero);
+
+   // get glyphs for current row
+   row     = _mulle_structarray_get( &_rowArray, i);
+   glyphs  = _mulle_structarray_get( &_glyphArray, row->glyphRange.location);
+   nGlyphs = row->glyphRange.length;
+
+   // get glyphs
+   x = _cursorPosition.x;
+   if( x > nGlyphs)
+      return( CGRectZero);
+
+   offset.x = glyphs[ x].x;
+
+   h = _metrics.lineHeight;
+   y = 0.0f;
+   if( h >= 8.0f)
+   {
+      h -= 2;
+      y  = 1;
+   }
+   offset.y = -(_metrics.lineHeight / 2); // depends on alignment, really, use middle here
+
+   return( CGRectMake( offset.x - 0.5, _metrics.ascender + y, 1, _metrics.lineHeight));
+}
 
 
 
 - (CGFloat) offsetNeededToMakeCursorVisible
 {
-   CGPoint                       offset;
-   CGRect                        canvas;
-   CGFloat                       min;
    CGFloat                       diff;
+   CGFloat                       min;
+   CGPoint                       offset;
+   CGPoint                       origin;
+   CGRect                        canvas;
+   NSUInteger                    nGlyphs;
+   NSUInteger                    nRows;
+   struct CATextLayerLayouterRow   *row;
    struct UIGlyphPosition        *glyph;
-   struct CATextLayerRowGlyphs   *p;
+   struct UIGlyphPosition        *glyphs;
 
-   if( _cursorPosition.y >= _nRows)
+   nRows = _mulle_structarray_get_count( &_rowArray);
+   if( _cursorPosition.y >= nRows)
    {
       //MulleUILog( "1");
       return( 0.0);
    }
 
-   p = &_rowGlyphs[ _cursorPosition.y];
-   if( ! p->nGlyphs)
+   // get glyphs for current row
+   row     = _mulle_structarray_get( &_rowArray, _cursorPosition.y);
+   glyphs  = _mulle_structarray_get( &_glyphArray, row->glyphRange.location);
+   nGlyphs = row->glyphRange.length;
+
+   if( ! nGlyphs)
    {
       //MulleUILog( "1a");
       return( 0.0);
    }
       
-   if( _cursorPosition.x > p->nGlyphs)
+   if( _cursorPosition.x > nGlyphs)
    {
       //MulleUILog( "2");
       return( 0.0);
    }
-   canvas   = [self canvas];
+
+   canvas   = [_textLayer canvas];
 
    // if text fits in visible don't mess with it
 
-   glyph    = &p->glyphs[ 0];
-   offset.x = _layoutOrigin.x + glyph->x;
+   origin   = [_textLayer origin];
+
+   glyph    = &glyphs[ 0];
+   offset.x = origin.x + glyph->x;
    if( offset.x < CGRectGetMinX( canvas))
       goto scrolling;
    // use sentinel node to our advantage
-   glyph    = &p->glyphs[ p->nGlyphs];
-   offset.x = _layoutOrigin.x + glyph->x - 2.0;  // overshoot of nanovg
+   glyph    = &glyphs[ nGlyphs];
+   offset.x = origin.x + glyph->x - 2.0;  // overshoot of nanovg
    if( offset.x > CGRectGetMaxX( canvas))
       goto scrolling;
 
@@ -66,9 +111,9 @@
 
 // may need to scroll text to visible
 scrolling:   
-   glyph    = &p->glyphs[ _cursorPosition.x];
+   glyph    = &glyphs[ _cursorPosition.x];
 
-   offset.x = _layoutOrigin.x + glyph->x - 0.5; // why -0.5 ?
+   offset.x = origin.x + glyph->x - 0.5; // why -0.5 ?
    min      = canvas.size.width * 10.0 / 100.0;
 
    diff = (CGRectGetMinX( canvas) + min) - offset.x;
@@ -92,18 +137,24 @@ scrolling:
 - (MulleCursorPosition) cursorPositionForTextOffset:(NSUInteger) offset
 {
    MulleCursorPosition           cursorPosition;
-   struct CATextLayerRowGlyphs   *p;
+   NSUInteger                    nGlyphs;
+   NSUInteger                    nRows;
+   struct CATextLayerLayouterRow   *row;
 
-   if( ! _nRows)
+   nRows = _mulle_structarray_get_count( &_rowArray);
+
+   if( ! nRows)
       return( MulleCursorPositionNull); // or ?
 
    if( offset == NSNotFound)
       return( MulleCursorPositionNull); // or ?
 
-   for( cursorPosition.y = 0; cursorPosition.y < _nRows; cursorPosition.y++)
+   for( cursorPosition.y = 0; cursorPosition.y < nRows; cursorPosition.y++)
    {
-      p = &_rowGlyphs[ cursorPosition.y];
-      if( offset < p->nGlyphs)
+      row     = _mulle_structarray_get( &_rowArray, cursorPosition.y);
+      nGlyphs = row->glyphRange.length;
+
+      if( offset < nGlyphs)
       {
          cursorPosition.x = offset;
          return( cursorPosition);
@@ -111,9 +162,12 @@ scrolling:
    }
 
    // hmm shouldn't really happen
-   cursorPosition.y = _nRows - 1;
-   p = &_rowGlyphs[ cursorPosition.y];
-   cursorPosition.x = p->nGlyphs;
+   cursorPosition.y = nRows - 1;
+
+   row     = _mulle_structarray_get( &_rowArray, cursorPosition.y);
+   nGlyphs = row->glyphRange.length;
+
+   cursorPosition.x = nGlyphs;
    return( cursorPosition);
 }
 
@@ -122,28 +176,35 @@ scrolling:
 {
    NSUInteger   n;
 
-   n = [self textOffsetForCharacterOffset:offset];
+   n = [_textLayer textOffsetForCharacterOffset:offset];
    return( [self cursorPositionForTextOffset:n]);
 }
 
 
 - (NSUInteger) characterOffsetForCursorPosition:(MulleCursorPosition) cursorPosition
 {
-   struct CATextLayerRowGlyphs   *p;
+   NSUInteger                    nGlyphs;
+   NSUInteger                    nRows;
+   struct CATextLayerLayouterRow   *row;
    struct UIGlyphPosition        *glyph;
+   struct UIGlyphPosition        *glyphs;
    struct mulle_utf8data         data;
 
+   nRows = _mulle_structarray_get_count( &_rowArray);
    if( MulleCursorPositionIsMax( cursorPosition))
       cursorPosition = [self maxCursorPosition];
 
-   if( cursorPosition.y >= _nRows)
+   if( cursorPosition.y >= nRows)
       return( NSNotFound);
 
-   p = &_rowGlyphs[ cursorPosition.y];
-   if( cursorPosition.x > p->nGlyphs)
+   row     = _mulle_structarray_get( &_rowArray, cursorPosition.y);
+   glyphs  = _mulle_structarray_get( &_glyphArray, row->glyphRange.location);
+   nGlyphs = row->glyphRange.length;
+
+   if( cursorPosition.x > nGlyphs)
       return( NSNotFound);
 
-   glyph = &p->glyphs[ cursorPosition.x];
+   glyph = &glyphs[ cursorPosition.x];
 
    // nothing to draw ? then bail
    data = [self textUTF8DataInTextRange];
@@ -153,74 +214,119 @@ scrolling:
 
 - (CGPoint) pointAboveCursorPosition:(MulleCursorPosition) cursorPosition
 {
-   struct CATextLayerRowGlyphs   *p;
+   CGPoint                       origin;
+   NSUInteger                    nGlyphs;
+   NSUInteger                    nRows;
+   struct CATextLayerLayouterRow   *row;
+   struct UIGlyphPosition        *glyphs;
 
+   nRows = _mulle_structarray_get_count( &_rowArray);
    if( MulleCursorPositionIsMax( cursorPosition))
       cursorPosition = [self maxCursorPosition];
 
-   if( cursorPosition.y < 0 || cursorPosition.y >= _nRows)
+   if( cursorPosition.y < 0 || cursorPosition.y >= nRows)
       return( CGPointMake( -1, -1));
 
-   p = &_rowGlyphs[ cursorPosition.y];
-   if( cursorPosition.x < 0 || cursorPosition.x > p->nGlyphs)
+   row     = _mulle_structarray_get( &_rowArray, cursorPosition.y);
+   glyphs  = _mulle_structarray_get( &_glyphArray, row->glyphRange.location);
+   nGlyphs = row->glyphRange.length;
+
+   if( cursorPosition.x < 0 || cursorPosition.x > nGlyphs)
       return( CGPointMake( -1, -1));
 
-   return( CGPointMake( _layoutOrigin.x + p->glyphs[ cursorPosition.x].x,
-                        _layoutOrigin.y - 1.0));
+   origin = [_textLayer origin];
+   return( CGPointMake( origin.x + glyphs[ cursorPosition.x].x,
+                        origin.y - 1.0));
 }
 
 
 - (CGPoint) pointBelowCursorPosition:(MulleCursorPosition) cursorPosition
 {
-   struct CATextLayerRowGlyphs   *p;
+   CGPoint                       origin;
+   NSUInteger                    nGlyphs;
+   NSUInteger                    nRows;
+   struct CATextLayerLayouterRow   *row;
+   struct UIGlyphPosition        *glyphs;
 
+   nRows = _mulle_structarray_get_count( &_rowArray);
    if( MulleCursorPositionIsMax( cursorPosition))
       cursorPosition = [self maxCursorPosition];
 
-   if( cursorPosition.y < 0 || cursorPosition.y >= _nRows)
+   if( cursorPosition.y < 0 || cursorPosition.y >= nRows)
       return( CGPointMake( -1, -1));
 
-   p = &_rowGlyphs[ cursorPosition.y];
-   if( cursorPosition.x < 0 || cursorPosition.x > p->nGlyphs)
+   row     = _mulle_structarray_get( &_rowArray, cursorPosition.y);
+   glyphs  = _mulle_structarray_get( &_glyphArray, row->glyphRange.location);
+   nGlyphs = row->glyphRange.length;
+
+   if( cursorPosition.x < 0 || cursorPosition.x > nGlyphs)
       return( CGPointMake( -1, -1));
 
-   return( CGPointMake( _layoutOrigin.x + p->glyphs[ cursorPosition.x].x,
-                        _layoutOrigin.y + 0.0));
+   origin = [_textLayer origin];
+   return( CGPointMake( origin.x + glyphs[ cursorPosition.x].x,
+                        origin.y + 0.0));
 }
 
 
 - (MulleCursorPosition) cursorPositionForPoint:(CGPoint) point
 {
    CGFloat                       search;
+   CGPoint                       origin;
    NSInteger                     x;
    NSInteger                     y;
-   struct CATextLayerRowGlyphs   *p;
+   NSUInteger                    nGlyphs;
+   NSUInteger                    nRows;
+   struct CATextLayerLayouterRow   *row;
+   struct UIGlyphPosition        *glyphs;
 
+   origin = [_textLayer origin];
+   nRows  = _mulle_structarray_get_count( &_rowArray);
    // figure out the row that was hit, a row is _metrics.lineHeight and
-   // drawn at frame.origin.y + _layoutOrigin.y  + i *_metrics.lineHeight
-   y = (NSInteger) round( (point.y -_layoutOrigin.y) / _metrics.lineHeight);
+   // drawn at frame.origin.y + origin.y  + i *_metrics.lineHeight
+   y = (NSInteger) round( (point.y -origin.y) / _metrics.lineHeight);
    if( y < 0) 
       return( MulleCursorPositionMake( 0, 0));
-   if( y >= _nRows)
+   if( y >= nRows)
       return( MulleCursorPositionMax);
 
-   p = &_rowGlyphs[ y];
-   // calculate characters up till till this
+   row     = _mulle_structarray_get( &_rowArray, y);
+   glyphs  = _mulle_structarray_get( &_glyphArray, row->glyphRange.location);
+   nGlyphs = row->glyphRange.length;   // calculate characters up till till this
 
    // TODO: binary search anyone ?
-   search = point.x - _layoutOrigin.x;
-   for( x = 0; x < p->nGlyphs; x++)
+   search = point.x - origin.x;
+   for( x = 0; x < nGlyphs; x++)
    {
-      if( search >= p->glyphs[ x].x && search < p->glyphs[ x + 1].x)
+      if( search >= glyphs[ x].x && search < glyphs[ x + 1].x)
       {
          // check if hitting left or right side
-         if( search >= p->glyphs[ x].x + (p->glyphs[ x + 1].x - p->glyphs[ x].x) / 2)
+         if( search >= glyphs[ x].x + (glyphs[ x + 1].x - glyphs[ x].x) / 2)
             x++;
          return( MulleCursorPositionMake( x, y));
       }
    }
 
    return( MulleCursorPositionNull);
+}
+
+
+- (MulleCursorPosition) maxCursorPosition
+{
+   NSUInteger                    nGlyphs;
+   NSUInteger                    nRows;
+   struct CATextLayerLayouterRow   *row;
+
+   nRows = _mulle_structarray_get_count( &_rowArray);
+   if( ! nRows)
+      return( MulleCursorPositionMax);
+
+   row     = _mulle_structarray_get( &_rowArray, nRows - 1);
+   nGlyphs = row->glyphRange.length;
+
+   if( ! nGlyphs)
+      return( MulleCursorPositionMax);
+
+   return( MulleCursorPositionMake( nGlyphs, nRows - 1));
 }
 
 
@@ -251,22 +357,6 @@ scrolling:
 }
 
 
-- (MulleCursorPosition) maxCursorPosition
-{
-   NSUInteger   x;
-   NSUInteger   y;
-
-   if( ! _nRows)
-      return( MulleCursorPositionMax);
-
-   y = _nRows - 1;
-   x = _rowGlyphs[ y].nGlyphs;
-   if( ! x)
-      return( MulleCursorPositionMax);
-
-   return( MulleCursorPositionMake( x, y));
-}
-
 
 - (BOOL) deleteSelectionIfNeeded
 {
@@ -281,11 +371,12 @@ scrolling:
 // typed like mulle_utf32_t
 - (void) insertUTF32Character:(int32_t) c
 {
-   char                     *result;
-   char                     *s;
    MulleCursorPosition      cursorPosition;
    NSUInteger               pos;
+   char                     *result;
+   char                     *s;
    struct mulle_allocator   *allocator;
+   struct mulle_utf8data    data;
 
    [self deleteSelectionIfNeeded];
 
@@ -294,10 +385,11 @@ scrolling:
    if( pos == NSNotFound)
       return;
 
-   assert( pos < _data.length);
+   data = [_textLayer textUTF8Data];
+   assert( pos < data.length);
 
    allocator = MulleObjCInstanceGetAllocator( self);
-   s         = [self textUTF8String];
+   s         = [_textLayer textUTF8String];
    mulle_buffer_do_string( buffer, allocator, result)
    {
       mulle_buffer_add_bytes( buffer, s, pos);
@@ -308,7 +400,7 @@ scrolling:
       mulle_buffer_add_string( buffer, &s[ pos]);
    }
 
-   [self setTextUTF8String:result];
+   [_textLayer setTextUTF8String:result];
 
    // naive!! need to consider line breaks
    cursorPosition.x++;
@@ -324,10 +416,10 @@ scrolling:
 // cursor position is in Unicode characters...
 - (void) backspaceCharacter
 {
-   char                  *s;
    MulleCursorPosition   cursorPosition;
    NSUInteger            pos1;
    NSUInteger            pos2;
+   char                  *s;
 
    if( [self deleteSelectionIfNeeded])
       return;
@@ -341,9 +433,9 @@ scrolling:
    pos1           = [self characterOffsetForCursorPosition:cursorPosition];
    if( pos1 == NSNotFound)
       return;
-   s              = [self textUTF8String];
+   s              = [_textLayer textUTF8String];
    s = MulleObjC_asprintf( "%.*s%s", (int) pos1, s, &s[ pos2]);
-   [self setTextUTF8String:s];
+   [_textLayer setTextUTF8String:s];
    [self setCursorPosition:cursorPosition];
 }
 
@@ -371,9 +463,9 @@ scrolling:
 
    --cursorPosition.x;
    
-   s              = [self textUTF8String];
+   s              = [_textLayer textUTF8String];
    s = MulleObjC_asprintf( "%.*s%s", (int) pos1, s, &s[ pos2]);
-   [self setTextUTF8String:s];
+   [_textLayer setTextUTF8String:s];
    [self setCursorPosition:cursorPosition];
 }
 
@@ -415,15 +507,15 @@ scrolling:
 
 - (struct MulleCursorUTF8Data) cursorUTF8Data
 {
-   struct MulleCursorUTF8Data  info;
-   NSUInteger                  offset;
    MulleCursorPosition         cursorPosition;
+   NSUInteger                  offset;
+   struct MulleCursorUTF8Data  info;
    struct mulle_utf8data       data;
 
-   cursorPosition = [self cursorPosition];
-   offset         = [self characterOffsetForCursorPosition:cursorPosition];
+   cursorPosition       = [self cursorPosition];
+   offset               = [self characterOffsetForCursorPosition:cursorPosition];
 
-   data                 = [self textUTF8DataInTextRange];
+   data                 = [_textLayer textUTF8DataInTextRange];
    info.dataUpToCursor  = mulle_utf8data_make( data.characters, offset);
    info.dataAfterCursor = mulle_utf8data_make( &data.characters[ offset], data.length);
    return( info);

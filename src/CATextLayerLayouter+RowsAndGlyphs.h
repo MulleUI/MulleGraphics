@@ -34,8 +34,8 @@
 //
 // prefer a local CATextLayer over one in import.h
 #ifdef __has_include
-# if __has_include( "CATextLayer.h")
-#  import "CATextLayer.h"
+# if __has_include( "CATextLayerLayouter.h")
+#  import "CATextLayerLayouter.h"
 # endif
 #endif
 
@@ -106,30 +106,18 @@ static inline int   CAGlyphSeatingIsNull( struct CAGlyphSeating a)
 
 
 
-@interface CATextLayer( RowsAndGlyphs)
+@interface CATextLayerLayouter( RowsAndGlyphs)
 
-// called by the layouter, sets context properties and
-// calls updateRowsAndGlyphsWithContext if needed
-- (void) prepareRowsAndGlyphsWithContextIfNeeded:(id <UILayoutContext>) context;
-- (void) prepareRowsAndGlyphsWithContext:(id <UILayoutContext>) context;
-
-
-// called by property setter to invalidate
-- (void) invalidateRowsAndGlyphs;
-
-
-- (void) updateRowsAndGlyphsWithContext:(id <UILayoutContext>) context;
+// these are called on demand
+- (void) updateRowsWithContextIfNeeded:(id <UILayoutContext>) context;
+- (void) updateGlyphsWithContextIfNeeded:(id <UILayoutContext>) context;
 - (void) updateRowsAndGlyphsWithContextIfNeeded:(id <UILayoutContext>) context;
 
-
-// canvas can be zero and this will still work (given proper max)
-- (CGSize) sizeThatFits:(CGSize) max
-                context:(id <UILayoutContext>) context;
 
 // The text origin without -textOffset added. This calculates the base for the
 // origin of a text for drawing. You don't pass the visual bounds, but the area
 // you want to draw the text into with alignments.
-// (This is used to calculate _layoutOrigin when rect == [self canvas])
+// (This is used to calculate _origin when rect == [self canvas])
 // the -[CALayer insets] are not calculated into the bounds, so for
 // the position in the canvas you have to use
 //
@@ -155,6 +143,47 @@ static inline int   CAGlyphSeatingIsNull( struct CAGlyphSeating a)
 - (CAGlyphSeating) getGlyphPosition:(struct UIGlyphPosition  *) glyphPosition
                             atPoint:(CGPoint) point;
 
+
+- (void) dumpRowsAndGlyphsToFILE:(FILE *) fp;
+
+@end
+
+
+@interface CATextLayer( CATextLayerLayouter_RowsAndGlyphs_Forward)
+
+
+// canvas can be zero and this will still work (given proper max)
+- (CGSize) sizeThatFits:(CGSize) max
+                context:(id <UILayoutContext>) context;
+
+// The text origin without -textOffset added. This calculates the base for the
+// origin of a text for drawing. You don't pass the visual bounds, but the area
+// you want to draw the text into with alignments.
+// (This is used to calculate _origin when rect == [self canvas])
+// the -[CALayer insets] are not calculated into the bounds, so for
+// the position in the canvas you have to use
+//
+// boundsInCanvas = UITextVisualBoundsExtrude( vbounds, [layer insets]);
+//
+// The visualBounds are purely based on font information. They do not take
+// into account alignment or other non-font layouting information. i.e.
+// perfect for Left and Baseline, all others need compensation for the
+// changed origin.
+//
+- (CGRect) visualBoundsWithContext:(id <UILayoutContext>) context
+                            insets:(struct MulleEdgeInsets) insets;
+
+// convenience with CATextLayerVisualBoundsInsets as value for insets
+- (CGRect) visualBoundsWithContext:(id <UILayoutContext>) context;
+
+// does not call updateRowsAndGlyphsWithContextIfNeeded: you must ensure that
+// the glyphInformation is not stale
+- (NSUInteger) characterOffsetOfGlyphAtPoint:(CGPoint) point;
+
+// does not call updateRowsAndGlyphsWithContextIfNeeded: you must ensure that
+// the glyphInformation is not stale
+- (CAGlyphSeating) getGlyphPosition:(struct UIGlyphPosition  *) glyphPosition
+                            atPoint:(CGPoint) point;
 
 - (void) dumpRowsAndGlyphsToFILE:(FILE *) fp;
 

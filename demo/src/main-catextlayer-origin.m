@@ -83,43 +83,43 @@
 {
    CATextLayer           *textLayer;
    CGRect                frame;
+   CGRect                rect;
    id <UILayoutContext>  context;
    NSInteger             tag;
 
    tag = [layer tag];
-   if( tag < 1 || tag > 3)
+   if( tag >= 1 && tag <= 3)
    {
-      [super layoutAuxillaryLayer:layer
-                       layoutInfo:info];
-      return;
+      context    = [self layoutContext];
+      rect       = [self contentRect];
+      textLayer  = MULLE_OBJC_CLASS_CAST( CATextLayer, layer);
+      frame.size = [textLayer sizeThatFits:rect.size
+                                   context:context];
+
+      // add some space so we notice an alignment
+      frame.size.width += 64;
+
+      switch( tag)
+      {
+      case 1 : // Left Aligned
+         frame.origin = CGPointMake( CGRectGetMidX( info->rect),
+                                     CGRectGetMidY( info->rect) - 32);
+         break;
+
+      case 2 : // Center Aligned
+         frame.origin = CGPointMake( CGRectGetMidX( info->rect) - frame.size.width / 2.0,
+                                     CGRectGetMidY( info->rect));
+         break;
+
+      case 3 : // Right Aligned
+         frame.origin = CGPointMake( CGRectGetMidX( info->rect) - frame.size.width,
+                                     CGRectGetMidY( info->rect) + 32);
+         break;
+      }
+
+      [layer setFrame:frame];
    }
 
-   context    = [self layoutContext];
-   textLayer  = MULLE_OBJC_CLASS_CAST( CATextLayer, layer);
-   frame.size = [textLayer sizeThatFits:[self contentRect].size
-                                context:context];
-
-   // add some space so we notice an alignment
-   frame.size.width += 64;
-
-   switch( tag)
-   {
-   case 1 : // Left Aligned
-      frame.origin = CGPointMake( CGRectGetMidX( info->rect),
-                                  CGRectGetMidY( info->rect) - 32);
-      break;
-
-   case 2 : // Center Aligned
-      frame.origin = CGPointMake( CGRectGetMidX( info->rect) - frame.size.width / 2.0,
-                                  CGRectGetMidY( info->rect));
-      break;
-
-   case 3 : // Right Aligned
-      frame.origin = CGPointMake( CGRectGetMidX( info->rect) - frame.size.width,
-                                  CGRectGetMidY( info->rect) + 32);
-      break;
-   }
-   [layer setFrame:frame];
    [super layoutAuxillaryLayer:layer
                     layoutInfo:info];
 }

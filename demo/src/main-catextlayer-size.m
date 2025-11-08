@@ -11,8 +11,8 @@
 
 - (BOOL) drawInContext:(CGContext *) context
 {
-   CGRect                      vbounds;
-   struct MulleEdgeInsets      insets;
+   CGRect                   vbounds;
+   struct MulleEdgeInsets   insets;
 
     //
    // draw visual bounds on top of what CATextLayer drew
@@ -36,12 +36,6 @@
    return( YES);
 }
 
-- (void) didDrawInContext:(CGContext *) context
-{
-   [self dumpLayoutToFILE:stderr];
-   [self dumpRowsAndGlyphsToFILE:stderr];
-}
-
 @end
 
 
@@ -63,7 +57,7 @@ static void   changeLayerString( UIView *view)
 {
    CATextLayer              *layer;
    CGFloat                  insetValue;
-   CGLayoutContext          *context;
+   id <UILayoutContext>     context;
    CGRect                   frame;
    CGSize                   size;
    char                     *s;

@@ -25,10 +25,10 @@
 
 - (BOOL) drawInContext:(CGContext *) context
 {
-   BOOL     flag;
-   CGRect   canvas;
-   CGFloat  ascender;
-   CGFloat  descender;
+   BOOL      flag;
+   CGFloat   ascender;
+   CGFloat   descender;
+   CGRect    canvas;
 
    canvas = [self canvas];
    CGContextStrokeLineWithColor( context, 
@@ -37,7 +37,6 @@
                                  1.0,
                                  CGColorMakeWhite());
    // compute metrics or get ascendet for baseline
-   [self updateRowsAndGlyphsWithContextIfNeeded:context];
    ascender = [self fontAscender];
    CGContextStrokeLineWithColor( context, 
                                  CGPointMake( 0, 
@@ -58,10 +57,10 @@
    [super drawInContext:context];
    
    CGContextFillCircleWithColor( context,
-                                 CACircleMakeWithCenterAndRadius( _layoutOrigin, 8.0),
+                                 CACircleMakeWithCenterAndRadius( _origin, 8.0),
                                  CGColorMakePapaya());
    CGContextStrokeCircleWithColor( context,
-                                   CACircleMakeWithCenterAndRadius( _layoutOrigin, 8.0),
+                                   CACircleMakeWithCenterAndRadius( _origin, 8.0),
                                    1.0,
                                    CGColorMakeWhite());
    return( YES);
@@ -147,7 +146,7 @@
    CGRect                extrudedRect;
    CGRect                rect;
 
-   tag = [layer tag];
+   tag    = [layer tag];
    switch( tag)
    {
    case 1 : 
@@ -174,8 +173,8 @@
       frame.origin.x = CGRectGetMidX( frame);
       frame.origin.y = CGRectGetMaxY( frame) + 10.0;
 
-      frame.size     = [infoLayer sizeThatFits:info->rect.size
-                                       context:info->context];
+      frame.size     = [textLayer sizeThatFits:info->rect.size
+                                    context:info->context];
       frame.origin.x -= frame.size.width / 2.0;
       [layer setFrame:frame];
       break;
@@ -183,12 +182,11 @@
    case -2 :
       outlineFrame  = CGRectZero;
       outlineLayer  = MULLE_OBJC_CLASS_CAST( CGGraphicsLayer, layer);
-
       textLayer     = MULLE_OBJC_CLASS_CAST( CATextLayer, [self layerWithTag:1]);
-      [textLayer updateRowsAndGlyphsWithContextIfNeeded:info->context];
 
       point         = [self convertPoint:[self mouseLocation]
                                  toLayer:textLayer];
+
       rect          = [textLayer glyphRectAtPoint:point];
       if( ! CGRectIsNull( rect))
       {
@@ -238,8 +236,8 @@ static UITextVerticalAlignment   values[] =
    UITextAlignmentTop,
    UITextAlignmentBottom,
    UITextAlignmentBaseline,          // only for single line
-   UITextAlignmentBoundsMiddle,      // only for single line
-   UITextAlignmentVisualMiddle 
+   UITextAlignmentVisualMiddle,
+   UITextAlignmentVisualFill
 };
 #define n_values (sizeof( values) / sizeof( values[ 0]))
 

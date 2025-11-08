@@ -338,6 +338,7 @@ static struct GlyphMetrics   glyphMetrics[ MOCK_FONT_ASCII_COUNT] =
 #pragma mark - Multi-Line Text Handling
 - (NSInteger)getTextRows:(struct UITextRow *)outputRows
                    count:(NSUInteger)maxCount
+             textRowSize:(size_t) textRowSize
                     text:(char *)string
                   length:(NSUInteger)length
            breakRowWidth:(CGFloat)breakRowWidth
@@ -350,6 +351,8 @@ static struct GlyphMetrics   glyphMetrics[ MOCK_FONT_ASCII_COUNT] =
     NSUInteger i;
     NSUInteger start;
 
+    assert( textRowSize == sizeof( struct struct UITextRow));
+
     charWidth = 0.0f;
     currentWidth = 0.0f;
     scale = [self fontSize] / 12.0f;
@@ -359,7 +362,7 @@ static struct GlyphMetrics   glyphMetrics[ MOCK_FONT_ASCII_COUNT] =
 
     // Start first row
     if (outputRows) {
-        outputRows[rowCount].start = string;
+        outputRows[rowCount].range.location = 0;
     }
 
     for (i = 0; i < length; i++) {
@@ -397,10 +400,11 @@ static struct GlyphMetrics   glyphMetrics[ MOCK_FONT_ASCII_COUNT] =
                 }
 
                 // Finalize current row
-                if (outputRows) {
-                    outputRows[rowCount].end = &string[i];
+                if (outputRows) 
+                {
+                    outputRows[rowCount].range.length = i- outputRows[rowCount].location];
                     outputRows[rowCount].width = currentWidth;
-                    outputRows[rowCount].next = &string[start];
+                    outputRows[rowCount].next  = &string[start];
                 }
 
                 rowCount++;
@@ -410,7 +414,7 @@ static struct GlyphMetrics   glyphMetrics[ MOCK_FONT_ASCII_COUNT] =
 
                 // Start new row
                 if (outputRows) {
-                    outputRows[rowCount].start = &string[start];
+                    outputRows[rowCount].range.location = start;
                 }
                 currentWidth = 0.0f;
             }
@@ -422,9 +426,8 @@ static struct GlyphMetrics   glyphMetrics[ MOCK_FONT_ASCII_COUNT] =
             if (ch == '\n') {
                 // Finalize the current row on encountering a newline
                 if (outputRows) {
-                    outputRows[rowCount].end = &string[i];
+                    outputRows[rowCount].range.length = i - outputRows[rowCount].location];
                     outputRows[rowCount].width = currentWidth;
-                    outputRows[rowCount].next = NULL;
                 }
                 rowCount++;
                 currentWidth = 0.0f;  // Reset for the next row
@@ -434,7 +437,7 @@ static struct GlyphMetrics   glyphMetrics[ MOCK_FONT_ASCII_COUNT] =
 
                 // Start the new row right after the newline
                 if (outputRows) {
-                    outputRows[rowCount].start = &string[i + 1];
+                    outputRows[rowCount].range.location = i + 1;
                 }
                 start = i + 1;
             }
@@ -444,16 +447,15 @@ static struct GlyphMetrics   glyphMetrics[ MOCK_FONT_ASCII_COUNT] =
     // Handle the final row after the loop
     if (rowCount < maxCount) {
         if (outputRows) {
-            outputRows[rowCount].end = &string[length];
+            outputRows[rowCount].range.length = length - outputRows[rowCount].location];
             outputRows[rowCount].width = currentWidth;
-            outputRows[rowCount].next = NULL;
         }
         rowCount++;
     }
 
     return rowCount;
 }
-
+   
 
 - (CGRect) boundsOfTextRows:(struct UITextRow *)rows
                       count:(NSUInteger)count

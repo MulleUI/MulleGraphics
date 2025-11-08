@@ -24,6 +24,7 @@ src/main-catextlayer.m
 src/main-catextlayer-multiline.m
 src/main-catextlayer-origin.m
 src/main-catextlayer-origin-multiline.m
+src/main-catextlayer-pure.m
 src/main-catextlayer-size.m
 src/main-checkerboard.m
 src/main-graphicslayer-bgborder.m

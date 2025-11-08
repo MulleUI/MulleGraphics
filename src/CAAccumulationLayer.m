@@ -70,7 +70,10 @@
 
 - (void) mulleGainAccessWithUniquingSet:(struct mulle_pointerset *) uniquing
 {
+   assert( mulle_pointerset_get( uniquing, self) == self);
+
    [super mulleGainAccessWithUniquingSet:uniquing];
+
    [self->_framebuffer[ 0] mulleGainAccessWithUniquingSet:uniquing];
    [self->_framebuffer[ 1] mulleGainAccessWithUniquingSet:uniquing];
 }
@@ -78,6 +81,8 @@
 
 - (void) mulleRelinquishAccessWithUniquingSet:(struct mulle_pointerset *) uniquing
 {
+   assert( mulle_pointerset_get( uniquing, self) == self);
+
    [self->_framebuffer[ 1] mulleRelinquishAccessWithUniquingSet:uniquing];
    [self->_framebuffer[ 0] mulleRelinquishAccessWithUniquingSet:uniquing];
    [super mulleRelinquishAccessWithUniquingSet:uniquing];

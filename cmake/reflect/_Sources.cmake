@@ -25,11 +25,12 @@ src/CAShadowLayer.m
 src/CAShadowLayer+nanovg.m
 src/CAShapeLayer.m
 src/CAShapeLayer+nanovg.m
-src/CATextLayer+Cursor.m
-src/CATextLayer+Layout.m
-src/CATextLayer+MulleGraphics.m
-src/CATextLayer+RowsAndGlyphs.m
-src/CATextLayer+Selection.m
+src/CATextLayerLayouter+CGGraphicsLayerLayouter.m
+src/CATextLayerLayouter+Cursor.m
+src/CATextLayerLayouter+Layout.m
+src/CATextLayerLayouter+RowsAndGlyphs.m
+src/CATextLayerLayouter+Selection.m
+src/CATextLayerLayouter.m
 src/CATextLayer.m
 src/CGGraphicsLayer+MulleGraphics.m
 src/CGGraphicsLayer.m

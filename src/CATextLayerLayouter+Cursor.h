@@ -3,10 +3,17 @@
 //
 // prefer a local CATextLayer over one in import.h
 #ifdef __has_include
+# if __has_include( "CATextLayerLayouter.h")
+#  import "CATextLayerLayouter.h"
+# endif
+#endif
+
+#ifdef __has_include
 # if __has_include( "CATextLayer.h")
 #  import "CATextLayer.h"
 # endif
 #endif
+
 
 // we want "import.h" always anyway
 #import "import.h"
@@ -23,7 +30,43 @@ struct MulleCursorUTF8Data
 };
 
 
-@interface CATextLayer( Cursor)
+@interface CATextLayerLayouter( Cursor)
+
+- (CGRect) cursorRectInRow:(NSUInteger) i;
+
+- (CGFloat) offsetNeededToMakeCursorVisible;
+
+// point is within bounds
+- (MulleCursorPosition) cursorPositionForPoint:(CGPoint) point;
+- (NSUInteger) characterOffsetForCursorPosition:(MulleCursorPosition) cursor;
+
+// point is in pixels starting from 0,0
+- (CGPoint) pointAboveCursorPosition:(MulleCursorPosition) cursor;
+- (CGPoint) pointBelowCursorPosition:(MulleCursorPosition) cursor;
+
+// offset in bytes into UTF8 string translated to cursor position
+- (MulleCursorPosition) cursorPositionForCharacterOffset:(NSUInteger) offset;
+- (MulleCursorPosition) cursorPositionForTextOffset:(NSUInteger) offset;
+
+// point is within bounds
+- (void) setCursorPositionToPoint:(CGPoint) point;
+
+- (MulleCursorPosition) maxCursorPosition;
+
+/*
+ * keyboard support here for now
+ */
+- (void) insertUTF32Character:(int32_t) c;
+- (void) backspaceCharacter;
+
+- (struct MulleCursorUTF8Data) cursorUTF8Data;
+
+@end
+
+
+@interface CATextLayer( CATextLayerLayouter_Cursor_Forward)
+
+- (CGRect) cursorRectInRow:(NSUInteger) i;
 
 - (CGFloat) offsetNeededToMakeCursorVisible;
 

@@ -11,10 +11,10 @@
 
 - (BOOL) drawInContext:(CGContext *) context
 {
-   CGRect                   vbounds;
    CGPoint                  point;
-   struct MulleEdgeInsets   insets;
    CGRect                   canvas;
+   CGRect                   vbounds;
+   struct MulleEdgeInsets   insets;
 
    //
    // draw visual bounds on top of what CATextLayer drew
@@ -35,7 +35,7 @@
 
    vbounds = [self visualBoundsWithContext:context];
    MulleUICLog( "vbounds: %s", CGRectUTF8String( vbounds));
-   point   = [self textOriginInRect:canvas
+   point   = [self textOriginInRect:[self insetCanvas]
                             context:context];
    MulleUICLog( "point  : %s", CGPointUTF8String( point));
    point   = CGPointAdd( point, [self textOffset]);
@@ -52,18 +52,12 @@
    }
    CGContextRestore( context);
 
-   // draw _layoutOrigin marker
+   // draw _origin marker
    CGContextFillCircleWithColor( context, 
-                                 CACircleMakeWithCenterAndRadius( _layoutOrigin, 10.0),
+                                 CACircleMakeWithCenterAndRadius( _origin, 10.0),
                                  CGColorMakeBlue());
 
    return( YES);
-}
-
-- (void) didDrawInContext:(CGContext *) context
-{
-   [self dumpLayoutToFILE:stderr];
-   [self dumpRowsAndGlyphsToFILE:stderr];
 }
 
 @end
