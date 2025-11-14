@@ -1,0 +1,34 @@
+=== Basic Text Set/Get ===
+Set string: "VfL Bochum", got: "VfL Bochum"
+Set data: "1848", got: "1848" (length: 4)
+Set empty string, got: "" (length: 0)
+
+=== Generation Count ===
+Initial count: 1
+After setText: 2 (increment: 1)
+After setText again: 3 (increment: 1)
+After setFontPixelSize: 4 (increment: 1)
+
+=== Row Management ===
+Initial row count: 0
+After setText (wipes rows): 0
+After addTextLayerRow: 1
+After addTextLayerRows (3): 4
+After removeAllTextLayerRows: 0
+
+=== Text Data Without Null Terminator ===
+Setting data without null: length=3
+Retrieved data: "VfL" (length: 3)
+Retrieved string: "VfL" (strlen: 3)
+
+=== Multiple Mutations ===
+Text: "A", gen: 2
+Text: "AB", gen: 3
+Text: "ABC", gen: 4
+
+=== Property Changes ===
+Initial: 2
+After setFontPixelSize: 3 (delta: 1)
+After setTextLetterSpacing: 4 (delta: 1)
+After setTextLineHeight: 5 (delta: 1)
+After setTextAlignment: 6 (delta: 1)

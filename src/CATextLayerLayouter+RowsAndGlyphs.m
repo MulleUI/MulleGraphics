@@ -165,48 +165,49 @@
    lineHeight = _metrics.lineHeight;
    max        = (size.height / lineHeight) + 2;
 
+   // nRows = 0 can happen if we have just whitespace or ""
    nRows      = [context getTextRows:NULL
                                count:max
                          textRowSize:sizeof( struct CATextLayerLayouterRow)
                                 text:data.characters
                               length:data.length
                        breakRowWidth:width];
-   if( ! nRows)
-      nRows = 1;
-
-   arraySize = _mulle_structarray_get_size( &_rowArray);
-   if( nRows > arraySize)
+   if( nRows)
    {
-      diff = nRows - arraySize;
-      _mulle_structarray_advance( &_rowArray, diff);
-   }
-   _mulle_structarray_set_count( &_rowArray, nRows);
+      arraySize = _mulle_structarray_get_size( &_rowArray);
+      if( nRows > arraySize)
+      {
+         diff = nRows - arraySize;
+         _mulle_structarray_advance( &_rowArray, diff);
+      }
+      _mulle_structarray_set_count( &_rowArray, nRows);
 
-   rows = _mulle_structarray_get( &_rowArray, 0);
+      rows = _mulle_structarray_get( &_rowArray, 0);
 
-   [context getTextRows:(struct UITextRow *) rows
-                  count:nRows
-            textRowSize:sizeof( struct CATextLayerLayouterRow)
-                   text:data.characters
-                 length:data.length
-          breakRowWidth:width];
+      [context getTextRows:(struct UITextRow *) rows
+                     count:nRows
+               textRowSize:sizeof( struct CATextLayerLayouterRow)
+                      text:data.characters
+                    length:data.length
+             breakRowWidth:width];
 
    // clean up glyphRange because it would be uninitialized at least in
    // debugging
 #ifdef DEBUG
-   {
-      struct CATextLayerLayouterRow   *p;
-      struct CATextLayerLayouterRow   *sentinel;
-
-      p        = &rows[ 0];
-      sentinel = &rows[ nRows];
-      while( p < sentinel)
       {
-         p->glyphRange = mulle_range_make_invalid();
-         ++p;
+         struct CATextLayerLayouterRow   *p;
+         struct CATextLayerLayouterRow   *sentinel;
+
+         p        = &rows[ 0];
+         sentinel = &rows[ nRows];
+         while( p < sentinel)
+         {
+            p->glyphRange = mulle_range_make_invalid();
+            ++p;
+         }
       }
-   }
 #endif
+   }
    // we have to tell the glypharray that its invalid now
    _rowArrayValid   = YES;
    _glyphArrayValid = NO;
@@ -290,148 +291,161 @@ static BOOL   CATextLayerLayouterNeedsUpdates( CATextLayerLayouter *self)
 
 
 - (CGRect) visualBoundsWithContext:(id <UILayoutContext>) context
-                            insets:(struct MulleEdgeInsets) insets
 {
-   NSUInteger                      i, j;
-   struct UIGlyphPosition          *glyph;
-   float                           minx;
-   float                           miny;
-   float                           maxx;
-   float                           maxy;
    CGFloat                         x;
    CGFloat                         y;
-   NSUInteger                      nRows;
-   struct UIGlyphPosition          *glyphs;
-   struct CATextLayerLayouterRow   *row;
+   NSUInteger                      i, j;
    NSUInteger                      nGlyphs;
+   NSUInteger                      nRows;
+   float                           maxx;
+   float                           maxy;
+   float                           minx;
+   float                           miny;
+   struct CATextLayerLayouterRow   *row;
+   struct UIGlyphPosition          *glyph;
+   struct UIGlyphPosition          *glyphs;
+   void                            *state;
 
-   assert( context);
-
-   [self updateRowsAndGlyphsWithContextIfNeeded:context];
-
-   MulleUILog( "a: %g d: %g h: %g", _metrics.ascender, _metrics.descender, _metrics.lineHeight);
-
-   assert( _metrics.lineHeight);
-
-   nRows = _mulle_structarray_get_count( &_rowArray);
-
-   // get x and width, then redo Y
-   minx = INFINITY;
-   miny = INFINITY;
-   maxx = -INFINITY;
-   maxy = -INFINITY;
-
-   for( j = 0; j < nRows; j++)
+   // as this routine can get called from within the render, its no
+   // convenient to clobber the current state
+   state = [context pushGraphicsState];
    {
-      row     = _mulle_structarray_get( &_rowArray, j);
-      glyphs  = _mulle_structarray_get( &_glyphArray, row->glyphRange.location);
-      nGlyphs = row->glyphRange.length;
+      assert( context);
 
-      // get last
-      i = 0;
+      [self updateRowsAndGlyphsWithContextIfNeeded:context];
+
+      MulleUILog( "a: %g d: %g h: %g", _metrics.ascender, _metrics.descender, _metrics.lineHeight);
+
+      assert( _metrics.lineHeight);
+
+      nRows = _mulle_structarray_get_count( &_rowArray);
+
+      // get x and width, then redo Y
+      minx = INFINITY;
+      miny = INFINITY;
+      maxx = -INFINITY;
+      maxy = -INFINITY;
+
+      for( j = 0; j < nRows; j++)
+      {
+         row     = _mulle_structarray_get( &_rowArray, j);
+         glyphs  = _mulle_structarray_get( &_glyphArray, row->glyphRange.location);
+         nGlyphs = row->glyphRange.length;
+
+         // get last
+         i = 0;
+         for(;;)
+         {
+            if( i >= nGlyphs)
+               goto next;
+
+            glyph = &glyphs[ i];
+            // if this is true, assume glyph produces no ink
+            if( UIGlyphPositionHasStrokes( glyph))
+            {
+               x    = glyph->minx;
+               minx = fminf( minx, x);
+               break;
+            }
+         }
+
+         // p->nGlyphs know to be > 0 by above loop
+         for( i = nGlyphs - 1;; --i)
+         {
+            glyph = &glyphs[ i];
+            if( UIGlyphPositionHasStrokes( glyph))
+            {
+               x    = glyph->maxx;
+               maxx = fmaxf( maxx, x);
+               break;
+            }
+            if ( ! i)
+               break;
+         }
+next:
+         ;
+      }
+
+
+      // get top y of first row with visible characters
+      // we have to
+      j = 0;
       for(;;)
       {
-         if( i >= nGlyphs)
-            goto next;
-
-         glyph = &glyphs[ i];
-         // if this is true, assume glyph produces no ink
-         if( UIGlyphPositionHasStrokes( glyph))
-         {
-            x    = glyph->minx + insets.left;
-            minx = fminf( minx, x);
+         if( j >= nRows)
             break;
-         }
-      }
 
-      // p->nGlyphs know to be > 0 by above loop
-      for( i = nGlyphs - 1;; --i)
-      {
-         glyph = &glyphs[ i];
-         if( UIGlyphPositionHasStrokes( glyph))
+         row     = _mulle_structarray_get( &_rowArray, j);
+         glyphs  = _mulle_structarray_get( &_glyphArray, row->glyphRange.location);
+         nGlyphs = row->glyphRange.length;
+
+         for( i = 0; i < nGlyphs; i++)
          {
-            x    = glyph->maxx - insets.right;
-            maxx = fmaxf( maxx, x);
+            glyph = &glyphs[ i];
+            if( UIGlyphPositionHasStrokes( glyph))
+            {
+               // converted from baseline
+               y    = glyph->miny;
+               y   += _metrics.ascender + j * _metrics.lineHeight;
+               miny = fminf( miny, y);
+            }
+         }
+
+         if( ! isinf( miny))
             break;
+         ++j;
+      }
+
+      j = nRows;
+      for(;;)
+      {
+         if( ! j)
+            break;
+         --j;
+
+         row     = _mulle_structarray_get( &_rowArray, j);
+         glyphs  = _mulle_structarray_get( &_glyphArray, row->glyphRange.location);
+         nGlyphs = row->glyphRange.length;
+
+         for( i = 0; i < nGlyphs; i++)
+         {
+            glyph = &glyphs[ i];
+            if( UIGlyphPositionHasStrokes( glyph))
+            {
+               y    = glyph->maxy;
+               y   += _metrics.ascender + j * _metrics.lineHeight;
+               maxy = fmaxf( maxy, y);
+            }
          }
-         if ( ! i)
+
+         if( ! isinf( maxy))
             break;
       }
-next:
-      ;
    }
-
-
-   // get top y of first row with visible characters
-   // we have to
-   j = 0;
-   for(;;)
-   {
-      if( j >= nRows)
-         break;
-
-      row     = _mulle_structarray_get( &_rowArray, j);
-      glyphs  = _mulle_structarray_get( &_glyphArray, row->glyphRange.location);
-      nGlyphs = row->glyphRange.length;
-
-      for( i = 0; i < nGlyphs; i++)
-      {
-         glyph = &glyphs[ i];
-         if( UIGlyphPositionHasStrokes( glyph))
-         {
-            // converted from baseline
-            y    = glyph->miny + insets.top;
-            y   += _metrics.ascender + j * _metrics.lineHeight;
-            miny = fminf( miny, y);
-         }
-      }
-
-      if( ! isinf( miny))
-         break;
-      ++j;
-   }
-
-   j = nRows;
-   for(;;)
-   {
-      if( ! j)
-         break;
-      --j;
-
-      row     = _mulle_structarray_get( &_rowArray, j);
-      glyphs  = _mulle_structarray_get( &_glyphArray, row->glyphRange.location);
-      nGlyphs = row->glyphRange.length;
-
-      for( i = 0; i < nGlyphs; i++)
-      {
-         glyph = &glyphs[ i];
-         if( UIGlyphPositionHasStrokes( glyph))
-         {
-            y    = glyph->maxy - insets.bottom;
-            y   += _metrics.ascender + j * _metrics.lineHeight;
-            maxy = fmaxf( maxy, y);
-         }
-      }
-
-      if( ! isinf( maxy))
-         break;
-   }
+   [context popGraphicsState:state];
 
    MulleUILog( "%g %g %g %g", minx, miny, maxx, maxy);
 
+   // If no visible glyphs were found, bounds are still at infinity
+   // Return empty/degenerate rect like we do for whitespace-only text
+   if( isinf( minx) || isinf( maxx) || isinf( miny) || isinf( maxy))
+   {
+      // Use ascender for y position to match whitespace behavior
+      return( CGRectMake( 0.0f, _metrics.ascender, 0.0f, 0.0f));
+   }
+
+   // if aliasPixelVisible is NO (default), inset by 1 pixel to exclude
+   // anti-aliasing pixels from visual bounds
+   if( ! [_textLayer isAliasPixelVisible])
+   {
+      minx += 1.0f;
+      miny += 1.0f;
+      maxx -= 1.0f;
+      maxy -= 1.0f;
+   }
+
    return( CGRectMake( minx, miny, maxx - minx, maxy - miny));
 }
-
-
-- (CGRect) visualBoundsWithContext:(id <UILayoutContext>) context;
-{
-   CGRect   bounds;
-
-   bounds = [self visualBoundsWithContext:context
-                                   insets:CATextLayerVisualBoundsInsets];
-   return( bounds);
-}
-
 
 
 

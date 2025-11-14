@@ -55,7 +55,7 @@ void   setupSceneInContentPlane( UIWindowPlane *plane)
    NSUInteger         row;
    NSUInteger         column;
    UIView             *view;
-   CALayer            *layer;
+   CGGraphicsLayer    *layer;
    CGRect             canvas;
 
    contentRect = [plane contentRect];
@@ -76,7 +76,7 @@ void   setupSceneInContentPlane( UIWindowPlane *plane)
          [view setBorderColor:CGColorMakeWithHexColor( 0x00FF00FF)];
          [plane addSubview:view];
 
-         layer = (CGGraphicsLayer *) [view layer];
+         layer = MULLE_OBJC_CLASS_CAST( CGGraphicsLayer, [view layer]);
          // on its own just reduces or enlarges the checkerboard to be
          // drawn, nothing will scale.
          canvas = [layer canvas];

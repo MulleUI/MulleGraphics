@@ -118,196 +118,157 @@ static NSUInteger  count_newlines( mulle_utf8_t *s)
    CGFloat      rowsHeight;
    CGRect       visualBounds;
    NSUInteger   nRows;
+   void         *state;
 
-   [self updateRowsAndGlyphsWithContextIfNeeded:context];
-
-   MulleUILog( "rect: %s  metrics: %s", CGRectUTF8String( rect),
-                                        CGTextMetricsUTF8String( _metrics));
-
-   // MEMO: special casing single line is OK, when the text moves to
-   //       double line, the contrast is stark already and then it doesnt
-   //       really matter that UITextAlignmentVisual... ceases
-   //       to be useful
-   nRows = [_textLayer numberOfRows];
-   if( nRows <= 1)
+   state = [context pushGraphicsState];
    {
-      switch( [_textLayer textVerticalAlignment])
+      [self updateRowsAndGlyphsWithContextIfNeeded:context];
+
+      // MEMO: special casing single line is OK, when the text moves to
+      //       double line, the contrast is stark already and then it doesnt
+      //       really matter that UITextAlignmentVisual... ceases
+      //       to be useful
+      nRows = _mulle_structarray_get_count( &_rowArray);
+      if( nRows <= 1)
       {
-         // ascender starts on canvas.origin.y by fontInfo
-      case UITextAlignmentTop :
-         origin.y = _metrics.ascender;
-         break;
-      case UITextAlignmentBottom :
-         origin.y = rect.size.height - _metrics.descender;
-         break;
-      case UITextAlignmentMiddle :
-         origin.y = (rect.size.height + _metrics.ascender - _metrics.descender) / 2.0;;
-         break;
+         switch( [_textLayer textVerticalAlignment])
+         {
+            // ascender starts on canvas.origin.y by fontInfo
+         case UITextAlignmentTop :
+            origin.y = _metrics.ascender;
+            break;
+         case UITextAlignmentBottom :
+            origin.y = rect.size.height - _metrics.descender;
+            break;
+         case UITextAlignmentMiddle :
+            origin.y = (rect.size.height + _metrics.ascender - _metrics.descender) / 2.0;;
+            break;
 
-      default :
+         default :
 #ifdef DEBUG       
-         mulle_fprintf( stderr, "_textVerticalAlignment: %x is unknown\n", [_textLayer textVerticalAlignment]);
-         abort();
+            mulle_fprintf( stderr, "_textVerticalAlignment: %x is unknown\n", [_textLayer textVerticalAlignment]);
+            abort();
 #endif         
-         // fall thru in not debug
+            // fall thru in not debug
 
-      case UITextAlignmentBaseline :
-         origin.y = rect.size.height / 2.0;
-         break;
-      //
-      // w=10
-      // 0123456789
-      // xxxx
-      // 10 / 2.0 + (4 - 0) / 2 = 7
-      // 20 -> 10   rect.size.height - (rect.size.height - _visualBounds[ 3])
-      case UITextAlignmentVisualFill   :
-      case UITextAlignmentVisualMiddle :
-         visualBounds = [self visualBoundsWithContext:context];
-         origin.y     = _metrics.ascender + (rect.size.height - visualBounds.size.height) / 2.0 - visualBounds.origin.y;
-         break;
+         case UITextAlignmentBaseline :
+            origin.y = rect.size.height / 2.0;
+            break;
+         //
+         // w=10
+         // 0123456789
+         // xxxx
+         // 10 / 2.0 + (4 - 0) / 2 = 7
+         // 20 -> 10   rect.size.height - (rect.size.height - _visualBounds[ 3])
+         case UITextAlignmentVisualFill   :
+         case UITextAlignmentVisualMiddle :
+            visualBounds = [self visualBoundsWithContext:context];
+            origin.y     = _metrics.ascender + (rect.size.height - visualBounds.size.height) / 2.0 - visualBounds.origin.y;
+            break;
+         }
       }
-   }
-   else
-   {
-      // now we know the number of rows,
-      // calculate the height of all rows
-
-      rowsHeight = [_textLayer fontMetricsWithLayoutContext:context].textLineHeight * nRows;
-
-      // this is top aligned as default, other alignments use this as well
-      switch( [_textLayer textVerticalAlignment])
+      else
       {
-         // set as bottom aligned
-      case UITextAlignmentTop :
-         origin.y = _metrics.ascender;
-         break;
+         // now we know the number of rows,
+         // calculate the height of all rows
 
-      case UITextAlignmentBottom :
-         origin.y = rect.size.height - rowsHeight + _metrics.ascender;
-         break;
+         rowsHeight = [_textLayer fontMetricsWithLayoutContext:context].textLineHeight * nRows;
 
-      // the baseline alignment for multiple lines doesn't seem useful,
-      // yet for visual stability we need to produce something
+         // this is top aligned as default, other alignments use this as well
+         switch( [_textLayer textVerticalAlignment])
+         {
+            // set as bottom aligned
+         case UITextAlignmentTop :
+            origin.y = _metrics.ascender;
+            break;
 
-      case UITextAlignmentMiddle :
-         origin.y = (rect.size.height - rowsHeight) / 2.0 + _metrics.ascender;
-         break;
+         case UITextAlignmentBottom :
+            origin.y = rect.size.height - rowsHeight + _metrics.ascender;
+            break;
 
-      default :
-#ifdef DEBUG       
-         mulle_fprintf( stderr, "textVerticalAlignment: %x is unknown\n", [_textLayer textVerticalAlignment]);
-         abort();
-#endif         
-         // fall thru in not debug
-      case UITextAlignmentVisualMiddle   :
-      case UITextAlignmentVisualFill     :
-      case UITextAlignmentBaseline       :
-         // if odd rows the baseline of the middle is in the center
-         // otherwise same as "middle"
-         if( nRows & 1)
-            origin.y = (rect.size.height - rowsHeight + _metrics.lineHeight) / 2.0;
-         else
+         // the baseline alignment for multiple lines doesn't seem useful,
+         // yet for visual stability we need to produce something
+
+         case UITextAlignmentMiddle :
             origin.y = (rect.size.height - rowsHeight) / 2.0 + _metrics.ascender;
-         break;
+            break;
 
+         default :
+#ifdef DEBUG
+            mulle_fprintf( stderr, "textVerticalAlignment: %x is unknown\n", [_textLayer textVerticalAlignment]);
+            abort();
+#endif
+            // fall thru in not debug
+         case UITextAlignmentVisualMiddle   :
+         case UITextAlignmentVisualFill     :
+         case UITextAlignmentBaseline       :
+            // if odd rows the baseline of the middle is in the center
+            // otherwise same as "middle"
+            if( nRows & 1)
+               origin.y = (rect.size.height - rowsHeight + _metrics.lineHeight) / 2.0;
+            else
+               origin.y = (rect.size.height - rowsHeight) / 2.0 + _metrics.ascender;
+            break;
+
+         }
       }
-   }
 
-   switch( [_textLayer textAlignment])
-   {
-   default :
+      switch( [_textLayer textAlignment])
+      {
+      default :
 #ifdef DEBUG       
-      mulle_fprintf( stderr, "_textAlignment: %x is unknown\n", [_textLayer textAlignment]);
-      abort();
-#endif    
-      // fall thru in not debug
-   case UITextAlignmentLeft   : origin.x = CGRectGetMinX( rect);
-                                break;
-   case UITextAlignmentRight  : origin.x = CGRectGetMaxX( rect);
-                                break;
-   case UITextAlignmentCenter : origin.x = CGRectGetMidX( rect);
-                                break;
+         mulle_fprintf( stderr, "_textAlignment: %x is unknown\n", [_textLayer textAlignment]);
+         abort();
+#endif
+         // fall thru in not debug
+      case UITextAlignmentLeft   : origin.x = CGRectGetMinX( rect);
+                                   break;
+      case UITextAlignmentRight  : origin.x = CGRectGetMaxX( rect);
+                                   break;
+      case UITextAlignmentCenter : origin.x = CGRectGetMidX( rect);
+                                   break;
+      }
+
+      MulleUILog( "%s origin: %s", NS_ENUM_PRINT( UITextVerticalAlignment, [_textLayer textVerticalAlignment]),
+                                   CGPointUTF8String( origin));
+
+      origin.x += rect.origin.x;
+      origin.y += rect.origin.y;
+
+      // If cursor is visible, keep it always visible
+      if( [_textLayer isEditing])
+         origin.x += [self offsetNeededToMakeCursorVisible];
+
+      origin.x += _textOffset.x;
+      origin.y += _textOffset.y;
    }
+   [context popGraphicsState:state];
 
-   MulleUILog( "%s origin: %s", NS_ENUM_PRINT( UITextVerticalAlignment, [_textLayer textVerticalAlignment]),
-                                CGPointUTF8String( origin));
-
-   origin.x += rect.origin.x;
-   origin.y += rect.origin.y;
-
-   // If cursor is visible, keep it always visible
-   if( [_textLayer isEditing])
-      origin.x += [self offsetNeededToMakeCursorVisible];
    return( origin);
 }
 
 
 - (CGPoint) textOriginWithContext:(id <UILayoutContext>) context
 {
-   CGRect          canvas;
-   CGPoint         origin;
+   CGRect         canvas;
+   CGPoint        origin;
    UIEdgeInsets   insets;
 
    canvas = [_textLayer insetCanvas];
    if( canvas.size.width == 0.0f)
    {
-      insets = [_textLayer insets];
-      origin = CGPointMake( insets.left, insets.top);
-      return( origin);
+      insets   = [_textLayer insets];
+      origin.x = insets.left + _textOffset.x;
+      origin.y = insets.right + _textOffset.y;
+   }
+   else
+   {
+      origin   = [self textOriginInRect:canvas
+                                context:context];
    }
 
-   origin    = [self textOriginInRect:canvas
-                              context:context];
-
-   origin.x += _textOffset.x;
-   origin.y += _textOffset.y;
 
    return( origin);
-}
-
-
-- (NSUInteger) characterOffsetAtPoint:(CGPoint) point
-{
-   CGPoint      adjusted;
-   NSUInteger   index;
-   CGPoint      origin;
-
-   origin   = [_textLayer origin];
-   adjusted = CGPointMake( point.x - origin.x, point.y - origin.y);
-   index    = [self characterOffsetOfGlyphAtPoint:adjusted];
-   return( index);
-}
-
-
-- (CGRect) glyphRectAtPoint:(CGPoint) point
-{
-   CGRect                   rect;
-   struct UIGlyphPosition   glyphPosition;
-   CGPoint                  offset;
-   CGPoint                  adjusted;
-   CAGlyphSeating           seating;
-   CGPoint      origin;
-
-   origin   = [_textLayer origin];
-   adjusted = CGPointMake( point.x - origin.x, point.y - origin.y);
-   seating  = [self getGlyphPosition:&glyphPosition
-                            atPoint:adjusted];
-   if( CAGlyphSeatingIsNull( seating))
-   {
-      //mulle_fprintf( stderr, "Not found\n");
-      return( CGRectNull);
-   }
-
-   offset    = origin;
-   offset.y += seating.row * [_textLayer renderedFontMetrics].textLineHeight;
-
-   rect = CGRectMakeWithOriginAndOpposite( 
-                               CGPointMake( offset.x + glyphPosition.minx,
-                                            offset.y + glyphPosition.miny),
-                               CGPointMake( offset.x + glyphPosition.maxx,
-                                            offset.y + glyphPosition.maxy));      
-   // mulle_fprintf( stderr, "%tu -> %s\n", index, CGRectUTF8String( rect));
-   return( rect);
 }
 
 @end

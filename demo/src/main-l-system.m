@@ -72,6 +72,7 @@ static char   *lindenmayer( char *s)
    self   = [super initWithFrame:frame];
 
    center = CGPointMake( 0, frame.size.height - 1);
+   angle  = 0.0;
 
    for( i = 0; i < 5; i++)
    {
@@ -106,8 +107,8 @@ static char   *lindenmayer( char *s)
       oldCenter = center;
        // draw forward
        // polar to cartesian based on step and angle:
-      center.x = oldCenter.x + STEP * cos( CADegreesToRadiansAsAngle( angle));
-      center.y = oldCenter.y + STEP * sin( CADegreesToRadiansAsAngle( angle));
+      center.x = oldCenter.x + STEP * cos( angle * M_PI_f / 180.0);
+      center.y = oldCenter.y + STEP * sin( angle * M_PI_f / 180.0);
       [context strokeLineFromPoint:oldCenter
                            toPoint:center
                        strokeWidth:1.0

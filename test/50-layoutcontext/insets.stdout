@@ -1,0 +1,4 @@
+=== Insets ===
+Default insets: {0, 0, 0, 0}
+After setInsets: {10, 20, 10, 20}
+Inset canvas: 20 10 160 80

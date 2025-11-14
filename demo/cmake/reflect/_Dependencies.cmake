@@ -12,6 +12,94 @@ if( MULLE_TRACE_INCLUDE)
 endif()
 
 #
+# Generated from sourcetree: 96956698-555F-42F8-A7E6-252B8EC21531;MulleGraphics;no-singlephase;
+# Disable with : `mulle-sourcetree mark MulleGraphics no-link`
+# Disable for this platform: `mulle-sourcetree mark MulleGraphics no-cmake-platform-${MULLE_UNAME}`
+# Disable for a sdk: `mulle-sourcetree mark MulleGraphics no-cmake-sdk-<name>`
+#
+if( COLLECT_ALL_LOAD_DEPENDENCY_LIBRARIES_AS_NAMES)
+   list( APPEND ALL_LOAD_DEPENDENCY_LIBRARIES "MulleGraphics")
+else()
+   if( NOT MULLE_GRAPHICS_LIBRARY)
+      find_library( MULLE_GRAPHICS_LIBRARY NAMES
+         ${CMAKE_STATIC_LIBRARY_PREFIX}MulleGraphics${CMAKE_DEBUG_POSTFIX}${CMAKE_STATIC_LIBRARY_SUFFIX}
+         ${CMAKE_STATIC_LIBRARY_PREFIX}MulleGraphics${CMAKE_STATIC_LIBRARY_SUFFIX}
+         MulleGraphics
+         NO_CMAKE_SYSTEM_PATH NO_SYSTEM_ENVIRONMENT_PATH NO_CMAKE_FIND_ROOT_PATH
+      )
+      if( NOT MULLE_GRAPHICS_LIBRARY AND NOT DEPENDENCY_IGNORE_SYSTEM_LIBARIES)
+         find_library( MULLE_GRAPHICS_LIBRARY NAMES
+            ${CMAKE_STATIC_LIBRARY_PREFIX}MulleGraphics${CMAKE_DEBUG_POSTFIX}${CMAKE_STATIC_LIBRARY_SUFFIX}
+            ${CMAKE_STATIC_LIBRARY_PREFIX}MulleGraphics${CMAKE_STATIC_LIBRARY_SUFFIX}
+            MulleGraphics
+         )
+      endif()
+      message( STATUS "MULLE_GRAPHICS_LIBRARY is ${MULLE_GRAPHICS_LIBRARY}")
+      #
+      # The order looks ascending, but due to the way this file is read
+      # it ends up being descending, which is what we need.
+      #
+      if( MULLE_GRAPHICS_LIBRARY)
+         #
+         # Add MULLE_GRAPHICS_LIBRARY to ALL_LOAD_DEPENDENCY_LIBRARIES list.
+         # Disable with: `mulle-sourcetree mark MulleGraphics no-cmake-add`
+         #
+         list( APPEND ALL_LOAD_DEPENDENCY_LIBRARIES ${MULLE_GRAPHICS_LIBRARY})
+         #
+         # Inherit information from dependency.
+         # Encompasses: no-cmake-searchpath,no-cmake-dependency,no-cmake-loader
+         # Disable with: `mulle-sourcetree mark MulleGraphics no-cmake-inherit`
+         #
+         # temporarily expand CMAKE_MODULE_PATH
+         get_filename_component( _TMP_MULLE_GRAPHICS_ROOT "${MULLE_GRAPHICS_LIBRARY}" DIRECTORY)
+         get_filename_component( _TMP_MULLE_GRAPHICS_ROOT "${_TMP_MULLE_GRAPHICS_ROOT}" DIRECTORY)
+         #
+         #
+         # Search for "Definitions.cmake" and "DependenciesAndLibraries.cmake" to include.
+         # Disable with: `mulle-sourcetree mark MulleGraphics no-cmake-dependency`
+         #
+         foreach( _TMP_MULLE_GRAPHICS_NAME "MulleGraphics")
+            set( _TMP_MULLE_GRAPHICS_DIR "${_TMP_MULLE_GRAPHICS_ROOT}/include/${_TMP_MULLE_GRAPHICS_NAME}/cmake")
+            # use explicit path to avoid "surprises"
+            if( IS_DIRECTORY "${_TMP_MULLE_GRAPHICS_DIR}")
+               list( INSERT CMAKE_MODULE_PATH 0 "${_TMP_MULLE_GRAPHICS_DIR}")
+               #
+               include( "${_TMP_MULLE_GRAPHICS_DIR}/DependenciesAndLibraries.cmake" OPTIONAL)
+               #
+               list( REMOVE_ITEM CMAKE_MODULE_PATH "${_TMP_MULLE_GRAPHICS_DIR}")
+               #
+               unset( MULLE_GRAPHICS_DEFINITIONS)
+               include( "${_TMP_MULLE_GRAPHICS_DIR}/Definitions.cmake" OPTIONAL)
+               list( APPEND INHERITED_DEFINITIONS ${MULLE_GRAPHICS_DEFINITIONS})
+               break()
+            else()
+               message( STATUS "${_TMP_MULLE_GRAPHICS_DIR} not found")
+            endif()
+         endforeach()
+         #
+         # Search for "MulleObjCLoader+<name>.h" in include directory.
+         # Disable with: `mulle-sourcetree mark MulleGraphics no-cmake-loader`
+         #
+         if( NOT NO_INHERIT_OBJC_LOADERS)
+            foreach( _TMP_MULLE_GRAPHICS_NAME "MulleGraphics")
+               set( _TMP_MULLE_GRAPHICS_FILE "${_TMP_MULLE_GRAPHICS_ROOT}/include/${_TMP_MULLE_GRAPHICS_NAME}/MulleObjCLoader+${_TMP_MULLE_GRAPHICS_NAME}.h")
+               if( EXISTS "${_TMP_MULLE_GRAPHICS_FILE}")
+                  list( APPEND INHERITED_OBJC_LOADERS ${_TMP_MULLE_GRAPHICS_FILE})
+                  break()
+               endif()
+            endforeach()
+         endif()
+      else()
+         # Disable with: `mulle-sourcetree mark MulleGraphics no-require-link`
+         message( SEND_ERROR "MULLE_GRAPHICS_LIBRARY was not found in ${CMAKE_STATIC_LIBRARY_PREFIX}MulleGraphics${CMAKE_DEBUG_POSTFIX}${CMAKE_STATIC_LIBRARY_SUFFIX}
+${CMAKE_STATIC_LIBRARY_PREFIX}MulleGraphics${CMAKE_STATIC_LIBRARY_SUFFIX}
+MulleGraphics")
+      endif()
+   endif()
+endif()
+
+
+#
 # Generated from sourcetree: AC2B5582-8BF6-42B5-BAAB-934BDB8B7B51;MulleFoundation;no-singlephase;
 # Disable with : `mulle-sourcetree mark MulleFoundation no-link`
 # Disable for this platform: `mulle-sourcetree mark MulleFoundation no-cmake-platform-${MULLE_UNAME}`

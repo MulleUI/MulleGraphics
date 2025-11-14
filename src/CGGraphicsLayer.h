@@ -71,7 +71,6 @@ typedef BOOL   CGGraphicsLayerDrawCallback_t( CGGraphicsLayer *layer,
 
 @property( retain, nonserializable) id <CGGraphicsLayerLayouter>  layouter;
 
-
 // MEMO: initNoLock is actually the designated initializer funneled into by
 // _initWithFrame which is hidden. Subclasses generally want to override
 // initWithFrame: though

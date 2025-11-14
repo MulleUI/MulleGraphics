@@ -1,0 +1,19 @@
+=== Multi-line Right/Bottom Layout ===
+Layer has 3 rows:
+  row[0]: range={0,3} text="VfL" sel=none cur=none
+         selRect:0 0 0 0 cursorRect:0 0 0 0
+  row[1]: range={4,6} text="Bochum" sel=none cur=none
+         selRect:0 0 0 0 cursorRect:0 0 0 0
+  row[2]: range={11,4} text="1848" sel=none cur=none
+         selRect:0 0 0 0 cursorRect:0 0 0 0
+  origin:200 64.56
+
+=== With larger lineHeight ===
+Layer has 3 rows:
+  row[0]: range={0,3} text="VfL" sel=none cur=none
+         selRect:0 0 0 0 cursorRect:0 0 0 0
+  row[1]: range={4,6} text="Bochum" sel=none cur=none
+         selRect:0 0 0 0 cursorRect:0 0 0 0
+  row[2]: range={11,4} text="1848" sel=none cur=none
+         selRect:0 0 0 0 cursorRect:0 0 0 0
+  origin:200 40.56

@@ -1,0 +1,14 @@
+=== Paint Properties ===
+Initial textPaint: null
+Initial selectionPaint: set
+Initial cursorPaint: set
+
+=== ClearType ===
+Default clearTypeEnabled: YES
+After setClearTypeEnabled:NO: NO
+After setClearTypeEnabled:YES: YES
+
+=== Alias Pixel Visible ===
+Default aliasPixelVisible: NO
+After setAliasPixelVisible:YES: YES
+After setAliasPixelVisible:NO: NO

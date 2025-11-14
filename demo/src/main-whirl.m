@@ -115,12 +115,14 @@ struct whirls_options
 
 @interface WhirlLayer : CGGraphicsLayer
 {
+   // for TAO this is bad as on our autolocking CGGraphicsLayer we have
+   // now a thread affine mutable object dangling, this is still fine
+   // though as long as we only access it in one thread
    NSMutableArray  *_whirls;
-
 }
 
-@property( assign) CGFloat      zoff;
-@property( assign) CGFloat      hueBase;
+@property( assign) CGFloat   zoff;
+@property( assign) CGFloat   hueBase;
 
 @end
 
@@ -179,6 +181,19 @@ struct whirls_options
    return( YES);
 }
 
+#ifdef DEBUG
+- (void) mulleGainAccessWithUniquingSet:(struct mulle_pointerset *) uniquing
+{
+   [super mulleGainAccessWithUniquingSet:uniquing];
+}
+
+
+- (void) mulleRelinquishAccessWithUniquingSet:(struct mulle_pointerset *) uniquing
+{
+   [super mulleRelinquishAccessWithUniquingSet:uniquing];
+}
+#endif
+
 @end
 
 
@@ -190,7 +205,7 @@ int   main( int argc, char *argv[])
    UIView          *view;
    UIWindowPlane   *contentPlane;
    MulleUIPerf     *perf;
-   WhirlLayer     *layer;
+   WhirlLayer      *layer;
    CGRect          contentRect;
    CGRect          frame;
    NSUInteger      styleMask;

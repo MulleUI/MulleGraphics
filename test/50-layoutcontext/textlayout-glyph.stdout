@@ -1,0 +1,15 @@
+=== Single 'X' Right/Bottom Layout ===
+Layer origin: 200 96.56
+Layer frame: 0 0 200 100
+
+Testing point: 190 95
+Glyph rect: 190 83.56 12 14
+Character offset: 0
+Character at offset: 'X'
+
+=== Testing multiple points ===
+Point 180 90 -> offset:0 rect:nan nan 0 0 char:'X'
+Point 190 90 -> offset:0 rect:190 83.56 12 14 char:'X'
+Point 195 95 -> offset:0 rect:190 83.56 12 14 char:'X'
+Point 200 100 -> offset:0 rect:190 83.56 12 14 char:'X'
+Point 185 85 -> offset:0 rect:nan nan 0 0 char:'X'

@@ -1,0 +1,7 @@
+=== aliasPixelVisible Flag Test ===
+Default aliasPixelVisible: NO
+visualBounds with NO: -12 0.56 24 12
+Set aliasPixelVisible: YES
+visualBounds with YES: -13 -0.44 26 14
+Width difference: 2 (expected: 2.0)
+Height difference: 2 (expected: 2.0)

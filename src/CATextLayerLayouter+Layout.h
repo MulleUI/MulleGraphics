@@ -49,11 +49,6 @@
                      context:(id <UILayoutContext>) context;
 - (CGPoint) textOriginWithContext:(id <UILayoutContext>) context;
 
-
-- (NSUInteger) characterOffsetAtPoint:(CGPoint) point;
-
-- (CGRect) glyphRectAtPoint:(CGPoint) point;
-
 @end
 
 
@@ -62,10 +57,5 @@
 - (CGPoint) textOriginInRect:(CGRect) rect
                      context:(id <UILayoutContext>) context;
 - (CGPoint) textOriginWithContext:(id <UILayoutContext>) context;
-
-
-- (NSUInteger) characterOffsetAtPoint:(CGPoint) point;
-
-- (CGRect) glyphRectAtPoint:(CGPoint) point;
 
 @end

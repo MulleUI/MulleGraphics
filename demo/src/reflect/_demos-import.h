@@ -12,6 +12,21 @@
  */
 
 // To remove the following dependency (headers and library) completely:
+//   `mulle-sde dependency remove MulleGraphics`
+// (Use 96956698-555F-42F8-A7E6-252B8EC21531 instead of MulleGraphics, if there are duplicate entries)
+//
+// You can tweak the following #import with these commands:
+//    remove #import      : `mulle-sde dependency mark MulleGraphics no-header`
+//    rename              : `mulle-sde dependency|library set MulleGraphics include whatever.h`
+//    reorder             : `mulle-sde dependency move MulleGraphics <up|down>`
+//    toggle #import      : `mulle-sde dependency mark MulleGraphics [no-]import`
+//    toggle public       : `mulle-sde dependency mark MulleGraphics [no-]public`
+//    toggle optional     : `mulle-sde dependency mark MulleGraphics [no-]require`
+//    remove for platform : `mulle-sde dependency mark MulleGraphics no-platform-<uname>`
+//        (use `mulle-sourcetree-to-c --unames` to list known values)
+#import <MulleGraphics/MulleGraphics.h>   // MulleGraphics
+
+// To remove the following dependency (headers and library) completely:
 //   `mulle-sde dependency remove MulleFoundation`
 // (Use AC2B5582-8BF6-42B5-BAAB-934BDB8B7B51 instead of MulleFoundation, if there are duplicate entries)
 //

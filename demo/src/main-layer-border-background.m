@@ -8,14 +8,14 @@
 //
 static UIView   *demoViewWithFrame( CGRect frame, CGColor a, CGColor b)
 {
-   CALayer      *layer;
-   CGGradient   *gradient;
-   UIView       *view;
+   CGGraphicsLayer   *layer;
+   CGGradient        *gradient;
+   UIView            *view;
 
    view        = [UIView viewWithFrame:frame];
 
    // MEMO: could also just forward down to layer via view...
-   layer       = (CGGraphicsLayer *) [view layer];
+   layer       = MULLE_OBJC_CLASS_CAST( CGGraphicsLayer, [view layer]);
    gradient    = [CGGradient gradientWithStartColor:a
                                            endColor:b];
    [layer setBackgroundPaint:gradient];

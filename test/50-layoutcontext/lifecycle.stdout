@@ -1,0 +1,4 @@
+=== Lifecycle & Updates ===
+Initial generation count: 4
+After setText generation: 5 (delta: 1)
+After setFont generation: 6 (delta: 1)

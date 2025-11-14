@@ -1,0 +1,56 @@
+=== Empty and Nil Text ===
+Empty string: length=0
+NULL string: length=0
+Valid text: vbounds=-12 0.56 24 12
+
+=== Whitespace Only ===
+Single space: vbounds=0 12.56 0 0
+Three spaces: vbounds=0 12.56 0 0
+Ten spaces: vbounds=0 12.56 0 0
+
+=== Newlines Only (STRESS TEST) ===
+Single newline: vbounds=0 12.56 0 0
+Two newlines: vbounds=0 12.56 0 0
+Three newlines: vbounds=0 12.56 0 0
+Five newlines: vbounds=0 12.56 0 0
+
+=== Mixed Whitespace and Newlines ===
+Space-newline-space: vbounds=0 12.56 0 0
+Spaces and newlines: vbounds=0 12.56 0 0
+
+=== Newlines with Text ===
+Leading newline: vbounds=-12 16.56 24 12
+Trailing newline: vbounds=-12 0.56 24 12
+Both newlines: vbounds=-12 16.56 24 12
+Multiple newlines between: vbounds=-5 0.56 11 60
+
+=== Single Character ===
+Single 'X': vbounds=-5 0.56 10 12
+Single 'i': vbounds=-1 0.56 2 12
+Single 'W': vbounds=-8 0.56 15 12
+Single '.': vbounds=-1 9.56 3 3
+
+=== Unicode Characters ===
+German umlaut: "Müller", vbounds=-24 0.56 48 12
+Euro sign: "100€", vbounds=-17 0.56 35 12
+Soccer emoji: "⚽", vbounds=-9 -1.44 18 17
+
+=== Long Lines ===
+100 chars clipping: width=1010 height=16
+100 chars wrapping: width=199 height=92
+
+=== Small/Zero Frames ===
+Zero width: vbounds=-5 0.56 10 44
+Zero height: vbounds=-12 0.56 24 12
+1x1 frame: vbounds=-5 0.56 10 28
+10x10 frame (font=16): vbounds=-5 0.56 10 28
+
+=== Tab Characters ===
+A-tab-B: "A	B", vbounds=-15 0.56 30 12
+Single tab: vbounds=0 12.56 0 0
+Three tabs: vbounds=0 12.56 0 0
+
+=== Multi-line Variations ===
+Three lines: vbounds=-5 0.56 11 44
+Three words: vbounds=-31 0.56 61.5 44
+Growing lines: vbounds=-23 0.56 46 60

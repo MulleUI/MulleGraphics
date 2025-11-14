@@ -1,0 +1,24 @@
+=== CATextLayer Render Test ===
+Created CGContext with NoDrawing and TraceDrawCalls
+Configured CATextLayer: "VfL Bochum 1848"
+Frame: 50 50 300 200
+
+--- Begin Rendering ---
+nvgReset( vg)
+nvgGlobalAlpha( vg, 1.000000)
+nvgTransform( vg, 1.000000, 0.000000, 0.000000, 1.000000, 0.000000, 0.000000)
+nvgTransform( vg, 1.000000, 0.000000, 0.000000, 1.000000, 50.000000, 50.000000)
+nvgFontFace( vg, "sans")
+nvgFontSize( vg, 24.000000)
+nvgTextLineHeight( vg, 24.000000)
+nvgTextAlign( vg, NVG_ALIGN_CENTER|NVG_ALIGN_BASELINE)
+nvgTextLetterSpacing( vg, 0.000000)
+nvgClearType( vg, NO)
+nvgTextColor( vg, {r:0.000000, g:0.000000, b:0.000000, a:1.000000})
+nvgTextBackgroundColor( vg, CGColorMake( 0.000000, 0.000000, 0.000000, 0.000000))
+nvgText( vg, 150.000000, 109.000000, "VfL Bochum 1848", +15)
+nvgText -> 249.000000
+nvgClearType( vg, NO)
+--- End Rendering ---
+
+Render completed successfully

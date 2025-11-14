@@ -75,6 +75,10 @@ struct CATextLayerFontMetrics
 // the correct color to use
 @property( assign, getter=isClearTypeEnabled) BOOL  clearTypeEnabled;
 
+// if YES, anti-aliasing pixels are considered visible in visualBounds
+// if NO (default), visualBounds is inset by 1 pixel to exclude anti-aliasing
+@property( assign, getter=isAliasPixelVisible) BOOL  aliasPixelVisible;
+
 
 // properties that invalidate rows and glyphs
 // increment textPropertiesGenerationCounts
@@ -152,6 +156,12 @@ struct CATextLayerFontMetrics
 - (struct CATextLayerFontMetrics) fontMetricsWithLayoutContext:(id <UILayoutContext>) context;
 
 - (struct CATextLayerFontMetrics) prepareLayoutContext:(id <UILayoutContext>) context;
+
+- (CGRect) glyphRectAtPoint:(CGPoint) point;
+
+- (NSUInteger) characterOffsetAtPoint:(CGPoint) point;
+
+- (CGRect) visualBoundsWithContext:(id <UILayoutContext>) context;
 
 //
 // this may change fontSize to a random value!

@@ -17,9 +17,9 @@
 
    mulle_fprintf( stderr, "%s\n", __FUNCTION__);
 
-   old = nvgTrace( CGContextGetNVGContext( context), stderr);
+   old = nvgTrace( CGContextGetNVGContext( context), [context nameUTF8String],  stderr);
    [super renderInContext:context];
-   nvgTrace( CGContextGetNVGContext( context), old);
+   nvgTrace( CGContextGetNVGContext( context), [context nameUTF8String], old);
    mulle_fprintf( stderr, "\n");
 }
 

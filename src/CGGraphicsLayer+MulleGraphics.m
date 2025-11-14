@@ -299,7 +299,7 @@ void  CGGraphicsLayerSetupDrawTransform( CGGraphicsLayer *self,
 
    isTracing = [self isTracingDrawCalls];
    if( isTracing)
-      oldtrace = nvgTrace( CGContextGetNVGContext( context), stderr);
+      oldtrace = nvgTrace( CGContextGetNVGContext( context), [context nameUTF8String], stderr);
 
    // this draws with _frame coordinates w/o bounds and rotation
    if( [self drawsBackgroundWithAlpha:alpha])
@@ -336,7 +336,7 @@ void  CGGraphicsLayerSetupDrawTransform( CGGraphicsLayer *self,
    }
 
    if( isTracing)
-      nvgTrace( CGContextGetNVGContext( context), oldtrace);
+      nvgTrace( CGContextGetNVGContext( context), [context nameUTF8String], oldtrace);
 }
 
 

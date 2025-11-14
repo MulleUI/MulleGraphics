@@ -11,8 +11,8 @@
 
 - (BOOL) drawInContext:(CGContext *) context
 {
-   CGRect                   vbounds;
-   struct MulleEdgeInsets   insets;
+   CGRect     vbounds;
+   CGPoint    origin;
 
     //
    // draw visual bounds on top of what CATextLayer drew
@@ -23,12 +23,12 @@
 
    MulleUICLog( "%s", CGRectUTF8String( vbounds));
 
-   insets = [self insets];
+   origin = [self origin];
 
    CGContextSave( context);
    {
       CGContextResetScissor( context);
-      CGContextTranslate( context, CGPointMake( insets.left, insets.right));
+      CGContextTranslate( context, origin);
       CGContextStrokeRectWithColor( context, vbounds, 1.0, CGColorMakeLime());
    }
    CGContextRestore( context);
@@ -113,6 +113,7 @@ static UIView *   setupSceneInWindow( UIWindow *window)
    [layer setBorderColor:CGColorMakeRed()];
    [layer setTextColor:CGColorMakeBlack()];
    [layer setTextBackgroundColor:CGColorMakeGray()];
+   //[layer setTextVerticalAlignment:valignment];
 
    view = [UIView viewWithLayer:layer];
    [contentView addSubview:view];

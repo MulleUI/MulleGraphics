@@ -50,7 +50,7 @@ struct ribbons_options
 
 - (BOOL) drawInContext:(CGContext *) context
 {
-   CGContextStrokeLineWithColor( context, self->_origin, [self->_neighbor origin], -1.0, self->_color);
+   CGContextStrokeLineWithColor( context, self->_origin, [self->_neighbor origin], 1.0, self->_color);
    return( YES);
 }
 

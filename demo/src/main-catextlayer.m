@@ -128,7 +128,7 @@
 
 
    layouter = MULLE_OBJC_CLASS_CAST( CATextLayerLayouter, _layouter);
-   mulle_sprintf_do( buf, "visualBounds : %s", CGRectUTF8String( [layouter visualBoundsWithContext:context]))
+   mulle_sprintf_do( buf, "visualBounds : %s", CGRectUTF8String( [self visualBoundsWithContext:context]))
    {
       CGContextTextInRect( context, buf,
                            (size_t) -1,
@@ -148,7 +148,6 @@
                            CGTextOptionAlignVisually);
       textRect.origin.y += 20;
    }
-
 
 
    mulle_sprintf_do( buf, "FontPixelSize : %g", _renderedFontMetrics.fontPixelSize)

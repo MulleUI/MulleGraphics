@@ -60,7 +60,7 @@
 {
    NSUInteger   i;
 
-   i = [self characterOffsetAtPoint:point];
+   i = [self characterOffsetOfGlyphAtPoint:point];
    if( i == NSNotFound)
       return;
 
@@ -73,7 +73,7 @@
 {
    NSUInteger   i;
 
-   i = [self characterOffsetAtPoint:point];
+   i = [self characterOffsetOfGlyphAtPoint:point];
    if( i == NSNotFound)
       return;
 

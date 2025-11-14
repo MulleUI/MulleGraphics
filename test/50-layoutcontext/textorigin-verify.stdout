@@ -1,0 +1,35 @@
+=== Alignment Math Verification ===
+Test Rect: 0 0 200 100
+Font Size: 16.0
+Expected font metrics (from 16px font):
+  ascender:  ~12.56
+  descender: ~3.44
+  lineHeight: 16.0
+
+Horizontal Alignment (X-axis):
+  Left:   x = rect.minX = 0.0
+  Center: x = rect.midX = 100.0
+  Right:  x = rect.maxX = 200.0
+
+Vertical Alignment (Y-axis) for single line:
+  Top:      y = ascender = 12.56
+  Middle:   y = (height + ascender - descender) / 2 = (100 + 12.56 - 3.44) / 2 = 54.56
+  Bottom:   y = height - descender = 100 - 3.44 = 96.56
+  Baseline: y = height / 2 = 100 / 2 = 50
+
+For multi-line (3 lines, lineHeight=16):
+  rowsHeight = 16 * 3 = 48
+  Top:      y = ascender = 12.56
+  Middle:   y = (height - rowsHeight) / 2 + ascender = (100 - 48) / 2 + 12.56 = 26 + 12.56 = 38.56... hmm
+  Bottom:   y = height - rowsHeight + ascender = 100 - 48 + 12.56 = 64.56... hmm
+
+=== Actual Values from textOriginInRect:context: ===
+Center/Top: 100 12.56
+Center/Middle: 100 54.56
+Center/Bottom: 100 96.56
+Center/Baseline: 100 50
+
+Multi-line (3 lines):
+Center/Top: 100 12.56
+Center/Middle: 100 46.56
+Center/Bottom: 100 80.56

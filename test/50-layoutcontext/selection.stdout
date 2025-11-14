@@ -1,0 +1,8 @@
+=== Basic Selection ===
+Initial selection: {0, 0}
+After selectAll: {0, 15}
+After deselectAll: {0, 0}
+
+=== Multi-line Selection ===
+Selection spanning lines: {3, 10}
+Selection with newlines: {0, 14}

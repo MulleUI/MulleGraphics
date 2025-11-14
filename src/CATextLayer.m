@@ -3,7 +3,9 @@
 #import "import-private.h"
 
 #import "CGGraphicsLayer+MulleGraphics.h"
-#import "CATextLayerLayouter+CGGraphicsLayerLayouter.h" // for protocol
+#import "CATextLayerLayouter+CGGraphicsLayerLayouter.h"
+#import "CATextLayerLayouter+Layout.h"
+#import "CATextLayerLayouter+RowsAndGlyphs.h"
 
 
 #include <ctype.h>
@@ -28,6 +30,7 @@
    self = [super _initWithFrame:frame];
 
    _clearTypeEnabled = YES;
+   _aliasPixelVisible = NO;  // default: inset by 1 pixel
 
    // because Fonts are crap and don't adhere to size requests properly, it's
    // usually better to overdraw than to clip.
@@ -95,6 +98,7 @@
    // because Fonts are crap and don't adhere to size requests properly, it's
    // usually better to overdraw than to clip.
    copy->_clearTypeEnabled    = self->_clearTypeEnabled;
+   copy->_aliasPixelVisible   = self->_aliasPixelVisible;
    copy->_masksToBounds       = self->_masksToBounds;
 
    //
@@ -126,23 +130,11 @@
    [self setCursorPaint:[CGPaint paintWithColor:color]];
 }
 
-
-
 - (void) setSelectionColor:(CGColor) color
 {
    [self setSelectionPaint:[CGPaint paintWithColor:color]];
 }
 
-
-- (void) setFontPixelSize:(CGFloat) value
-{
-   [self willChange];
-   if( value != _fontPixelSize)
-   {
-      _fontPixelSize = value;
-      _textPropertiesGenerationCount++;
-   }
-}
 
 - (void) setFrame:(CGRect) frame
 {
@@ -159,6 +151,35 @@
 }
 
 
+- (void) setFontPixelSize:(CGFloat) value
+{
+   [self willChange];
+
+   if( ! isinf( value))
+   {
+      value = mvgRoundedFontSize( value);
+      if( value == _fontPixelSize)
+         return;
+   }
+   _fontPixelSize = value;
+   _textPropertiesGenerationCount++;
+}
+
+
+- (void) setTextLineHeight:(CGFloat) textLineHeight
+{
+   [self willChange];
+
+   if( ! isinf( textLineHeight))
+   {
+      if( textLineHeight == _textLineHeight)
+         return;
+   }
+   _textLineHeight = textLineHeight;
+   _textPropertiesGenerationCount++;
+}
+
+
 
 - (void) setTextLetterSpacing:(CGFloat) textLetterSpacing
 {
@@ -169,18 +190,6 @@
       _textPropertiesGenerationCount++;
    }
 }
-
-
-- (void) setTextLineHeight:(CGFloat) textLineHeight
-{
-   [self willChange];
-   if( textLineHeight != _textLineHeight)
-   {
-      _textLineHeight = textLineHeight;
-      _textPropertiesGenerationCount++;
-   }
-}
-
 
 
 - (void) setTextAlignment:(UITextAlignment) textAlignment
@@ -217,13 +226,16 @@ static void   assert_sane_font_name( char *s)
 // fontNameUTF8String ?
 - (void) setFontNameUTF8String:(char *) s
 {
+   if( _fontNameUTF8String == s)
+      return;
+
    assert_sane_font_name( s);
 
-   if( strcmp( _fontNameUTF8String, s))
-   {
-      MulleObjCObjectSetDuplicatedUTF8String( self, &_fontNameUTF8String, s);
-      _textPropertiesGenerationCount++;
-   }
+   if( _fontNameUTF8String && s && ! strcmp( _fontNameUTF8String, s))
+      return;
+
+   MulleObjCObjectSetDuplicatedUTF8String( self, &_fontNameUTF8String, s);
+   _textPropertiesGenerationCount++;
 }
 
 
@@ -422,6 +434,7 @@ uintptr_t   mulle_utf8_utf32_offset_at_characters( char *data,
    CGFloat      actualFontHeight;
    CGFloat      probe;
    CGFloat      factor;
+   CGFloat      fontPixelSize;
    CGRect       canvas;
    CGRect       fontBounds;
    NSUInteger   nRows;
@@ -461,7 +474,8 @@ uintptr_t   mulle_utf8_utf32_offset_at_characters( char *data,
    if( ! nRows)
       nRows = 1;
 
-   return( (CGFloat) (int) ((canvas.size.height / (CGFloat) nRows) * factor));
+   fontPixelSize = (canvas.size.height / (CGFloat) nRows) * factor;
+   return( mvgRoundedFontSize( fontPixelSize));
 }
 
 
@@ -505,6 +519,63 @@ uintptr_t   mulle_utf8_utf32_offset_at_characters( char *data,
    // memo we dont use vertical height, thats used by the layouter only
    return( metrics);
 }
+
+
+- (NSUInteger) characterOffsetAtPoint:(CGPoint) point
+{
+   CGPoint               adjusted;
+   NSUInteger            index;
+   CATextLayerLayouter   *layouter = MULLE_OBJC_CLASS_CAST( CATextLayerLayouter, _layouter);
+
+   adjusted = CGPointMake( point.x - _origin.x, point.y - _origin.y);
+   index    = [layouter characterOffsetOfGlyphAtPoint:adjusted];
+   return( index);
+}
+
+
+- (CGRect) glyphRectAtPoint:(CGPoint) point
+{
+   CGRect                   rect;
+   struct UIGlyphPosition   glyphPosition;
+   CGPoint                  offset;
+   CGPoint                  adjusted;
+   CAGlyphSeating           seating;
+   CATextLayerLayouter      *layouter = MULLE_OBJC_CLASS_CAST( CATextLayerLayouter, _layouter);
+
+   adjusted = CGPointMake( point.x - _origin.x, point.y - _origin.y);
+   seating  = [layouter getGlyphPosition:&glyphPosition
+                                 atPoint:adjusted];
+
+   if( CAGlyphSeatingIsNull( seating))
+   {
+      //mulle_fprintf( stderr, "Not found\n");
+      return( CGRectNull);
+   }
+
+   offset    = _origin;
+   offset.y += seating.row * _renderedFontMetrics.textLineHeight;
+
+   rect = CGRectMakeWithOriginAndOpposite(
+                               CGPointMake( offset.x + glyphPosition.minx,
+                                            offset.y + glyphPosition.miny),
+                               CGPointMake( offset.x + glyphPosition.maxx,
+                                            offset.y + glyphPosition.maxy));
+   // mulle_fprintf( stderr, "%tu -> %s\n", index, CGRectUTF8String( rect));
+   return( rect);
+}
+
+
+- (CGRect) visualBoundsWithContext:(id <UILayoutContext>) context
+{
+   CGRect                rect;
+   CATextLayerLayouter   *layouter = MULLE_OBJC_CLASS_CAST( CATextLayerLayouter, _layouter);
+
+   rect           = [layouter visualBoundsWithContext:context];
+   rect.origin.x += _origin.x;
+   rect.origin.y += _origin.y;
+   return( rect);
+}
+
 
 
 - (BOOL) drawInContext:(CGContext *) context

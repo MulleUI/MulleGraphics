@@ -1,0 +1,15 @@
+lh:inf font:16 rows:0 v:UITextAlignmentBottom origin:100 64.56 text:
+A
+B
+C
+---
+lh:24 font:16 rows:0 v:UITextAlignmentBottom origin:100 40.56 text:
+A
+B
+C
+---
+lh:8 font:16 rows:0 v:UITextAlignmentBottom origin:100 88.56 text:
+A
+B
+C
+---

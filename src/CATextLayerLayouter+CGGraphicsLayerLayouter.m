@@ -63,56 +63,59 @@
    struct UIGlyphPosition          *glyph;
    struct UIGlyphPosition          *glyphs;
    struct CATextLayerFontMetrics   metrics;
+   void                            *state;
 
-   textLayer = MULLE_OBJC_CLASS_CAST_NON_NIL( CATextLayer, layer);
-   metrics   = [textLayer prepareLayoutContext:context];
-
-   // canvas might still be 0, as we are likely calculating sizeToFit:
-   // we change it to max (temporarily)
-   [textLayer setSizeToFitMaxSize:max];
+   state = [context pushGraphicsState];
    {
-      [self setTextLayer:textLayer];
-      // MEMO: i think i need to force and update here
-      [self invalidate];
-      [self updateRowsAndGlyphsWithContextIfNeeded:context];
+      textLayer = MULLE_OBJC_CLASS_CAST_NON_NIL( CATextLayer, layer);
+      metrics   = [textLayer prepareLayoutContext:context];
+
+      // canvas might still be 0, as we are likely calculating sizeToFit:
+      // we change it to max (temporarily)
+      [textLayer setSizeToFitMaxSize:max];
+      {
+         [self setTextLayer:textLayer];
+         // MEMO: i think i need to force and update here
+         [self invalidate];
+         [self updateRowsAndGlyphsWithContextIfNeeded:context];
+      }
+      [textLayer setSizeToFitMaxSize:CGSizeZero];
+
+      nRows = _mulle_structarray_get_count( &_rowArray);
+
+      // the height don't change, and our virtual start is always zero
+      textSize.width  = 0.0f;
+      textSize.height = metrics.textLineHeight * nRows;
+
+      // adjust for "funny" output with overlapping lineheights
+      if( metrics.textLineHeight < _metrics.lineHeight)
+         textSize.height += (_metrics.lineHeight - metrics.textLineHeight);
+
+      minx = INFINITY;
+      maxx = -INFINITY;
+
+      for( i = 0; i < nRows; i++)
+      {
+         row     = _mulle_structarray_get( &_rowArray, i);
+         glyphs  = _mulle_structarray_get( &_glyphArray, row->glyphRange.location);
+         nGlyphs = row->glyphRange.length;
+         if( ! nGlyphs)
+            continue;
+
+         // get last
+         glyph = &glyphs[ 0];
+         minx  = fminf( minx, glyph->minx);
+         glyph = &glyphs[ nGlyphs - 1];
+         maxx  = fmaxf( maxx, glyph->maxx - 2.0f);  // fummel
+      }
+
+      if( ! isinf( maxx))
+         textSize.width = maxx - minx;
    }
-   [textLayer setSizeToFitMaxSize:CGSizeZero];
-
-   nRows = _mulle_structarray_get_count( &_rowArray);
-
-   // the height don't change, and our virtual start is always zero
-   textSize.width  = 0.0f;
-   textSize.height = metrics.textLineHeight * nRows;
-
-   // adjust for "funny" output with overlapping lineheights
-   if( metrics.textLineHeight < _metrics.lineHeight)
-      textSize.height += (_metrics.lineHeight - metrics.textLineHeight);
-
-   minx = INFINITY;
-   maxx = -INFINITY;
-
-   for( i = 0; i < nRows; i++)
-   {
-      row     = _mulle_structarray_get( &_rowArray, i);
-      glyphs  = _mulle_structarray_get( &_glyphArray, row->glyphRange.location);
-      nGlyphs = row->glyphRange.length;
-      if( ! nGlyphs)
-         continue;
-
-      // get last
-      glyph = &glyphs[ 0];
-      minx  = fminf( minx, glyph->minx);
-      glyph = &glyphs[ nGlyphs - 1];
-      maxx  = fmaxf( maxx, glyph->maxx - 2.0f);  // fummel
-   }
-
-   if( ! isinf( maxx))
-      textSize.width = maxx - minx;
+   [context popGraphicsState:state];
 
    return( textSize);
 }
-
-
 
 
 - (void) layoutLayer:(CGGraphicsLayer *) layer
