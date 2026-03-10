@@ -61,6 +61,8 @@ struct CATextLayerLayouterRow
 
    // values exist after a frame is drawn, will change on next redraw possibly
    struct CGTextMetrics                _metrics;
+   // values exist if textLayer enables useVisualBounds
+   struct CGTextMetrics                _visualMetrics;
 
    // this can be stale if the layer text has changed, do not use
 }

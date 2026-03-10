@@ -41,9 +41,10 @@ static void  dump_layer_rows( CATextLayer *layer)
               &textData.characters[ row->textRange.location],
               row->selectionStyle == CATextLayerSelectionStyleNone ? "none" : "rect",
               row->cursorStyle == CATextLayerCursorStyleNone ? "none" : "line");
-      printf( "         selRect:%s cursorRect:%s\n",
-              CGRectUTF8String( row->selectionRect),
-              CGRectUTF8String( row->cursorRect));
+      printf( "         selX:%.1f selWidth:%.1f cursorX:%.1f\n",
+              row->selectionX,
+              row->selectionWidth,
+              row->cursorX);
    }
    printf( "  origin:%s\n", CGPointUTF8String( [layer origin]));
 }

@@ -32,7 +32,7 @@ struct MulleCursorUTF8Data
 
 @interface CATextLayerLayouter( Cursor)
 
-- (CGRect) cursorRectInRow:(NSUInteger) i;
+- (CGFloat) cursorXInRow:(NSUInteger) i;
 
 - (CGFloat) offsetNeededToMakeCursorVisible;
 
@@ -66,7 +66,7 @@ struct MulleCursorUTF8Data
 
 @interface CATextLayer( CATextLayerLayouter_Cursor_Forward)
 
-- (CGRect) cursorRectInRow:(NSUInteger) i;
+- (CGFloat) cursorXInRow:(NSUInteger) i;
 
 - (CGFloat) offsetNeededToMakeCursorVisible;
 

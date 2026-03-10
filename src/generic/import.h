@@ -8,7 +8,7 @@
  * vendor/extension: mulle-objc/objc
  *
  * This is a central include file to keep dependencies out of the library
- *  Objective-C files. It is usally imported by Objective-C .h files only.
+ *  Objective-C files. It is usually imported by Objective-C .h files only.
  *  .m and .aam use import-private.h.
  */
 
@@ -28,9 +28,17 @@
  */
 
 #import "_MulleGraphics-import.h"
-#ifndef MULLE_GRAPHICS_EXTERN_GLOBAL
-# define MULLE_GRAPHICS_EXTERN_GLOBAL MULLE_C_EXTERN_GLOBAL
-#endif
 
+#ifdef MULLE_GRAPHICS_BUILD
+# define MULLE_GRAPHICS_GLOBAL        MULLE_C_GLOBAL
+# define MULLE_GRAPHICS_GLOBAL_VAR    MULLE_C_GLOBAL_VAR
+#else
+# if defined( MULLE_GRAPHICS_INCLUDE_DYNAMIC) || (defined( MULLE_INCLUDE_DYNAMIC) && ! defined( MULLE_GRAPHICS_INCLUDE_STATIC))
+#  define MULLE_GRAPHICS_GLOBAL       MULLE_C_EXTERN_GLOBAL
+# else
+#  define MULLE_GRAPHICS_GLOBAL       extern
+# endif
+# define MULLE_GRAPHICS_GLOBAL_VAR
+#endif
 
 /* You can add some more import statements here */

@@ -12,21 +12,18 @@
 @implementation CATextLayerLayouter( Cursor)
 
 
-- (CGRect) cursorRectInRow:(NSUInteger) i
+- (CGFloat) cursorXInRow:(NSUInteger) i
 {
-   CGFloat                       h;
-   CGFloat                       y;
-   CGPoint                       offset;
-   NSUInteger                    nGlyphs;
-   NSUInteger                    x;
+   NSUInteger                      nGlyphs;
+   NSUInteger                      x;
    struct CATextLayerLayouterRow   *row;
-   struct UIGlyphPosition        *glyphs;
+   struct UIGlyphPosition          *glyphs;
 
    if( MulleCursorPositionIsMax( _cursorPosition))
       _cursorPosition = [self maxCursorPosition];
 
    if( _cursorPosition.y != i)
-      return( CGRectZero);
+      return( 0);
 
    // get glyphs for current row
    row     = _mulle_structarray_get( &_rowArray, i);
@@ -36,20 +33,9 @@
    // get glyphs
    x = _cursorPosition.x;
    if( x > nGlyphs)
-      return( CGRectZero);
+      return( 0);
 
-   offset.x = glyphs[ x].x;
-
-   h = _metrics.lineHeight;
-   y = 0.0f;
-   if( h >= 8.0f)
-   {
-      h -= 2;
-      y  = 1;
-   }
-   offset.y = -(_metrics.lineHeight / 2); // depends on alignment, really, use middle here
-
-   return( CGRectMake( offset.x - 0.5, _metrics.ascender + y, 1, _metrics.lineHeight));
+   return( glyphs[ x].x - 0.5);
 }
 
 

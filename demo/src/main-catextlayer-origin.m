@@ -245,7 +245,7 @@ int   main( int argc, char *argv[])
 
    mulle_fprintf( stderr, "%s\n", __FUNCTION__);
 
-   old = nvgTrace( CGContextGetNVGContext( context), [context nameUTF8String], stderr);
+   old = nvgTrace( CGContextGetNVGContext( context), stderr);
    [super renderInContext:context];
    nvgTrace( CGContextGetNVGContext( context), old);
    mulle_fprintf( stderr, "\n");

@@ -232,12 +232,11 @@
 
 static UITextVerticalAlignment   values[] = 
 {
-   UITextAlignmentMiddle,
+   UITextAlignmentBaseline,
    UITextAlignmentTop,
    UITextAlignmentBottom,
-   UITextAlignmentBaseline,          // only for single line
-   UITextAlignmentVisualMiddle,
-   UITextAlignmentVisualFill
+   UITextAlignmentMiddle,
+   UITextAlignmentFill
 };
 #define n_values (sizeof( values) / sizeof( values[ 0]))
 

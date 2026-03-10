@@ -8,16 +8,31 @@
 
 @implementation CAShapeLayer
 
-- (void) setCGPath:(CGPath *) path
+- (instancetype) initNoLock
 {
-   CGPathDestroy( _path);
+   self = [super initNoLock];
+   if( self)
+   {
+      _ownsPath = YES;
+   }
+   return( self);
+}
+
+
+- (void) setPath:(CGPath *) path
+{
+   assert( path != _path);
+
+   if( _ownsPath)
+      CGPathDestroy( _path);
    _path = path;
 }
 
 
 - (void) dealloc
 {
-   CGPathDestroy( _path);
+   if( _ownsPath)
+      CGPathDestroy( _path);
    [super dealloc];
 }
 
@@ -38,7 +53,7 @@
 }
 
 
-// MEMO: a paint is usally a value and not mutable i.e. threadsafe no problem
+// MEMO: a paint is usually a value and not mutable i.e. thread-safe no problem
 //       we don't need to gain or relinquish. But! if we have a CGImage it
 //       could be a CGFramebuffer, which is mutable and we would need to
 //       transfer it. But! The CGImage is also part of the resource management

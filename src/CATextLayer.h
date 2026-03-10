@@ -24,9 +24,12 @@ typedef NS_ENUM( NSUInteger, CATextLayerSelectionStyle)
 struct CATextLayerRow
 {
    NSRange                     textRange;
-   CGRect                      selectionRect;
+
+   CGFloat                     selectionX;
+   CGFloat                     selectionWidth;
    CATextLayerSelectionStyle   selectionStyle;
-   CGRect                      cursorRect;
+
+   CGFloat                     cursorX;
    CATextLayerCursorStyle      cursorStyle;
 };
 
@@ -65,15 +68,16 @@ struct CATextLayerFontMetrics
 //       colorized with a mono color, so gradients aren't possible
 @property( observable, copy) CGPaint     *textPaint;
 
-// only used with clearType. If nil, the default backgroundPaint will
-// be used. The textBackgroundPaint is just informational for clearType it will
-// not be used to paint
+// only used with clearType or if drawsTextBackground is set. If nil, the
+// default backgroundPaint will be used. The textBackgroundPaint is just
+// informational for clearType it will not be used to paint. It will get used
+// if drawsTextBackground is enabled.
 @property( observable, copy) CGPaint     *textBackgroundPaint;
 
 // for cleartype it's important to know the color the text is drawn on
 // if the layer backgroundColor is transparent, use this color to supply
 // the correct color to use
-@property( assign, getter=isClearTypeEnabled) BOOL  clearTypeEnabled;
+@property( assign, getter=isClearTypeEnabled) BOOL   clearTypeEnabled;
 
 // if YES, anti-aliasing pixels are considered visible in visualBounds
 // if NO (default), visualBounds is inset by 1 pixel to exclude anti-aliasing
@@ -99,6 +103,12 @@ struct CATextLayerFontMetrics
 // not used by CATextLayer but used by Editor, stored here for easier UI
 // setup
 @property( assign) UITextVerticalAlignment   textVerticalAlignment;
+
+// if YES, use visual bounds (actual rendered pixels) for vertical alignment
+// if NO (default), use font metrics bounds (ascender/descender/lineHeight)
+// NOTE: not observable because BOOLs cannot be animated
+@property( assign) BOOL                      useVisualBounds;
+@property( assign) BOOL                      drawsTextBackground;
 
 
 
@@ -167,5 +177,9 @@ struct CATextLayerFontMetrics
 // this may change fontSize to a random value!
 //
 - (CGFloat) suggestedFontPixelSizeWithContext:(id <UILayoutContext>) context;
+
+// this tries to fit the text also horizontally into canvas, this is
+// used by UIButton initially (unless you set a fontPixelSize)
+- (CGFloat) suggestedFontPixelSizeToFitTextWithContext:(id <UILayoutContext>) context;
 
 @end

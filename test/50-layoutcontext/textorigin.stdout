@@ -9,8 +9,8 @@ text: "VfL" h:UITextAlignmentLeft v:UITextAlignmentBottom rect:0 0 200 100 -> or
 text: "VfL" h:UITextAlignmentCenter v:UITextAlignmentBottom rect:0 0 200 100 -> origin:100 96.56 [0 newlines]
 text: "VfL" h:UITextAlignmentRight v:UITextAlignmentBottom rect:0 0 200 100 -> origin:200 96.56 [0 newlines]
 text: "VfL" h:UITextAlignmentCenter v:UITextAlignmentBaseline rect:0 0 200 100 -> origin:100 50 [0 newlines]
-text: "VfL" h:UITextAlignmentCenter v:UITextAlignmentVisualMiddle rect:0 0 200 100 -> origin:100 56 [0 newlines]
-text: "VfL" h:UITextAlignmentCenter v:UITextAlignmentVisualFill rect:0 0 200 100 -> origin:100 56 [0 newlines]
+text: "VfL" h:UITextAlignmentCenter v:UITextAlignmentMiddle rect:0 0 200 100 -> origin:100 56 [0 newlines]
+text: "VfL" h:UITextAlignmentCenter v:UITextAlignmentFill rect:0 0 200 100 -> origin:100 12.56 [0 newlines]
 
 === Multi-Line Tests ===
 text: "VfL
@@ -52,7 +52,7 @@ Bochum" h:UITextAlignmentCenter v:UITextAlignmentMiddle rect:0 0 200 100 -> orig
 text: "VfL
 Bochum" h:UITextAlignmentRight v:UITextAlignmentBottom rect:0 0 200 100 -> origin:200 80.56 [1 newlines]
 text: "VfL
-Bochum" h:UITextAlignmentCenter v:UITextAlignmentBaseline rect:0 0 200 100 -> origin:100 46.56 [1 newlines]
+Bochum" h:UITextAlignmentCenter v:UITextAlignmentBaseline rect:0 0 200 100 -> origin:100 42 [1 newlines]
 
 === Different Rect Sizes ===
 text: "VfL" h:UITextAlignmentCenter v:UITextAlignmentMiddle rect:10 10 50 30 -> origin:45 29.56 [0 newlines]

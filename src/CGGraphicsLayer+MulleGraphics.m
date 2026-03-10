@@ -260,7 +260,6 @@ void  CGGraphicsLayerSetupDrawTransform( CGGraphicsLayer *self,
 {
    CGFloat   alpha;
    BOOL      isDrawing;
-   BOOL      isTracing;
    FILE      *oldtrace;
 
    assert( context);
@@ -297,9 +296,7 @@ void  CGGraphicsLayerSetupDrawTransform( CGGraphicsLayer *self,
    // clean slate for background, then content, and then border
    //
 
-   isTracing = [self isTracingDrawCalls];
-   if( isTracing)
-      oldtrace = nvgTrace( CGContextGetNVGContext( context), [context nameUTF8String], stderr);
+   oldtrace = nvgTrace( CGContextGetNVGContext( context), _drawCallTracer);
 
    // this draws with _frame coordinates w/o bounds and rotation
    if( [self drawsBackgroundWithAlpha:alpha])
@@ -335,8 +332,7 @@ void  CGGraphicsLayerSetupDrawTransform( CGGraphicsLayer *self,
       [self drawBorderInContext:context];
    }
 
-   if( isTracing)
-      nvgTrace( CGContextGetNVGContext( context), [context nameUTF8String], oldtrace);
+   nvgTrace( CGContextGetNVGContext( context), oldtrace);
 }
 
 

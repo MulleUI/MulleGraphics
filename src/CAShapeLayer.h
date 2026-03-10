@@ -28,7 +28,7 @@
 // CGPathDestroy on it (unless ownsPath is set to NO)
 //
 @property( assign) struct CGPath               *path;
-@property( assign, getter=isOwningPath) BOOL   ownsPath;
+@property( assign, getter=isOwningPath) BOOL   ownsPath;  // default YES
 
 @end
 

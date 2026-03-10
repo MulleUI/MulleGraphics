@@ -34,6 +34,7 @@
    
    // Create text layer
    _textLayer = [CATextLayer instance];
+   [_textLayer setLayouter:nil];
    [_textLayer setFontPixelSize:FONT_PIXEL_SIZE];
    [_textLayer setTextAlignment:UITextAlignmentLeft];
    [_textLayer setBackgroundColor:CGColorMakeLightGray()];
@@ -50,32 +51,36 @@
    [_textLayer setTextUTF8Data:data];
    
    // Manually create rows - this is what the layouter would normally do
-   // Row 0: "The quick brown fox" (0-19)
+   // Row 0: "The quick brown fox" (0-19) - with selection at start
    rows[ 0].textRange       = NSMakeRange( 0, 19);
-   rows[ 0].selectionRect   = CGRectMake( 0, 0, 100, LINE_HEIGHT);
+   rows[ 0].selectionX      = 10;
+   rows[ 0].selectionWidth  = 80;
    rows[ 0].selectionStyle  = CATextLayerSelectionStyleRect;
-   rows[ 0].cursorRect      = CGRectZero;
+   rows[ 0].cursorX         = 0;
    rows[ 0].cursorStyle     = CATextLayerCursorStyleNone;
    
-   // Row 1: "jumps over the lazy dog." (20-44)
+   // Row 1: "jumps over the lazy dog." (20-44) - with cursor in middle
    rows[ 1].textRange       = NSMakeRange( 20, 24);
-   rows[ 1].selectionRect   = CGRectZero;
+   rows[ 1].selectionX      = 0;
+   rows[ 1].selectionWidth  = 0;
    rows[ 1].selectionStyle  = CATextLayerSelectionStyleNone;
-   rows[ 1].cursorRect      = CGRectMake( 150, LINE_HEIGHT, 2, LINE_HEIGHT);
+   rows[ 1].cursorX         = 120;
    rows[ 1].cursorStyle     = CATextLayerCursorStyleLine;
    
-   // Row 2: "This is line three." (45-64)
+   // Row 2: "This is line three." (45-64) - no selection/cursor
    rows[ 2].textRange       = NSMakeRange( 45, 19);
-   rows[ 2].selectionRect   = CGRectZero;
+   rows[ 2].selectionX      = 0;
+   rows[ 2].selectionWidth  = 0;
    rows[ 2].selectionStyle  = CATextLayerSelectionStyleNone;
-   rows[ 2].cursorRect      = CGRectZero;
+   rows[ 2].cursorX         = 0;
    rows[ 2].cursorStyle     = CATextLayerCursorStyleNone;
    
-   // Row 3: "And here's line four." (65-86)
+   // Row 3: "And here's line four." (65-86) - with selection in middle
    rows[ 3].textRange       = NSMakeRange( 65, 21);
-   rows[ 3].selectionRect   = CGRectMake( 50, LINE_HEIGHT * 3, 120, LINE_HEIGHT);
+   rows[ 3].selectionX      = 60;
+   rows[ 3].selectionWidth  = 100;
    rows[ 3].selectionStyle  = CATextLayerSelectionStyleRect;
-   rows[ 3].cursorRect      = CGRectZero;
+   rows[ 3].cursorX         = 0;
    rows[ 3].cursorStyle     = CATextLayerCursorStyleNone;
    
    // Add rows to text layer

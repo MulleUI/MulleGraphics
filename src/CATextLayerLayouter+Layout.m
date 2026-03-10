@@ -114,103 +114,105 @@ static NSUInteger  count_newlines( mulle_utf8_t *s)
 - (CGPoint) textOriginInRect:(CGRect) rect
                      context:(id <UILayoutContext>) context
 {
-   CGPoint      origin;
-   CGFloat      rowsHeight;
-   CGRect       visualBounds;
-   NSUInteger   nRows;
-   void         *state;
+   CGFloat                baselineY;
+   CGFloat                boundsHeight;
+   CGFloat                rowsHeight;
+   CGFloat                textLineHeight;
+   CGPoint                origin;
+   CGRect                 visualBounds;
+   NSUInteger             middleRow;
+   NSUInteger             nRows;
+   void                   *state;
+   BOOL                   useVisualBounds;
+   struct CGTextMetrics   *metrics;
+
+   mulle_fprintf( stderr, "textOriginInRect: rect=(%.1f, %.1f, %.1f, %.1f)\n",
+                  rect.origin.x, rect.origin.y, rect.size.width, rect.size.height);
 
    state = [context pushGraphicsState];
    {
       [self updateRowsAndGlyphsWithContextIfNeeded:context];
 
-      // MEMO: special casing single line is OK, when the text moves to
-      //       double line, the contrast is stark already and then it doesnt
-      //       really matter that UITextAlignmentVisual... ceases
-      //       to be useful
       nRows = _mulle_structarray_get_count( &_rowArray);
-      if( nRows <= 1)
+      if( ! nRows)
+         nRows = 1;
+
+      textLineHeight = [_textLayer fontMetricsWithLayoutContext:context].textLineHeight;
+      rowsHeight     = textLineHeight * nRows;
+
+      // Determine bounds to use
+      useVisualBounds = [_textLayer useVisualBounds];
+      if( useVisualBounds)
       {
-         switch( [_textLayer textVerticalAlignment])
-         {
-            // ascender starts on canvas.origin.y by fontInfo
-         case UITextAlignmentTop :
-            origin.y = _metrics.ascender;
-            break;
-         case UITextAlignmentBottom :
-            origin.y = rect.size.height - _metrics.descender;
-            break;
-         case UITextAlignmentMiddle :
-            origin.y = (rect.size.height + _metrics.ascender - _metrics.descender) / 2.0;;
-            break;
+         visualBounds = [self visualBoundsWithContext:context];
+         //boundsTop    = visualBounds.origin.y;
+         boundsHeight = visualBounds.size.height;
 
-         default :
-#ifdef DEBUG       
-            mulle_fprintf( stderr, "_textVerticalAlignment: %x is unknown\n", [_textLayer textVerticalAlignment]);
-            abort();
-#endif         
-            // fall thru in not debug
-
-         case UITextAlignmentBaseline :
-            origin.y = rect.size.height / 2.0;
-            break;
-         //
-         // w=10
-         // 0123456789
-         // xxxx
-         // 10 / 2.0 + (4 - 0) / 2 = 7
-         // 20 -> 10   rect.size.height - (rect.size.height - _visualBounds[ 3])
-         case UITextAlignmentVisualFill   :
-         case UITextAlignmentVisualMiddle :
-            visualBounds = [self visualBoundsWithContext:context];
-            origin.y     = _metrics.ascender + (rect.size.height - visualBounds.size.height) / 2.0 - visualBounds.origin.y;
-            break;
-         }
+         _visualMetrics.ascender   = _metrics.ascender - visualBounds.origin.y;
+         _visualMetrics.descender  = _visualMetrics.lineHeight - _visualMetrics.ascender;
+         _visualMetrics.lineHeight = boundsHeight / nRows;
+         metrics                   = &_visualMetrics;
       }
       else
       {
-         // now we know the number of rows,
-         // calculate the height of all rows
+         // Font metrics bounds
+         // boundsTop    = 0.0;
+         boundsHeight = rowsHeight;
+         metrics      = &_metrics;
+      }
 
-         rowsHeight = [_textLayer fontMetricsWithLayoutContext:context].textLineHeight * nRows;
-
-         // this is top aligned as default, other alignments use this as well
-         switch( [_textLayer textVerticalAlignment])
+      // Calculate baseline reference point
+      // For odd rows: baseline of middle row
+      // For even rows: midpoint between two center rows
+      if( nRows == 1)
+      {
+      }
+      else
+         if( nRows & 1)
          {
-            // set as bottom aligned
-         case UITextAlignmentTop :
-            origin.y = _metrics.ascender;
-            break;
-
-         case UITextAlignmentBottom :
-            origin.y = rect.size.height - rowsHeight + _metrics.ascender;
-            break;
-
-         // the baseline alignment for multiple lines doesn't seem useful,
-         // yet for visual stability we need to produce something
-
-         case UITextAlignmentMiddle :
-            origin.y = (rect.size.height - rowsHeight) / 2.0 + _metrics.ascender;
-            break;
-
-         default :
-#ifdef DEBUG
-            mulle_fprintf( stderr, "textVerticalAlignment: %x is unknown\n", [_textLayer textVerticalAlignment]);
-            abort();
-#endif
-            // fall thru in not debug
-         case UITextAlignmentVisualMiddle   :
-         case UITextAlignmentVisualFill     :
-         case UITextAlignmentBaseline       :
-            // if odd rows the baseline of the middle is in the center
-            // otherwise same as "middle"
-            if( nRows & 1)
-               origin.y = (rect.size.height - rowsHeight + _metrics.lineHeight) / 2.0;
-            else
-               origin.y = (rect.size.height - rowsHeight) / 2.0 + _metrics.ascender;
-            break;
-
+            // odd rows: baseline of middle row
+            middleRow  = nRows / 2;
+            baselineY  = (middleRow - 1) * textLineHeight + metrics->ascender;
          }
+         else
+         {
+            // even rows: midpoint between two center baselines
+            middleRow  = nRows / 2;
+            baselineY  = (middleRow - 0.5) * textLineHeight;
+         }
+
+      // Calculate vertical origin based on alignment mode
+      switch( [_textLayer textVerticalAlignment])
+      {
+      case UITextAlignmentTop :
+         origin.y = metrics->ascender;
+         break;
+
+      case UITextAlignmentBottom :
+         origin.y = rect.size.height - boundsHeight + metrics->ascender;
+         break;
+
+      case UITextAlignmentMiddle :
+         origin.y = (rect.size.height - boundsHeight) / 2.0 + metrics->ascender;
+         break;
+
+      case UITextAlignmentBaseline :
+         // Center the baseline reference point
+         origin.y = rect.size.height / 2.0 - baselineY;
+         break;
+
+      case UITextAlignmentFill :
+         // Fill mode handled in suggestedFontPixelSizeWithContext
+         origin.y = metrics->ascender;
+         break;
+
+      default :
+#ifdef DEBUG
+         mulle_fprintf( stderr, "textVerticalAlignment: %x is unknown\n", [_textLayer textVerticalAlignment]);
+         abort();
+#endif
+         origin.y = metrics->ascender;
+         break;
       }
 
       switch( [_textLayer textAlignment])
@@ -236,7 +238,8 @@ static NSUInteger  count_newlines( mulle_utf8_t *s)
       origin.y += rect.origin.y;
 
       // If cursor is visible, keep it always visible
-      if( [_textLayer isEditing])
+      // (but not for centered text, where horizontal scrolling doesn't make sense)
+      if( [_textLayer isEditing] && [_textLayer textAlignment] != UITextAlignmentCenter)
          origin.x += [self offsetNeededToMakeCursorVisible];
 
       origin.x += _textOffset.x;
@@ -266,7 +269,6 @@ static NSUInteger  count_newlines( mulle_utf8_t *s)
       origin   = [self textOriginInRect:canvas
                                 context:context];
    }
-
 
    return( origin);
 }

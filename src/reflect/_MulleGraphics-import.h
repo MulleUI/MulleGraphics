@@ -19,7 +19,7 @@
 //    remove #import      : `mulle-sde dependency mark MulleCG no-header`
 //    rename              : `mulle-sde dependency|library set MulleCG include whatever.h`
 //    reorder             : `mulle-sde dependency move MulleCG <up|down>`
-//    toggle #import      : `mulle-sde dependency mark MulleCG [no-]import`
+//    toggle objc         : `mulle-sde dependency mark MulleCG [no-]import`
 //    toggle public       : `mulle-sde dependency mark MulleCG [no-]public`
 //    toggle optional     : `mulle-sde dependency mark MulleCG [no-]require`
 //    remove for platform : `mulle-sde dependency mark MulleCG no-platform-<uname>`
@@ -34,7 +34,7 @@
 //    remove #import      : `mulle-sde dependency mark MulleCA no-header`
 //    rename              : `mulle-sde dependency|library set MulleCA include whatever.h`
 //    reorder             : `mulle-sde dependency move MulleCA <up|down>`
-//    toggle #import      : `mulle-sde dependency mark MulleCA [no-]import`
+//    toggle objc         : `mulle-sde dependency mark MulleCA [no-]import`
 //    toggle public       : `mulle-sde dependency mark MulleCA [no-]public`
 //    toggle optional     : `mulle-sde dependency mark MulleCA [no-]require`
 //    remove for platform : `mulle-sde dependency mark MulleCA no-platform-<uname>`

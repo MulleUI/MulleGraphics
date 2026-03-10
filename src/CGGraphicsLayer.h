@@ -66,7 +66,8 @@ typedef BOOL   CGGraphicsLayerDrawCallback_t( CGGraphicsLayer *layer,
 // clip [layer bounds]
 @property CGGraphicsLayerDrawCallback_t    *drawCallback;
 
-@property( assign, getter=isTracingDrawCalls) BOOL   traceDrawCalls;
+// set to stderr or stdout turn off with NULL (default)
+@property( assign) FILE                    *drawCallTracer;
 @property( dynamic, assign) CGFloat        cornerRadius;
 
 @property( retain, nonserializable) id <CGGraphicsLayerLayouter>  layouter;

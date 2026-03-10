@@ -38,7 +38,8 @@
    _masksToBounds                 = NO;
    _fontPixelSize                 = INFINITY;   // means height of inset canvas
    _textAlignment                 = UITextAlignmentCenter;
-   _textVerticalAlignment         = UITextAlignmentVisualMiddle;
+   _textVerticalAlignment         = UITextAlignmentBaseline;
+   _useVisualBounds               = NO;
    _textPropertiesGenerationCount = 1; // start initially out of sync with editor
    _mulle_structarray_init( &_rowArray, sizeof( struct CATextLayerRow),
                                         alignof( struct CATextLayerRow),
@@ -444,23 +445,18 @@ uintptr_t   mulle_utf8_utf32_offset_at_characters( char *data,
       return( 0.0);
 
    factor = 1.0;
-   if( _textVerticalAlignment == UITextAlignmentVisualMiddle)
-   {
-      actualFontHeight = canvas.size.height;
-   }
-   else
+   if( _textVerticalAlignment == UITextAlignmentFill)
    {
       [context useFontWithNameUTF8String:_fontNameUTF8String];
-      [context setTextAlign:NVG_ALIGN_LEFT | NVG_ALIGN_TOP];
+      [context setCombinedTextAlignment:NVG_ALIGN_LEFT | NVG_ALIGN_TOP];
       [context setTextLetterSpacing:_textLetterSpacing];
 
       probe = 32.0f;
       [context setFontSize:probe];
 
       fontBounds.size.height = 0.0;
-      if( _textVerticalAlignment == UITextAlignmentVisualFill)
-         fontBounds = [context visualBoundsOfText:_textData.characters
-                                           length:_textData.length];
+      fontBounds = [context visualBoundsOfText:_textData.characters
+                                        length:_textData.length];
       // can happen if text is empty or just spaces
       if(fontBounds.size.height == 0.0)
          fontBounds = [context visualBoundsOfText:"|_;y\xB4" length:4];
@@ -468,6 +464,8 @@ uintptr_t   mulle_utf8_utf32_offset_at_characters( char *data,
       actualFontHeight = fontBounds.size.height;
       if( actualFontHeight != 0.0)
          factor = probe / actualFontHeight;
+
+      actualFontHeight = canvas.size.height;
    }
 
    nRows = [self numberOfRows];
@@ -485,7 +483,7 @@ uintptr_t   mulle_utf8_utf32_offset_at_characters( char *data,
 
    // these properties can be INFINITY for special values
    metrics.fontPixelSize = _fontPixelSize;
-   if( isinf( _fontPixelSize))
+   if( isinf( metrics.fontPixelSize))
       metrics.fontPixelSize = [self suggestedFontPixelSizeWithContext:context];
 
    assert( ! isinf( metrics.fontPixelSize) && ! isnan( metrics.fontPixelSize));
@@ -500,6 +498,35 @@ uintptr_t   mulle_utf8_utf32_offset_at_characters( char *data,
 }
 
 
+- (CGFloat) suggestedFontPixelSizeToFitTextWithContext:(id <UILayoutContext>) context
+{
+   float     fontPixelSize;
+   float     scale;
+   CGRect    canvas;
+   CGRect    fontBounds;
+
+   fontPixelSize = _fontPixelSize;
+   if( isinf( fontPixelSize))
+      fontPixelSize = [self suggestedFontPixelSizeWithContext:context];
+
+   [context useFontWithNameUTF8String:_fontNameUTF8String];
+   [context setTextAlignment:_textAlignment];
+   [context setTextLetterSpacing:_textLetterSpacing];
+   [context setFontSize:fontPixelSize];
+
+   fontBounds.size.width = 0.0;
+   fontBounds = [context visualBoundsOfText:_textData.characters
+                                     length:_textData.length];
+   // can happen if text is empty or just spaces
+   if( fontBounds.size.width == 0.0)
+       return( fontPixelSize);
+
+   canvas = [self insetCanvas];
+   scale  = canvas.size.width / fontBounds.size.width;
+   return( mvgRoundedFontSize( scale * fontPixelSize));
+}
+
+
 - (struct CATextLayerFontMetrics) prepareLayoutContext:(id <UILayoutContext>) context
 {
    struct CATextLayerFontMetrics   metrics;
@@ -508,11 +535,11 @@ uintptr_t   mulle_utf8_utf32_offset_at_characters( char *data,
 
    // set this last, depends on text letter spacing and font name
    metrics = [self fontMetricsWithLayoutContext:context];
-   MulleUILog( "metrics: { %g, %g}", metrics.fontPixelSize, metrics.textLineHeight);
+
    [context setFontSize:metrics.fontPixelSize];
    [context setTextLineHeight:metrics.textLineHeight];
 
-   [context setTextAlign:UITextAlignmentToTextAlign( _textAlignment)];
+   [context setCombinedTextAlignment:UITextAlignmentToTextAlign( _textAlignment)];
    [context setTextLetterSpacing:_textLetterSpacing];
    [context setLineBreakMode:_lineBreakMode];
 
@@ -581,15 +608,18 @@ uintptr_t   mulle_utf8_utf32_offset_at_characters( char *data,
 - (BOOL) drawInContext:(CGContext *) context
 {
    BOOL                    useClearType;
+   CGColor                 textBackgroundColor;
+   CGColor                 textColor;
    CGPaint                 *textBackgroundPaint;
    CGPaint                 *textPaint;
    CGPoint                 origin;
+   CGRect                  canvas;
    NSUInteger              i;
    NSUInteger              nRows;
-   CGColor                 textColor;
-   CGColor                 textBackgroundColor;
-   struct CATextLayerRow   *row;
    char                    *s;
+   struct CATextLayerRow   *row;
+   struct CGTextMetrics    metrics;
+   CGRect                  rect;
 
    if( ! [super drawInContext:context])
       return( NO);
@@ -602,8 +632,10 @@ uintptr_t   mulle_utf8_utf32_offset_at_characters( char *data,
 
    // set font, size, alignment...
    _renderedFontMetrics = [self prepareLayoutContext:context];
+   metrics              = CGContextTextMetrics( context);
 
    origin = _origin;
+   canvas = [self insetCanvas];
 
    // if textPaint is not set, use color derived from :_backgroundPaint
    textPaint = _textPaint ? _textPaint : [self suggestedTextPaint];
@@ -621,7 +653,6 @@ uintptr_t   mulle_utf8_utf32_offset_at_characters( char *data,
    textColor           = [textPaint mainColor];
    textBackgroundColor = [textBackgroundPaint mainColor];
 
-
    useClearType &= [textBackgroundPaint isMonochrome] &&
                    [textPaint isMonochrome] &&
                    [_selectionPaint isMonochrome];
@@ -629,27 +660,46 @@ uintptr_t   mulle_utf8_utf32_offset_at_characters( char *data,
 
    CGContextClearType( context, useClearType);
 
+   origin = _origin;
+   mulle_fprintf( stderr, "CATextLayer drawInContext: origin=(%.1f, %.1f)\n", origin.x, origin.y);
+
+   // Set initial position to origin
+   CGContextTranslate( context, origin);
+
    for( i = 0; i < nRows; i++)
    {
       row = _mulle_structarray_get( &_rowArray, i);
+      if( _drawsTextBackground)
+      {
+         // compensate for center/left
+         rect = CGRectMake( -origin.x, -metrics.ascender, canvas.size.width, metrics.ascender + metrics.descender);
+         assert( textBackgroundPaint);
+         CGContextFillRectWithPaintable( context, rect, textBackgroundPaint);
+      }
 
       /*
        * Draw selection
        */
       if( _selectable)
+      {
          switch( row->selectionStyle)
          {
-         default :
-            CGContextFillRectWithPaintable( context, row->selectionRect, _selectionPaint);
+         case CATextLayerSelectionStyleRect :
+            rect = CGRectMake( row->selectionX, -metrics.ascender, row->selectionWidth, metrics.ascender + metrics.descender);
+            assert( _selectionPaint);
+            CGContextFillRectWithPaintable( context, rect, _selectionPaint);
+            break;
+
          case CATextLayerSelectionStyleNone :
             break;
          }
+      }
 
       CGContextTextColor( context, textColor);
       CGContextTextBackgroundColor( context, textBackgroundColor);
 
       s = mulle_utf8data_characters_in_range( self->_textData, row->textRange);
-      CGContextText( context, origin, s, row->textRange.length);
+      CGContextText( context, CGPointZero, s, row->textRange.length);
 
       /*
        * Draw Cursor
@@ -658,15 +708,19 @@ uintptr_t   mulle_utf8_utf32_offset_at_characters( char *data,
       {
          switch( row->cursorStyle)
          {
-         default :
-            CGContextFillRectWithPaintable( context, row->cursorRect, _cursorPaint);
+         case CATextLayerCursorStyleLine :
+            rect = CGRectMake( row->cursorX, -metrics.ascender, 2, metrics.ascender + metrics.descender);
+            assert( _cursorPaint);
+            CGContextFillRectWithPaintable( context, rect, _cursorPaint);
+            break;
+
          case CATextLayerCursorStyleNone :
             break;
          }
       }
 
-      origin.y += _renderedFontMetrics.textLineHeight;
-
+      // Move down to next line
+      CGContextTranslate( context, CGPointMake( 0, _renderedFontMetrics.textLineHeight));
    }
    CGContextClearType( context, 0);
 

@@ -220,7 +220,7 @@ int   main( int argc, char *argv[])
    NSUInteger                styleMask;
    int                       i;
    unsigned long long        value;
-   UITextVerticalAlignment   valignment = UITextAlignmentVisualMiddle;
+   UITextVerticalAlignment   valignment = UITextAlignmentBaseline;
    char                      *text      = "|y|";
 
    i = 1;
@@ -233,12 +233,11 @@ int   main( int argc, char *argv[])
       else
       {
          mulle_fprintf( stderr, "Unknown vertical alignment \"%s\", known are %s\n", argv[ i],
-"UITextAlignmentMiddle"
-", UITextAlignmentBaseline"
-", UITextAlignmentVisualMiddle"
-", UITextAlignmentVisualFill"
+"UITextAlignmentBaseline"
 ", UITextAlignmentTop"
-", UITextAlignmentBottom");
+", UITextAlignmentBottom"
+", UITextAlignmentMiddle"
+", UITextAlignmentFill");
          return( 1);
       }
    }

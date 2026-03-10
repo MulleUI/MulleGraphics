@@ -77,9 +77,9 @@ int   main( void)
    [layer layoutWithLayoutInfo:&layoutInfo];
 
    // Redirect nvg trace to stdout for our test
-   nvgTrace( CGContextGetNVGContext( context), [context nameUTF8String], stdout);
+   nvgTrace( CGContextGetNVGContext( context), stdout);
    [layer renderInContext:context];
-   nvgTrace( CGContextGetNVGContext( context), NULL, NULL);
+   nvgTrace( CGContextGetNVGContext( context), NULL);
    
    CGContextEndFrame( context);
    mulle_printf( "--- End Rendering ---\n");

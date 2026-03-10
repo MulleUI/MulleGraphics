@@ -85,11 +85,15 @@ int   main( int argc, char *argv[])
    test_alignment( layer, context, "VfL", 
                    UITextAlignmentCenter, UITextAlignmentBaseline, rect);
 
-   // Visual alignments (single line)
+   // Visual alignments (single line) - test with useVisualBounds
+   [layer setUseVisualBounds:YES];
    test_alignment( layer, context, "VfL", 
-                   UITextAlignmentCenter, UITextAlignmentVisualMiddle, rect);
+                   UITextAlignmentCenter, UITextAlignmentMiddle, rect);
+   [layer setUseVisualBounds:NO];
+   
+   // Fill alignment
    test_alignment( layer, context, "VfL", 
-                   UITextAlignmentCenter, UITextAlignmentVisualFill, rect);
+                   UITextAlignmentCenter, UITextAlignmentFill, rect);
 
    printf( "\n=== Multi-Line Tests ===\n");
 

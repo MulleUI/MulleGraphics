@@ -27,8 +27,10 @@
 - (void) deselectAll;
 - (void) deleteSelection;
 
-- (CGRect) selectionRectInRow:(NSUInteger) i
-                    textRange:(NSRange) textRange;
+- (void) selectionInRow:(NSUInteger) i
+              textRange:(NSRange) textRange
+            selectionX:(CGFloat *) outX
+         selectionWidth:(CGFloat *) outWidth;
 
 @end
 

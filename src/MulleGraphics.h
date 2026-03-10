@@ -28,7 +28,8 @@ static inline unsigned int   MulleGraphics_get_version_patch( void)
 }
 
 
-extern uint32_t   MulleGraphics_get_version( void);
+MULLE_GRAPHICS_GLOBAL
+uint32_t   MulleGraphics_get_version( void);
 
 /*
    Add your library headers here for exposure to library

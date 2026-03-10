@@ -142,11 +142,10 @@
 
    memset( &layerRow, 0, sizeof( struct CATextLayerRow));
 
-   layerRow.cursorStyle    = [textLayer isEditing] ? CATextLayerCursorStyleLine : CATextLayerCursorStyleNone;
    layerRow.selectionStyle = ([textLayer isSelectable] && _selection.length) ? CATextLayerSelectionStyleRect : CATextLayerSelectionStyleNone;
 
    // do not need glyphs if we have no selection or no cursor
-   if( layerRow.cursorStyle != CATextLayerCursorStyleNone || layerRow.selectionStyle != CATextLayerSelectionStyleNone)
+   if( [textLayer isEditing] || layerRow.selectionStyle != CATextLayerSelectionStyleNone)
       [self updateRowsAndGlyphsWithContextIfNeeded:context];
    else
       [self updateRowsWithContextIfNeeded:context];
@@ -168,11 +167,29 @@
 
       layerRow.textRange        = row->textRow.range;
 
-      if( layerRow.cursorStyle != CATextLayerCursorStyleNone)
-         layerRow.selectionRect = [self selectionRectInRow:i
-                                                 textRange:layerRow.textRange];
-      if( layerRow.cursorStyle != CATextLayerCursorStyleNone)
-         layerRow.cursorRect    = [self cursorRectInRow:i];
+      // Calculate selection X and width
+      if( layerRow.selectionStyle != CATextLayerSelectionStyleNone)
+         [self selectionInRow:i
+                    textRange:layerRow.textRange
+                   selectionX:&layerRow.selectionX
+              selectionWidth:&layerRow.selectionWidth];
+      else
+      {
+         layerRow.selectionX     = 0;
+         layerRow.selectionWidth = 0;
+      }
+
+      // Determine if cursor is in this row
+      if( [textLayer isEditing] && _cursorPosition.y == i)
+      {
+         layerRow.cursorStyle = CATextLayerCursorStyleLine;
+         layerRow.cursorX     = [self cursorXInRow:i];
+      }
+      else
+      {
+         layerRow.cursorStyle = CATextLayerCursorStyleNone;
+         layerRow.cursorX     = 0;
+      }
 
       [textLayer addTextLayerRow:&layerRow];
       ++i;
@@ -183,6 +200,7 @@
    origin      = [self textOriginInRect:insetCanvas
                                 context:info->context];
 
+   mulle_fprintf( stderr, "Layouter setting origin=(%.1f, %.1f)\n", origin.x, origin.y);
    [textLayer setOrigin:origin];
 }
 
@@ -195,7 +213,11 @@
    for( i = 0; i < indent; i++)
       fputc( ' ', fp);
 
-   fprintf( fp, "%s\n", [self UTF8String]);
+   fprintf( fp, "%s: %s,%s",
+               [self UTF8String],
+               UITextAlignmentUTF8String( [_textLayer textAlignment]),
+               UITextVerticalAlignmentUTF8String( [_textLayer textVerticalAlignment]));
+   fprintf( fp, "\n");
 }
 
 @end

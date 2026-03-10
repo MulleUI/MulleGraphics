@@ -35,7 +35,7 @@
 #import "CGGraphicsLayer+MulleGraphics.h"
 #import "CGGraphicsLayer.h"
 #import "MulleEdgeInsets+UTF8String.h"
-#import "MulleObjCLoader+MulleGraphics.h"
+#import "MulleObjCDeps+MulleGraphics.h"
 
 
 #endif

@@ -69,22 +69,25 @@ else()
                list( REMOVE_ITEM CMAKE_MODULE_PATH "${_TMP_MULLE_GRAPHICS_DIR}")
                #
                unset( MULLE_GRAPHICS_DEFINITIONS)
+               unset( MULLE_GRAPHICS_RENDEZVOUS_GLOBALS)
                include( "${_TMP_MULLE_GRAPHICS_DIR}/Definitions.cmake" OPTIONAL)
                list( APPEND INHERITED_DEFINITIONS ${MULLE_GRAPHICS_DEFINITIONS})
+               include( "${_TMP_MULLE_GRAPHICS_DIR}/Definitions.cmake" OPTIONAL)
+               list( APPEND RENDEZVOUS_GLOBALS ${MULLE_GRAPHICS_RENDEZVOUS_GLOBALS})
                break()
             else()
                message( STATUS "${_TMP_MULLE_GRAPHICS_DIR} not found")
             endif()
          endforeach()
          #
-         # Search for "MulleObjCLoader+<name>.h" in include directory.
+         # Search for "MulleObjCDeps+<name>.h" in include directory.
          # Disable with: `mulle-sourcetree mark MulleGraphics no-cmake-loader`
          #
-         if( NOT NO_INHERIT_OBJC_LOADERS)
+         if( NOT NO_INHERIT_OBJC_DEPS)
             foreach( _TMP_MULLE_GRAPHICS_NAME "MulleGraphics")
-               set( _TMP_MULLE_GRAPHICS_FILE "${_TMP_MULLE_GRAPHICS_ROOT}/include/${_TMP_MULLE_GRAPHICS_NAME}/MulleObjCLoader+${_TMP_MULLE_GRAPHICS_NAME}.h")
+               set( _TMP_MULLE_GRAPHICS_FILE "${_TMP_MULLE_GRAPHICS_ROOT}/include/${_TMP_MULLE_GRAPHICS_NAME}/MulleObjCDeps+${_TMP_MULLE_GRAPHICS_NAME}.h")
                if( EXISTS "${_TMP_MULLE_GRAPHICS_FILE}")
-                  list( APPEND INHERITED_OBJC_LOADERS ${_TMP_MULLE_GRAPHICS_FILE})
+                  list( APPEND INHERITED_OBJC_DEPS ${_TMP_MULLE_GRAPHICS_FILE})
                   break()
                endif()
             endforeach()
@@ -157,22 +160,25 @@ else()
                list( REMOVE_ITEM CMAKE_MODULE_PATH "${_TMP_MULLE_FOUNDATION_DIR}")
                #
                unset( MULLE_FOUNDATION_DEFINITIONS)
+               unset( MULLE_FOUNDATION_RENDEZVOUS_GLOBALS)
                include( "${_TMP_MULLE_FOUNDATION_DIR}/Definitions.cmake" OPTIONAL)
                list( APPEND INHERITED_DEFINITIONS ${MULLE_FOUNDATION_DEFINITIONS})
+               include( "${_TMP_MULLE_FOUNDATION_DIR}/Definitions.cmake" OPTIONAL)
+               list( APPEND RENDEZVOUS_GLOBALS ${MULLE_FOUNDATION_RENDEZVOUS_GLOBALS})
                break()
             else()
                message( STATUS "${_TMP_MULLE_FOUNDATION_DIR} not found")
             endif()
          endforeach()
          #
-         # Search for "MulleObjCLoader+<name>.h" in include directory.
+         # Search for "MulleObjCDeps+<name>.h" in include directory.
          # Disable with: `mulle-sourcetree mark MulleFoundation no-cmake-loader`
          #
-         if( NOT NO_INHERIT_OBJC_LOADERS)
+         if( NOT NO_INHERIT_OBJC_DEPS)
             foreach( _TMP_MULLE_FOUNDATION_NAME "MulleFoundation")
-               set( _TMP_MULLE_FOUNDATION_FILE "${_TMP_MULLE_FOUNDATION_ROOT}/include/${_TMP_MULLE_FOUNDATION_NAME}/MulleObjCLoader+${_TMP_MULLE_FOUNDATION_NAME}.h")
+               set( _TMP_MULLE_FOUNDATION_FILE "${_TMP_MULLE_FOUNDATION_ROOT}/include/${_TMP_MULLE_FOUNDATION_NAME}/MulleObjCDeps+${_TMP_MULLE_FOUNDATION_NAME}.h")
                if( EXISTS "${_TMP_MULLE_FOUNDATION_FILE}")
-                  list( APPEND INHERITED_OBJC_LOADERS ${_TMP_MULLE_FOUNDATION_FILE})
+                  list( APPEND INHERITED_OBJC_DEPS ${_TMP_MULLE_FOUNDATION_FILE})
                   break()
                endif()
             endforeach()
@@ -245,22 +251,25 @@ else()
                list( REMOVE_ITEM CMAKE_MODULE_PATH "${_TMP_MULLE_UI_DIR}")
                #
                unset( MULLE_UI_DEFINITIONS)
+               unset( MULLE_UI_RENDEZVOUS_GLOBALS)
                include( "${_TMP_MULLE_UI_DIR}/Definitions.cmake" OPTIONAL)
                list( APPEND INHERITED_DEFINITIONS ${MULLE_UI_DEFINITIONS})
+               include( "${_TMP_MULLE_UI_DIR}/Definitions.cmake" OPTIONAL)
+               list( APPEND RENDEZVOUS_GLOBALS ${MULLE_UI_RENDEZVOUS_GLOBALS})
                break()
             else()
                message( STATUS "${_TMP_MULLE_UI_DIR} not found")
             endif()
          endforeach()
          #
-         # Search for "MulleObjCLoader+<name>.h" in include directory.
+         # Search for "MulleObjCDeps+<name>.h" in include directory.
          # Disable with: `mulle-sourcetree mark MulleUI no-cmake-loader`
          #
-         if( NOT NO_INHERIT_OBJC_LOADERS)
+         if( NOT NO_INHERIT_OBJC_DEPS)
             foreach( _TMP_MULLE_UI_NAME "MulleUI")
-               set( _TMP_MULLE_UI_FILE "${_TMP_MULLE_UI_ROOT}/include/${_TMP_MULLE_UI_NAME}/MulleObjCLoader+${_TMP_MULLE_UI_NAME}.h")
+               set( _TMP_MULLE_UI_FILE "${_TMP_MULLE_UI_ROOT}/include/${_TMP_MULLE_UI_NAME}/MulleObjCDeps+${_TMP_MULLE_UI_NAME}.h")
                if( EXISTS "${_TMP_MULLE_UI_FILE}")
-                  list( APPEND INHERITED_OBJC_LOADERS ${_TMP_MULLE_UI_FILE})
+                  list( APPEND INHERITED_OBJC_DEPS ${_TMP_MULLE_UI_FILE})
                   break()
                endif()
             endforeach()
@@ -333,22 +342,25 @@ else()
                list( REMOVE_ITEM CMAKE_MODULE_PATH "${_TMP_MULLE_GRAPHICS_IMAGE_DIR}")
                #
                unset( MULLE_GRAPHICS_IMAGE_DEFINITIONS)
+               unset( MULLE_GRAPHICS_IMAGE_RENDEZVOUS_GLOBALS)
                include( "${_TMP_MULLE_GRAPHICS_IMAGE_DIR}/Definitions.cmake" OPTIONAL)
                list( APPEND INHERITED_DEFINITIONS ${MULLE_GRAPHICS_IMAGE_DEFINITIONS})
+               include( "${_TMP_MULLE_GRAPHICS_IMAGE_DIR}/Definitions.cmake" OPTIONAL)
+               list( APPEND RENDEZVOUS_GLOBALS ${MULLE_GRAPHICS_IMAGE_RENDEZVOUS_GLOBALS})
                break()
             else()
                message( STATUS "${_TMP_MULLE_GRAPHICS_IMAGE_DIR} not found")
             endif()
          endforeach()
          #
-         # Search for "MulleObjCLoader+<name>.h" in include directory.
+         # Search for "MulleObjCDeps+<name>.h" in include directory.
          # Disable with: `mulle-sourcetree mark MulleGraphicsImage no-cmake-loader`
          #
-         if( NOT NO_INHERIT_OBJC_LOADERS)
+         if( NOT NO_INHERIT_OBJC_DEPS)
             foreach( _TMP_MULLE_GRAPHICS_IMAGE_NAME "MulleGraphicsImage")
-               set( _TMP_MULLE_GRAPHICS_IMAGE_FILE "${_TMP_MULLE_GRAPHICS_IMAGE_ROOT}/include/${_TMP_MULLE_GRAPHICS_IMAGE_NAME}/MulleObjCLoader+${_TMP_MULLE_GRAPHICS_IMAGE_NAME}.h")
+               set( _TMP_MULLE_GRAPHICS_IMAGE_FILE "${_TMP_MULLE_GRAPHICS_IMAGE_ROOT}/include/${_TMP_MULLE_GRAPHICS_IMAGE_NAME}/MulleObjCDeps+${_TMP_MULLE_GRAPHICS_IMAGE_NAME}.h")
                if( EXISTS "${_TMP_MULLE_GRAPHICS_IMAGE_FILE}")
-                  list( APPEND INHERITED_OBJC_LOADERS ${_TMP_MULLE_GRAPHICS_IMAGE_FILE})
+                  list( APPEND INHERITED_OBJC_DEPS ${_TMP_MULLE_GRAPHICS_IMAGE_FILE})
                   break()
                endif()
             endforeach()
@@ -421,22 +433,25 @@ else()
                list( REMOVE_ITEM CMAKE_MODULE_PATH "${_TMP_MULLE_UI_PERF_DIR}")
                #
                unset( MULLE_UI_PERF_DEFINITIONS)
+               unset( MULLE_UI_PERF_RENDEZVOUS_GLOBALS)
                include( "${_TMP_MULLE_UI_PERF_DIR}/Definitions.cmake" OPTIONAL)
                list( APPEND INHERITED_DEFINITIONS ${MULLE_UI_PERF_DEFINITIONS})
+               include( "${_TMP_MULLE_UI_PERF_DIR}/Definitions.cmake" OPTIONAL)
+               list( APPEND RENDEZVOUS_GLOBALS ${MULLE_UI_PERF_RENDEZVOUS_GLOBALS})
                break()
             else()
                message( STATUS "${_TMP_MULLE_UI_PERF_DIR} not found")
             endif()
          endforeach()
          #
-         # Search for "MulleObjCLoader+<name>.h" in include directory.
+         # Search for "MulleObjCDeps+<name>.h" in include directory.
          # Disable with: `mulle-sourcetree mark MulleUIPerf no-cmake-loader`
          #
-         if( NOT NO_INHERIT_OBJC_LOADERS)
+         if( NOT NO_INHERIT_OBJC_DEPS)
             foreach( _TMP_MULLE_UI_PERF_NAME "MulleUIPerf")
-               set( _TMP_MULLE_UI_PERF_FILE "${_TMP_MULLE_UI_PERF_ROOT}/include/${_TMP_MULLE_UI_PERF_NAME}/MulleObjCLoader+${_TMP_MULLE_UI_PERF_NAME}.h")
+               set( _TMP_MULLE_UI_PERF_FILE "${_TMP_MULLE_UI_PERF_ROOT}/include/${_TMP_MULLE_UI_PERF_NAME}/MulleObjCDeps+${_TMP_MULLE_UI_PERF_NAME}.h")
                if( EXISTS "${_TMP_MULLE_UI_PERF_FILE}")
-                  list( APPEND INHERITED_OBJC_LOADERS ${_TMP_MULLE_UI_PERF_FILE})
+                  list( APPEND INHERITED_OBJC_DEPS ${_TMP_MULLE_UI_PERF_FILE})
                   break()
                endif()
             endforeach()

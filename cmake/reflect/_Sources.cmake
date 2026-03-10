@@ -42,5 +42,5 @@ src/MulleGraphics.m
 # contents selected with patternfile ??-source--stage2-sources
 #
 set( STAGE2_SOURCES
-src/MulleObjCLoader+MulleGraphics.m
+src/MulleObjCDeps+MulleGraphics.m
 )

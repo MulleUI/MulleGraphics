@@ -87,7 +87,7 @@
 @end
 
 
-MULLE_GRAPHICS_EXTERN_GLOBAL
+MULLE_GRAPHICS_GLOBAL
 void  CGGraphicsLayerSetupDrawTransform( CGGraphicsLayer *self,
                                          CGContext *context,
                                          CGRect bounds);

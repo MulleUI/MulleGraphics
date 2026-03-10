@@ -18,10 +18,25 @@ static void   setupSceneInWindow( UIWindow *window)
 
    [layer setBorderWidth:1.0];
    [layer setBorderColor:CGColorMakeOrange()];
+   [layer setBackgroundColor:CGColorMakeDarkGray()];
+   [layer setFontPixelSize:24.0];
+   [layer setTextLineHeight:32.0];
    [layer setTextColor:CGColorMakeWhite()];
-   [layer setTextBackgroundColor:CGColorMakeGray()];
+   [layer setTextBackgroundColor:CGColorMakeDarkGray()];
+   [layer setSelectionColor:CGColorMakeWithRGBA( 0.0, 0.5, 1.0, 0.4)];  // Blue selection
+   [layer setCursorColor:CGColorMakeRed()];
+   [layer setSelectable:YES];
+   [layer setEditing:YES];
    [layer setLineBreakMode:NSLineBreakByWordWrapping];
    [layer setTextUTF8String:"This is line 1\nfollowed by line 2\nending in line 3"];
+   
+   // Set selection from character 10 to 35 (across multiple lines)
+   // "This is li[ne 1\nfollowed by line 2\nending i]n line 3"
+   [[layer layouter] setSelection:NSMakeRange( 10, 25)];
+   
+   // Set cursor at line 1, position 8 (after "followed")
+   [[layer layouter] setCursorPosition:MulleCursorPositionMake( 8, 1)];
+   
    view  = [UIView viewWithLayer:layer];
    [contentPlane addSubview:view];
 }
