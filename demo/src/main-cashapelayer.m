@@ -2,8 +2,6 @@
 
 #include <unistd.h>
 #include <math.h>
-
-
 static CGPath   *createWheelPath( CGRect rect, NSUInteger numPetals)
 {
    CGMutablePathRef   path;
@@ -34,14 +32,12 @@ static CGPath   *createWheelPath( CGRect rect, NSUInteger numPetals)
                                        radius,
                                        CARadiansToAngle( startRadians),
                                        CARadiansToAngle( endRadians),
-                                       NVG_CW);
+                                       CGPathFillStyleSolid);
    }
 
    CGPathCloseSubpath( path);
    return( path);
 }
-
-
 static void   setupSceneInWindow( UIWindow *window)
 {
    CAShapeLayer   *layer;
@@ -67,8 +63,6 @@ static void   setupSceneInWindow( UIWindow *window)
    view        = [UIView viewWithLayer:layer];
    [contentView addSubview:view];
 }
-
-
 int   main( int argc, char *argv[])
 {
    UIWindow        *window;
@@ -86,8 +80,6 @@ int   main( int argc, char *argv[])
    }
    return( [app runApp]);
 }
-
-
 
 //
 //                           ,╓≤æKª╨╙╙▓█D"╙╙╙*╨¥W▄╓,

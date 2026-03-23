@@ -1,11 +1,7 @@
 #import "import-private.h"
 
-
-
 #define B   { 0xF8, 0xF8, 0xF8, 0xFF }
 #define G   { 0xB2, 0xB2, 0xB2, 0xFF }
-
-
 static uint8_t   imagedata[ 8][ 8][ 4] =
 {
     { B, B, B, B,  G, G, G, G },
@@ -18,8 +14,6 @@ static uint8_t   imagedata[ 8][ 8][ 4] =
     { G, G, G, G,  B, B, B, B },
     { G, G, G, G,  B, B, B, B },
 };
-
-
 //
 // Create a little checkerboard pattern, which repeats itself.
 //
@@ -37,14 +31,12 @@ static BOOL   drawStuff( CGGraphicsLayer *layer, CGContext *_context)
    {
       image = [[[CGImage alloc] initWithRGBABytes:imagedata
                                        bitmapSize:CGPixelSizeMake( 8, 8)
-                                     textureFlags:NVG_IMAGE_REPEATX|NVG_IMAGE_REPEATY
+                                     textureFlags:CGImageFlagRepeatX|CGImageFlagRepeatY
                                           context:context] autorelease];
       [imageLayer setImage:image];
    }
    return( YES);
 }
-
-
 int   main( int argc, char *argv[])
 {
    UIWindow        *window;
@@ -62,8 +54,6 @@ int   main( int argc, char *argv[])
    }
    return( [app runApp]);
 }
-
-
 
 //
 //                           ,╓≤æKª╨╙╙▓█D"╙╙╙*╨¥W▄╓,

@@ -7,7 +7,7 @@
  - Observation: the glyph 'y' extends visually below the descender line by ~10 pixels, while 'v' sits perfectly on the baseline
 
  Why this happens (metrics vs. pixels)
- - Font metrics (ascender, descender, lineHeight) come from FreeType via nvgTextMetrics.
+ - Font metrics (ascender, descender, lineHeight) come from FreeType via CGContextTextMetrics.
    Example values for our demo at full canvas height:
      ascender  ~= 580.8076
      descender ~= -159.1924 (negative by definition below baseline)
@@ -17,7 +17,7 @@
 
  Baseline, metrics and visual bounds
  - Baseline: y where text is positioned; 'v' touches baseline; 'y' descends below.
- - CGTextMetrics from nvgTextMetrics are the canonical font metrics:
+ - CGTextMetrics from CGContextTextMetrics are the canonical font metrics:
      ascender  > 0 above baseline
      descender < 0 below baseline (we display its absolute value for convenience)
  - Visual bounds are computed from actual glyph geometry (UIGlyphPosition minx/miny/maxx/maxy) transformed into layer coordinates, with small insets (CATextLayerVisualBoundsInsets) to account for overdraw.
@@ -25,7 +25,7 @@
 
  How text is actually rendered (pipeline)
  1) CATextLayer prepares layout (font size, letter spacing, line height, alignments)
- 2) CGContext/NanoVG selects font, calls nvgText at the baseline (origin.y)
+ 2) CGContext selects font, calls CGContextText at the baseline (origin.y)
  3) NanoVG/Fontstash pulls glyph bitmaps from an atlas and positions them per glyph metrics
  4) The atlas uses integer pixel positions; subpixel coverage and hinting can push pixels slightly beyond metric lines
 
@@ -48,7 +48,7 @@
 
  Tracing tips
  - Enable draw call tracing: mulle-sde run --mulleui-trace-draw
- - Inspect nvgText and nvgTextMetrics calls to correlate baseline, ascender/descender, and final lines.
+ - Inspect CGContextText and CGContextTextMetrics calls to correlate baseline, ascender/descender, and final lines.
 
  Summary
  - The descender line is a font-metric reference; minor visual overdraw below it is expected due to glyph rasterization and padding.
@@ -57,8 +57,6 @@
 #import "import-private.h"
 
 #include <unistd.h>
-
-
 
 @interface DebugTextLayer : CATextLayer
 @end
@@ -114,8 +112,6 @@
       textRect.origin.y += 20;
    }
 
-
-
    mulle_sprintf_do( buf, "InsetCanvas : %s", CGRectUTF8String( canvas))
    {
       CGContextTextInRect( context, buf,
@@ -125,8 +121,6 @@
                            CGTextOptionAlignVisually);
       textRect.origin.y += 20;
    }
-
-
    layouter = MULLE_OBJC_CLASS_CAST( CATextLayerLayouter, _layouter);
    mulle_sprintf_do( buf, "visualBounds : %s", CGRectUTF8String( [self visualBoundsWithContext:context]))
    {
@@ -148,8 +142,6 @@
                            CGTextOptionAlignVisually);
       textRect.origin.y += 20;
    }
-
-
    mulle_sprintf_do( buf, "FontPixelSize : %g", _renderedFontMetrics.fontPixelSize)
    {
       CGContextTextInRect( context, buf,
@@ -183,8 +175,6 @@
 }
 
 @end
-
-
 static void   setupSceneInWindow( UIWindow *window,
                                   UITextVerticalAlignment valignment,
                                   char *text)
@@ -211,8 +201,6 @@ static void   setupSceneInWindow( UIWindow *window,
    [view setClipsToBounds:NO];
    [contentPlane addSubview:view];
 }
-
-
 int   main( int argc, char *argv[])
 {
    UIWindow                  *window;
@@ -261,8 +249,6 @@ int   main( int argc, char *argv[])
    }
    return( [app runApp]);
 }
-
-
 
 //
 //                           ,╓≤æKª╨╙╙▓█D"╙╙╙*╨¥W▄╓,

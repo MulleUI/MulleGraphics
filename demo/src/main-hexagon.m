@@ -1,8 +1,6 @@
 #import "import-private.h"
 
 #include <math.h>
-
-
 struct hexagon_options
 {
    NSUInteger   len;
@@ -23,8 +21,6 @@ struct hexagon_options
    CGFloat      repaintAlpha;
    CGFloat      hueChange;
 };
-
-
 struct hexagon_options  opts =
 {
 
@@ -49,8 +45,6 @@ struct hexagon_options  opts =
    .hueChange                 = 0.1
 };
 
-
-
 @interface Line : NSObject
 {
    CGPoint   position;
@@ -64,8 +58,6 @@ struct hexagon_options  opts =
 }
 
 @end
-
-
 @interface HexagonLayer : CGGraphicsLayer
 {
    NSMutableArray  *_lines;
@@ -74,8 +66,6 @@ struct hexagon_options  opts =
 @property( assign) NSUInteger   tick;
 
 @end
-
-
 @implementation Line
 
 - (instancetype) initWithHexagonLayer:(HexagonLayer *) layer
@@ -83,8 +73,6 @@ struct hexagon_options  opts =
    [self resetInHexagonLayer:layer];
    return( self);
 }
-
-
 - (void) resetInHexagonLayer:(HexagonLayer *) layer
 {
    self->position             = CGPointZero;
@@ -98,12 +86,8 @@ struct hexagon_options  opts =
    self->hslcomponents[ 0]    = fmod( [layer tick] * opts.hueChange, 1.0);
    self->hslcomponents[ 1]    = opts.hslcomponents[ 1];
    self->hslcomponents[ 2]    = opts.hslcomponents[ 2];
-
-
    [self beginPhaseInHexagonLayer:layer];
 }
-
-
 - (void) beginPhaseInHexagonLayer:(HexagonLayer *) layer
 {
    CGPoint   die;
@@ -132,8 +116,6 @@ struct hexagon_options  opts =
   }
 }
 
-
-
 static void   drawBoxWithDropShadow( CGContext *context,
                                      CGRect rect,
                                      CGColor color,
@@ -150,8 +132,6 @@ static void   drawBoxWithDropShadow( CGContext *context,
    CGContextFillRoundedShadow( context, rect, cornerRadius, &shadow);
    CGContextFillRoundedRectWithColor( context, rect, cornerRadius, color);
 }
-
-
 - (void) stepInHexagonLayer:(HexagonLayer *) layer
                     context:(CGContext *) context
 {
@@ -200,11 +180,7 @@ static void   drawBoxWithDropShadow( CGContext *context,
                              shadowBlur);
    }
 }
-
-
 @end
-
-
 @implementation HexagonLayer
 
 - (instancetype) initNoLock
@@ -218,15 +194,11 @@ static void   drawBoxWithDropShadow( CGContext *context,
 
    return( self);
 }
-
-
 - (void) dealloc
 {
    [self->_lines release];
    [super dealloc];
 }
-
-
 - (BOOL) drawInContext:(CGContext *) context
 {
    Line         *line;
@@ -242,13 +214,13 @@ static void   drawBoxWithDropShadow( CGContext *context,
 
     CGContextSave( context);
    {
-      CGContextGlobalCompositeOperation( context, NVG_SOURCE_OVER);
+      CGContextGlobalCompositeOperation( context, CGCompositeOperationSourceOver);
       fillColor = CGColorMakeWithRGBA( 0, 0, 0, self->_tick == 1
                                              ? 1.0
                                              : opts.repaintAlpha);
    CGContextFillRectWithColor( context, canvas, fillColor);
 
-   CGContextGlobalCompositeOperation( context, NVG_LIGHTER);
+   CGContextGlobalCompositeOperation( context, CGCompositeOperationLighter);
        CGContextTranslate( context, CGPointMake(canvas.size.width / 2.0, canvas.size.height / 2.0));
    for( line in _lines)
       [line stepInHexagonLayer:self
@@ -259,8 +231,6 @@ static void   drawBoxWithDropShadow( CGContext *context,
 }
 
 @end
-
-
 
 int   main( int argc, char *argv[])
 {
@@ -302,10 +272,6 @@ int   main( int argc, char *argv[])
 
    return( [app runApp]);
 }
-
-
-
-
 //
 //                           ,╓≤æKª╨╙╙▓█D"╙╙╙*╨¥W▄╓,
 //                      ╓▄ª╙└╧▓        █           ⁿ▓▓ª╦w
@@ -341,10 +307,6 @@ int   main( int argc, char *argv[])
 //                 "▀╦,       M ╙▌  ▀       `█W▐▌       wæQ▄▀╙
 //                     ╙▀W╥,╓╣   ╙█║        ╫M  █    ,╓▄╝╙`
 //                          ╙╙▀%▄▄▄▌,≤▄_▄≡,▐▓▓▄▄#ª▀"`
-
-
-
-
 /*
 var w = c.width = window.innerWidth,
     h = c.height = window.innerHeight,
@@ -472,6 +434,4 @@ window.addEventListener( 'resize', function(){
   dieX = w / 2 / opts.len;
   dieY = h / 2 / opts.len;
 });
-
-
 */

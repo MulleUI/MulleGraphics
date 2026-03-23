@@ -22,7 +22,6 @@
 #import "CAGradientLayer.h"
 #import "CAImageLayer+Cursor.h"
 #import "CAImageLayer.h"
-#import "CAOpenGLLayer.h"
 #import "CAShadowLayer.h"
 #import "CAShapeLayer.h"
 #import "CATextLayerLayouter+CGGraphicsLayerLayouter.h"

@@ -1,13 +1,7 @@
 #import "import-private.h"
-
-
 #define FRAMERATE_HZ      120.0
-
-
 // This demo shows how you can fairly easily convert C code into
 // a CACPUImagelayer subclass.
-
-
 
 /*
  * Plasma "inspired" by
@@ -33,16 +27,12 @@ static inline NSUInteger   plasma_function( NSUInteger x, NSUInteger y)
    return( 128.0 + (128.0 * sin( x / PLASMA_SIZE) * jitter.x)
            + 128.0 + (128.0 * sin( y / PLASMA_SIZE) * jitter.y) / 2);
 }
-
-
 @interface PlasmaLayer : CACPUImageLayer
 {
    uint32_t   _plasma[ H][W];
    uint32_t   _palette[ N_PALETTE_COLORS];
 }
 @end
-
-
 @implementation PlasmaLayer
 
 - (void) initPalette
@@ -56,8 +46,6 @@ static inline NSUInteger   plasma_function( NSUInteger x, NSUInteger y)
       _palette[x] = CGColorGetHexColor( color);
    }
 }
-
-
 - (void) initPlasma
 {
    NSUInteger   x, y;
@@ -66,8 +54,6 @@ static inline NSUInteger   plasma_function( NSUInteger x, NSUInteger y)
       for( x = 0; x < W; x++)
          _plasma[ y][ x] = plasma_function( x, y);
 }
-
-
 - (id) initWithFrame:(CGRect) frame
 {
    CGRect  rect;
@@ -84,8 +70,6 @@ static inline NSUInteger   plasma_function( NSUInteger x, NSUInteger y)
 
    return( self);
 }
-
-
 - (void) drawInBytes:(void *) texture
           bitmapInfo:(struct CGBitmapInfo) bitmapInfo
 {
@@ -107,22 +91,16 @@ static inline NSUInteger   plasma_function( NSUInteger x, NSUInteger y)
 }
 
 @end
-
-
 static BOOL   drawGrid( CGGraphicsLayer *layer, CGContext *_context)
 {
    CGContext    *context = _context;
    CGRect       canvas;
    CGFloat      xf, yf;
    CGFloat      xstep, ystep;
-   NVGcontext   *vg;
    NSUInteger   x, y;
 
    canvas = [layer canvas];
-
-   vg = CGContextGetNVGContext( context);
-
-   nvgBeginPath( vg);
+   CGContextBeginPath( context);
 
    xstep = canvas.size.width  / W;
    ystep = canvas.size.height / H;
@@ -130,20 +108,20 @@ static BOOL   drawGrid( CGGraphicsLayer *layer, CGContext *_context)
    for( y = 1; y < H; y++)
    {
       yf = (y * ystep) + ystep / 2.0;
-      nvgMoveTo( vg, 0, yf);
-      nvgLineTo( vg, canvas.size.width, yf);
+      CGContextMoveTo( context, CGPointMake(0, yf));
+      CGContextLineTo( context, CGPointMake(canvas.size.width, yf));
    }
 
    for( x = 1; x < W; x++)
    {
       xf = (x * xstep) + xstep / 2.0;
-      nvgMoveTo( vg, xf, 0);
-      nvgLineTo( vg, xf, canvas.size.height);
+      CGContextMoveTo( context, CGPointMake(xf, 0));
+      CGContextLineTo( context, CGPointMake(xf, canvas.size.height));
    }
 
-   nvgStrokeWidth( vg, 0.2);
-   nvgStrokeColor( vg, [UIColor darkGrayColor]);
-   nvgStroke( vg);
+   CGContextStrokeWidth( context, 0.2);
+   CGContextStrokeColor( context, [UIColor darkGrayColor]);
+   CGContextStroke( context);
 
    return( YES);
 }
@@ -157,8 +135,6 @@ static BOOL   drawGrid( CGGraphicsLayer *layer, CGContext *_context)
    CGGraphicsLayer   *_gridLayer;
 }
 @end
-
-
 @implementation PlasmaView
 
 + (Class) layerClass
@@ -196,8 +172,6 @@ static BOOL   drawGrid( CGGraphicsLayer *layer, CGContext *_context)
 }
 
 @end
-
-
 static PlasmaView   *setupPlasmaView( UIWindow *window, CGColor color)
 {
    PlasmaView   *view;
@@ -209,8 +183,6 @@ static PlasmaView   *setupPlasmaView( UIWindow *window, CGColor color)
 
    return( view);
 }
-
-
 int   main( int argc, char *argv[])
 {
    UIWindow        *window;
@@ -246,8 +218,6 @@ int   main( int argc, char *argv[])
 
    return( [app runApp]);
 }
-
-
 
 //
 //                           ,╓≤æKª╨╙╙▓█D"╙╙╙*╨¥W▄╓,

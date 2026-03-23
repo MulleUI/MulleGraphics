@@ -53,7 +53,7 @@
    CGPoint center   = CGPointMake( canvas.size.width  / 2,
                                     canvas.size.height / 2);
    CGContextBeginPath( context);
-   CGContextArc( context, CACircleMake(center.x, center.y, _radius), self->_lastAngle, self->_angle);
+   CGContextArcRadians( context, CACircleMake(center.x, center.y, _radius), self->_lastAngle, self->_angle, CARotationDirectionClockWise);
    CGContextStrokeColor( context, CGColorMakeWithHSLA( hue, 1.0, 0.5, 1.0));
    CGContextStrokeWidth( context, _size);
    CGContextStroke( context);
@@ -153,7 +153,7 @@
    fillColor = CGColorMakeWithRGBA( 0, 0, 0, _trail ? 0.1 : 1.0);
    CGContextFillRectWithColor( context, canvas, fillColor);
 
-   CGContextLineCap( context, NVG_ROUND);
+   CGContextLineCap( context, CGLineCapRound);
    for( orb in _orbs)
       for( i = 0; i < 3; i++)
       {

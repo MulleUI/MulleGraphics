@@ -1,4 +1,3 @@
 MulleCG;${MULLE_CG_NODETYPE:-tar};no-singlephase;5D78374A-4911-4625-B4A2-EEC28CE39F50;${MULLE_CG_URL:-https://github.com/MulleUI/MulleCG/archive/${MULLE_TAG}.tar.gz};${MULLE_CG_BRANCH};${MULLE_CG_TAG:-latest};;
 MulleCA;${MULLE_CA_NODETYPE:-tar};no-singlephase;B3672511-8868-4FDC-98D2-8CEC828555AD;${MULLE_CA_URL:-https://github.com/MulleUI/MulleCA/archive/${MULLE_TAG}.tar.gz};${MULLE_CA_BRANCH};${MULLE_CA_TAG:-latest};;
 mulle-objc-list;${MULLE__OBJC__LIST_NODETYPE:-tar};no-all-load,no-bequeath,no-cmake-inherit,no-header,no-link,no-singlephase;00344BA0-5779-470F-B072-F33F3F112A82;${MULLE__OBJC__LIST_URL:-https://github.com/mulle-objc/mulle-objc-list/archive/${MULLE_TAG}.tar.gz};${MULLE__OBJC__LIST_BRANCH};${MULLE__OBJC__LIST_TAG:-latest};;
-OpenGL;none;no-build,no-cmake-inherit,no-delete,no-dependency,no-fs,no-header,no-import,no-share,no-update,only-framework,only-platform-darwin;4B2C809B-C031-45AD-B339-64634536F448;;;;;include=<OpenGL/OpenGL.h>

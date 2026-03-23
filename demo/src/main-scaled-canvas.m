@@ -7,7 +7,7 @@
 // to map it to the frame. You can see that this leaves borders to the left
 // and to the right.
 //
-// A severe disadvantage of this (with nanovg) is, that the strokeWidth has
+// A severe disadvantage of this (with CGContext) is, that the strokeWidth has
 // to be scaled down to the ratio between canvas and frame, otherwise you get
 // a real big circle.
 //

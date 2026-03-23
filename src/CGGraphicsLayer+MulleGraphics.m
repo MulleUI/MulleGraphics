@@ -296,7 +296,7 @@ void  CGGraphicsLayerSetupDrawTransform( CGGraphicsLayer *self,
    // clean slate for background, then content, and then border
    //
 
-   oldtrace = nvgTrace( CGContextGetNVGContext( context), _drawCallTracer);
+   oldtrace = [context setTraceFile:_drawCallTracer];
 
    // this draws with _frame coordinates w/o bounds and rotation
    if( [self drawsBackgroundWithAlpha:alpha])
@@ -332,7 +332,7 @@ void  CGGraphicsLayerSetupDrawTransform( CGGraphicsLayer *self,
       [self drawBorderInContext:context];
    }
 
-   nvgTrace( CGContextGetNVGContext( context), oldtrace);
+   [context setTraceFile:oldtrace];
 }
 
 

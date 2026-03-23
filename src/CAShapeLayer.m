@@ -21,7 +21,7 @@
 
 - (void) setPath:(CGPath *) path
 {
-   assert( path != _path);
+   assert( !path || path != _path);
 
    if( _ownsPath)
       CGPathDestroy( _path);

@@ -20,7 +20,6 @@ src/CACPUImageLayer.m
 src/CAGradientLayer.m
 src/CAImageLayer+Cursor.m
 src/CAImageLayer.m
-src/CAOpenGLLayer.m
 src/CAShadowLayer.m
 src/CAShadowLayer+nanovg.m
 src/CAShapeLayer.m

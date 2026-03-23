@@ -1,6 +1,3 @@
-      { @selector( MulleObjCDeps), @selector( MulleCA) },      // 47a9beb6;MulleObjCDeps;3422b8ab;MulleCA
-      { @selector( MulleObjCDeps), @selector( MulleCG) },      // 47a9beb6;MulleObjCDeps;d422218a;MulleCG
-      { @selector( MulleObjCDeps), @selector( MulleUIBase) },      // 47a9beb6;MulleObjCDeps;3ebba954;MulleUIBase
       { @selector( CAAccumulationLayer), MULLE_OBJC_NO_CATEGORYID },      // 8ecd0f35;CAAccumulationLayer;;
       { @selector( CABasicAnimation), @selector( CGColor) },      // 1462ac1b;CABasicAnimation;94e785ef;CGColor
       { @selector( CABasicAnimation), @selector( CGGradient) },      // 1462ac1b;CABasicAnimation;37670335;CGGradient
@@ -9,7 +6,6 @@
       { @selector( CAGradientLayer), MULLE_OBJC_NO_CATEGORYID },      // cf9da5a2;CAGradientLayer;;
       { @selector( CAImageLayer), @selector( Cursor) },      // 2a9d3438;CAImageLayer;58a502f5;Cursor
       { @selector( CAImageLayer), MULLE_OBJC_NO_CATEGORYID },      // 2a9d3438;CAImageLayer;;
-      { @selector( CAOpenGLLayer), MULLE_OBJC_NO_CATEGORYID },      // bdc0ca3d;CAOpenGLLayer;;
       { @selector( CAShadowLayer), @selector( nanovg) },      // 8e87a8e1;CAShadowLayer;df06d543;nanovg
       { @selector( CAShadowLayer), MULLE_OBJC_NO_CATEGORYID },      // 8e87a8e1;CAShadowLayer;;
       { @selector( CAShapeLayer), @selector( nanovg) },      // 1effb374;CAShapeLayer;df06d543;nanovg

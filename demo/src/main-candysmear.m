@@ -29,8 +29,6 @@
 # define      smoothness      1.5      // > 0 < min radius
 # define      maxSegments     8
 #endif
-
-
 @interface Ball : NSObject
 {
    NSUInteger        _numSegment;
@@ -45,8 +43,6 @@
 @property( assign) CAPolarPoint  vector;
 
 @end
-
-
 @implementation Ball
 
 - (id) initWithRadius:(CGFloat) r
@@ -68,8 +64,6 @@
    _boundOffset     = mulle_calloc( _numSegment, sizeof( CGFloat));
    _boundOffsetBuff = mulle_calloc( _numSegment, sizeof( CGFloat));
    _sidePoints      = mulle_calloc( _numSegment, sizeof( CGPoint));
-
-
 // Cody sez:
 //    0.00: Red
 //    0.17: Yellow-orange
@@ -92,8 +86,6 @@
    }
    return( self);
 }
-
-
 /*
  * Ball collision
  */
@@ -108,8 +100,6 @@
    p    = CGPointAdd( _point, p);
    return( p);
 }
-
-
 - (CGFloat) getBoundOffset:(CGPoint) b
 {
    CGPoint          diff;
@@ -125,8 +115,6 @@
    assert( i < _numSegment);
    return( _boundOffset[ i]);
 }
-
-
 - (void) calcBounds:(Ball *) b
 {
    NSUInteger   i;
@@ -148,8 +136,6 @@
       }
    }
 }
-
-
 - (void) updateBounds
 {
    NSUInteger   i;
@@ -157,8 +143,6 @@
    for( i = 0; i < _numSegment; i++)
       _boundOffset[i] = _boundOffsetBuff[i];
 }
-
-
 - (void) react:(Ball *) b
 {
    CGFloat        dist;
@@ -200,8 +184,6 @@
    if( _point.y > size.height + _radius)
       _point.y = -_radius;
 }
-
-
 - (void) updateShape
 {
    NSUInteger   i;
@@ -228,8 +210,6 @@
       _boundOffsetBuff[ i] = _boundOffset[ i] = offset;
    }
 }
-
-
 - (void) iterate:(CGSize) size
 {
    [self checkBorders:size];
@@ -239,47 +219,37 @@
 
    [self updateShape];
 }
-
-
 /*
  * Ball drawing
  */
 - (BOOL) drawInContext:(CGContext *) context
 {
-   NVGcontext   *vg;
    NSUInteger   i;
    CGPoint      p;
-
-   vg = CGContextGetNVGContext( context);
-
-   nvgBeginPath( vg);
-   nvgGlobalCompositeOperation( vg, NVG_LIGHTER);
+   CGContextBeginPath( context);
+   CGContextGlobalCompositeOperation( context, CGCompositeOperationLighter);
    for( i = 0; i < _numSegment; i++)
    {
       p = [self getSidePoint:i];
       if( ! i)
-         nvgMoveTo( vg, p.x, p.y);
+         CGContextMoveTo( context, CGPointMake(p.x, p.y));
       else
-         nvgLineTo( vg, p.x, p.y);
+         CGContextLineTo( context, CGPointMake(p.x, p.y));
    }
-   nvgClosePath( vg);
+   CGContextClosePath( context);
 
    // TODO: need to smooth
-   nvgFillColor( vg, _fillColor);
-   nvgFill( vg);
+   CGContextFillColor( context, _fillColor);
+   CGContextFill( context);
    return( YES);
 }
 
 @end
-
-
 @interface CandySmearLayer : CAAccumulationLayer
 {
    id    balls[ numBalls];
 }
 @end
-
-
 @implementation CandySmearLayer
 
 - (instancetype) initWithFrame:(CGRect) rect
@@ -320,8 +290,6 @@
    }
    return( self);
 }
-
-
 - (void) dealloc
 {
    NSUInteger   i;
@@ -331,8 +299,6 @@
 
    [super dealloc];
 }
-
-
 
 - (void) mulleGainAccessWithUniquingSet:(struct mulle_pointerset *) uniquing
 {
@@ -348,8 +314,6 @@
          [balls[ i] mulleGainAccessWithUniquingSet:uniquing];
    }
 }
-
-
 - (void) mulleRelinquishAccessWithUniquingSet:(struct mulle_pointerset *) uniquing
 {
    NSUInteger   i;
@@ -362,14 +326,10 @@
 
    [super mulleRelinquishAccessWithUniquingSet:uniquing];
 }
-
-
 - (void) renderInContext:(CGContext *) context
 {
    [super renderInContext:context];
 }
-
-
 - (BOOL) drawInContext:(CGContext *) context
 {
    CGRect       canvas;
@@ -400,8 +360,6 @@
 
 @end
 
-
-
 static void   setupSceneInView( UIView *contentView)
 {
    CandySmearLayer   *layer;
@@ -417,8 +375,6 @@ static void   setupSceneInView( UIView *contentView)
    assert( view);
    [contentView addSubview:view];
 }
-
-
 int   main( int argc, char *argv[])
 {
    UIWindow        *window;
@@ -449,12 +405,8 @@ int   main( int argc, char *argv[])
 
       [app addWindow:window];
    }
-
-
    return( [app runApp]);
 }
-
-
 //
 //                           ,╓≤æKª╨╙╙▓█D"╙╙╙*╨¥W▄╓,
 //                      ╓▄ª╙└╧▓        █           ⁿ▓▓ª╦w

@@ -19,7 +19,7 @@
 //    remove #import      : `mulle-sde dependency mark MulleGraphics no-header`
 //    rename              : `mulle-sde dependency|library set MulleGraphics include whatever.h`
 //    reorder             : `mulle-sde dependency move MulleGraphics <up|down>`
-//    toggle #import      : `mulle-sde dependency mark MulleGraphics [no-]import`
+//    toggle objc         : `mulle-sde dependency mark MulleGraphics [no-]import`
 //    toggle public       : `mulle-sde dependency mark MulleGraphics [no-]public`
 //    toggle optional     : `mulle-sde dependency mark MulleGraphics [no-]require`
 //    remove for platform : `mulle-sde dependency mark MulleGraphics no-platform-<uname>`
@@ -34,7 +34,7 @@
 //    remove #import      : `mulle-sde dependency mark MulleFoundation no-header`
 //    rename              : `mulle-sde dependency|library set MulleFoundation include whatever.h`
 //    reorder             : `mulle-sde dependency move MulleFoundation <up|down>`
-//    toggle #import      : `mulle-sde dependency mark MulleFoundation [no-]import`
+//    toggle objc         : `mulle-sde dependency mark MulleFoundation [no-]import`
 //    toggle public       : `mulle-sde dependency mark MulleFoundation [no-]public`
 //    toggle optional     : `mulle-sde dependency mark MulleFoundation [no-]require`
 //    remove for platform : `mulle-sde dependency mark MulleFoundation no-platform-<uname>`
@@ -49,7 +49,7 @@
 //    remove #import      : `mulle-sde dependency mark MulleUI no-header`
 //    rename              : `mulle-sde dependency|library set MulleUI include whatever.h`
 //    reorder             : `mulle-sde dependency move MulleUI <up|down>`
-//    toggle #import      : `mulle-sde dependency mark MulleUI [no-]import`
+//    toggle objc         : `mulle-sde dependency mark MulleUI [no-]import`
 //    toggle public       : `mulle-sde dependency mark MulleUI [no-]public`
 //    toggle optional     : `mulle-sde dependency mark MulleUI [no-]require`
 //    remove for platform : `mulle-sde dependency mark MulleUI no-platform-<uname>`
@@ -64,7 +64,7 @@
 //    remove #import      : `mulle-sde dependency mark MulleGraphicsImage no-header`
 //    rename              : `mulle-sde dependency|library set MulleGraphicsImage include whatever.h`
 //    reorder             : `mulle-sde dependency move MulleGraphicsImage <up|down>`
-//    toggle #import      : `mulle-sde dependency mark MulleGraphicsImage [no-]import`
+//    toggle objc         : `mulle-sde dependency mark MulleGraphicsImage [no-]import`
 //    toggle public       : `mulle-sde dependency mark MulleGraphicsImage [no-]public`
 //    toggle optional     : `mulle-sde dependency mark MulleGraphicsImage [no-]require`
 //    remove for platform : `mulle-sde dependency mark MulleGraphicsImage no-platform-<uname>`
@@ -79,7 +79,7 @@
 //    remove #import      : `mulle-sde dependency mark MulleUIPerf no-header`
 //    rename              : `mulle-sde dependency|library set MulleUIPerf include whatever.h`
 //    reorder             : `mulle-sde dependency move MulleUIPerf <up|down>`
-//    toggle #import      : `mulle-sde dependency mark MulleUIPerf [no-]import`
+//    toggle objc         : `mulle-sde dependency mark MulleUIPerf [no-]import`
 //    toggle public       : `mulle-sde dependency mark MulleUIPerf [no-]public`
 //    toggle optional     : `mulle-sde dependency mark MulleUIPerf [no-]require`
 //    remove for platform : `mulle-sde dependency mark MulleUIPerf no-platform-<uname>`

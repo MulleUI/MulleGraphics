@@ -8,6 +8,12 @@
 // we want "import.h" always anyway
 #import "import.h"
 
+#ifdef __has_include
+# if __has_include( <MulleCG/CGContext+Render.h>)
+#  import <MulleCG/CGContext+Render.h>
+# endif
+#endif
+
 
 @interface CGGraphicsLayer( MulleGraphics) < CGRenderObject>
 

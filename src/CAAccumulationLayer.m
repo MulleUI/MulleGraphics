@@ -136,6 +136,7 @@
 - (CGRect) rectForPreviousFramebuffer:(CGFramebuffer *) layer
                                canvas:(CGRect) canvas
 {
+   MULLE_C_UNUSED( layer);
    CGRect   rect;
 
    rect = canvas;
@@ -174,6 +175,7 @@ static inline double   computeDecayFactor( double y, int n)
                                inRect:(CGRect) rect
                                canvas:(CGRect) canvas
 {
+   MULLE_C_UNUSED( layer);
    int       step;
    CGFloat   xOffset;
    CGFloat   yOffset;

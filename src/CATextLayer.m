@@ -448,7 +448,7 @@ uintptr_t   mulle_utf8_utf32_offset_at_characters( char *data,
    if( _textVerticalAlignment == UITextAlignmentFill)
    {
       [context useFontWithNameUTF8String:_fontNameUTF8String];
-      [context setCombinedTextAlignment:NVG_ALIGN_LEFT | NVG_ALIGN_TOP];
+      [context setCombinedTextAlignment:CGTextAlignLeft | CGTextAlignTop];
       [context setTextLetterSpacing:_textLetterSpacing];
 
       probe = 32.0f;

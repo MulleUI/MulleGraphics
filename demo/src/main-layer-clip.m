@@ -1,45 +1,43 @@
 #import "import-private.h"
 
 #import <string.h>
-
-
-#define POSSIBLE_NANOVG_INTERSECT_BUG
+#define POSSIBLE_INTERSECT_BUG
 
 // The problem is that the old scissor is converted to the current transform
 // for intersection. Then the rotated version is now set as the
 // new scissor, but that
 //
 
-// void nvgIntersectScissor(NVGcontext* ctx, float x, float y, float w, float h)
+// void CGContextIntersectScissor(CGContext *context, CGRect rect)
 // {
 //    NOT_AVAILABLE_IN_FONT_CONTEXT( ctx);
 //    NOT_AVAILABLE_IN_PATH_CONTEXT( ctx);
 //
-//    NVGstate* state = nvg__getState(ctx);
+//    (internal state access removed)
 //    float pxform[6], invxorm[6];
 //    float rect[4];
 //    float ex, ey, tex, tey;
 //
 //    // If no previous scissor has been set, set the scissor as current scissor.
 //    if (state->scissor.extent[0] < 0) {
-//       nvgScissor(ctx, x, y, w, h);
+//       CGContextScissor( context, CGRectMake(rect);
 //       return;
 //    }
 //
 //    // Transform the current scissor rect into current transform space.
 //    // If there is difference in rotation, this will be approximation.
-//    memcpy(pxform, state->scissor.xform, sizeof(float)*6);
+//    memcpy(pxform, state->scissor.xform, sizeof(float))*6);
 //    ex = state->scissor.extent[0];
 //    ey = state->scissor.extent[1];
-//    nvgTransformInverse(invxorm, state->xform);
-//    nvgTransformMultiply(pxform, invxorm);
-//    tex = ex*nvg__absf(pxform[0]) + ey*nvg__absf(pxform[2]);
-//    tey = ex*nvg__absf(pxform[1]) + ey*nvg__absf(pxform[3]);
+//    CGContextTransformInverse(invxorm, state->xform);
+//    CGContextTransformMultiply(pxform, invxorm);
+//    tex = ex*fabsf(pxform[0]) + ey*fabsf(pxform[2]);
+//    tey = ex*fabsf(pxform[1]) + ey*fabsf(pxform[3]);
 //
 //    // Intersect rects.
-//    nvg__isectRects(rect, pxform[4]-tex,pxform[5]-tey,tex*2,tey*2, x,y,w,h);
+//    isectRects(rect, pxform[4]-tex,pxform[5]-tey,tex*2,tey*2, x,y,w,h);
 //
-//    nvgScissor(ctx, rect[0], rect[1], rect[2], rect[3]);
+//    CGContextScissor( ctx, CGRectMake(rect[0], rect[1], rect[2], rect[3]));
 // }
 
 //
@@ -53,22 +51,15 @@ static BOOL   drawStuff( CGGraphicsLayer *layer, CGContext *_context)
    NSUInteger          y;
    NSUInteger          w;
    NSUInteger          h;
-   struct NVGcontext   *vg;
    CGRect              bounds;
    CGFloat             col;
    CGFloat             col_inc;
    CGRect              canvas;
-
-   vg = CGContextGetNVGContext( context);
-
-#ifdef POSSIBLE_NANOVG_INTERSECT_BUG
+#ifdef POSSIBLE_INTERSECT_BUG
    // visually this breaks the intersect we got from the view clipRect
    // or from our masksToBounds
    bounds = [layer bounds];
-   nvgIntersectScissor( vg, bounds.origin.x,
-                            bounds.origin.y,
-                            bounds.size.width,
-                            bounds.size.height);
+   CGContextIntersectScissor( context, bounds);
 #endif
    canvas = [layer canvas];
    w = (NSUInteger) ceil( canvas.size.width / 20.0);
@@ -77,19 +68,17 @@ static BOOL   drawStuff( CGGraphicsLayer *layer, CGContext *_context)
    for( y = 0; y < h; y++)
       for( x = 0; x < w; x++)
       {
-         nvgBeginPath( vg);
+         CGContextBeginPath( context);
          if( (x ^ y) & 1)
-            nvgFillColor( vg, CGColorMakeWithHSL( 0.2 * y / h + 0.8 * x / w, 1.0, 0.8));
+            CGContextFillColor( context, CGColorMakeWithHSL( 0.2 * y / h + 0.8 * x / w, 1.0, 0.8));
          else
-            nvgFillColor( vg, CGColorMakeWithHSL( 0.8 * y / h + 0.2 * x / w, 0.8, 0.5));
-         nvgRect( vg, x * 20.0, y * 20.0, 20.0, 20.0);
-         nvgFill( vg);
+            CGContextFillColor( context, CGColorMakeWithHSL( 0.8 * y / h + 0.2 * x / w, 0.8, 0.5));
+         CGContextRect( context, CGRectMake(x * 20.0, y * 20.0, 20.0, 20.0));
+         CGContextFill( context);
       }
 
    return( YES);
 }
-
-
 void   setupSceneInView( UIView *contentView)
 {
    CGRect            contentRect;
@@ -112,8 +101,6 @@ void   setupSceneInView( UIView *contentView)
    [layer setRotation:0.33];
    [layer setMasksToBounds:YES];
 }
-
-
 int   main( void)
 {
    CGContext       *context;
@@ -133,8 +120,6 @@ int   main( void)
 
    return( [app runApp]);
 }
-
-
 
 // PROPOSED AI FIX:
 #if 0
@@ -241,16 +226,16 @@ static int clipRectangles(float* subject, int subjectCount,
     return count;
 }
 
-void nvgIntersectScissor(NVGcontext* ctx, float x, float y, float w, float h)
+void cgIntersectScissor(CGContext* ctx, float x, float y, float w, float h)
 {
     NOT_AVAILABLE_IN_FONT_CONTEXT( ctx);
     NOT_AVAILABLE_IN_PATH_CONTEXT( ctx);
 
-    NVGstate* state = nvg__getState(ctx);
+    CGState* state = getState(ctx);
 
     // If no previous scissor has been set, set the scissor as current scissor.
     if (state->scissor.extent[0] < 0) {
-        nvgScissor(ctx, x, y, w, h);
+        CGContextScissor( ctx, CGRectMake(x, y, w, h));
         return;
     }
 
@@ -267,11 +252,11 @@ void nvgIntersectScissor(NVGcontext* ctx, float x, float y, float w, float h)
     // Transform clip rectangle corners to current coordinate space
     float pxform[6], invxorm[6];
     memcpy(pxform, state->scissor.xform, sizeof(float)*6);
-    nvgTransformInverse(invxorm, state->xform);
-    nvgTransformMultiply(pxform, invxorm);
+    CGContextTransformInverse(invxorm, state->xform);
+    CGContextTransformMultiply(pxform, invxorm);
 
     for (int i = 0; i < 4; i++) {
-        nvgTransformPoint(&clipRect[i*2], &clipRect[i*2+1],
+        CGContextTransformPoint(&clipRect[i*2], &clipRect[i*2+1],
                          pxform, clipRect[i*2], clipRect[i*2+1]);
     }
 
@@ -298,17 +283,15 @@ void nvgIntersectScissor(NVGcontext* ctx, float x, float y, float w, float h)
     float minX = result[0], maxX = result[0];
     float minY = result[1], maxY = result[1];
     for (int i = 1; i < resultCount; i++) {
-        minX = nvg__minf(minX, result[i*2]);
-        maxX = nvg__maxf(maxX, result[i*2]);
-        minY = nvg__minf(minY, result[i*2+1]);
-        maxY = nvg__maxf(maxY, result[i*2+1]);
+        minX = fminf(minX, result[i*2]);
+        maxX = fmaxf(maxX, result[i*2]);
+        minY = fminf(minY, result[i*2+1]);
+        maxY = fmaxf(maxY, result[i*2+1]);
     }
 
     // Set new scissor with bounding box
-    nvgScissor(ctx, minX, minY, maxX-minX, maxY-minY);
+    CGContextScissor( ctx, CGRectMake(minX, minY, maxX-minX, maxY-minY));
 }
-
-
 /// and
 
 // Optimized clipping for axis-aligned rectangle against rotated rectangle
@@ -390,8 +373,8 @@ static int clipAxisAlignedAgainstRotated(float x, float y, float w, float h,
             float yVal = m1 * xVal + b1_1;
             if (yVal >= y && yVal <= y+h) {
                 // Check if intersection is within the rotated edge segment
-                float minX = nvg__minf(clipRect[0], clipRect[2]);
-                float maxX = nvg__maxf(clipRect[0], clipRect[2]);
+                float minX = fminf(clipRect[0], clipRect[2]);
+                float maxX = fmaxf(clipRect[0], clipRect[2]);
                 if (xVal >= minX && xVal <= maxX) {
                     points[pointCount*2] = xVal;
                     points[pointCount*2+1] = yVal;
@@ -402,8 +385,8 @@ static int clipAxisAlignedAgainstRotated(float x, float y, float w, float h,
             // Intersect with second edge of first parallel pair
             yVal = m1 * xVal + b1_2;
             if (yVal >= y && yVal <= y+h) {
-                float minX = nvg__minf(clipRect[4], clipRect[6]);
-                float maxX = nvg__maxf(clipRect[4], clipRect[6]);
+                float minX = fminf(clipRect[4], clipRect[6]);
+                float maxX = fmaxf(clipRect[4], clipRect[6]);
                 if (xVal >= minX && xVal <= maxX) {
                     points[pointCount*2] = xVal;
                     points[pointCount*2+1] = yVal;
@@ -421,8 +404,8 @@ static int clipAxisAlignedAgainstRotated(float x, float y, float w, float h,
             // Intersect with first edge of second parallel pair
             float xVal = (yVal - b2_1) / m2;
             if (xVal >= x && xVal <= x+w) {
-                float minY = nvg__minf(clipRect[3], clipRect[5]);
-                float maxY = nvg__maxf(clipRect[3], clipRect[5]);
+                float minY = fminf(clipRect[3], clipRect[5]);
+                float maxY = fmaxf(clipRect[3], clipRect[5]);
                 if (yVal >= minY && yVal <= maxY) {
                     points[pointCount*2] = xVal;
                     points[pointCount*2+1] = yVal;
@@ -433,8 +416,8 @@ static int clipAxisAlignedAgainstRotated(float x, float y, float w, float h,
             // Intersect with second edge of second parallel pair
             xVal = (yVal - b2_2) / m2;
             if (xVal >= x && xVal <= x+w) {
-                float minY = nvg__minf(clipRect[7], clipRect[1]);
-                float maxY = nvg__maxf(clipRect[7], clipRect[1]);
+                float minY = fminf(clipRect[7], clipRect[1]);
+                float maxY = fmaxf(clipRect[7], clipRect[1]);
                 if (yVal >= minY && yVal <= maxY) {
                     points[pointCount*2] = xVal;
                     points[pointCount*2+1] = yVal;
@@ -451,7 +434,5 @@ static int clipAxisAlignedAgainstRotated(float x, float y, float w, float h,
 
     return pointCount;
 }
-
-
 #endif
 

@@ -14,14 +14,10 @@ static BOOL   drawStuff( CGGraphicsLayer *layer, CGContext *_context)
    NSUInteger          y;
    NSUInteger          w;
    NSUInteger          h;
-   struct NVGcontext   *vg;
    CGRect              bounds;
    CGFloat             col;
    CGFloat             col_inc;
    CGRect              canvas;
-
-   vg = CGContextGetNVGContext( context);
-
    canvas = [layer canvas];
    w = (NSUInteger) ceil( canvas.size.width / 20.0);
    h = (NSUInteger) ceil( canvas.size.height / 20.0);
@@ -29,19 +25,17 @@ static BOOL   drawStuff( CGGraphicsLayer *layer, CGContext *_context)
    for( y = 0; y < h; y++)
       for( x = 0; x < w; x++)
       {
-         nvgBeginPath( vg);
+         CGContextBeginPath( context);
          if( (x ^ y) & 1)
-            nvgFillColor( vg, CGColorMakeWithHSL( 0.2 * y / h + 0.8 * x / w, 1.0, 0.8));
+            CGContextFillColor( context, CGColorMakeWithHSL( 0.2 * y / h + 0.8 * x / w, 1.0, 0.8));
          else
-            nvgFillColor( vg, CGColorMakeWithHSL( 0.8 * y / h + 0.2 * x / w, 0.8, 0.5));
-         nvgRect( vg, x * 20.0, y * 20.0, 20.0, 20.0);
-         nvgFill( vg);
+            CGContextFillColor( context, CGColorMakeWithHSL( 0.8 * y / h + 0.2 * x / w, 0.8, 0.5));
+         CGContextRect( context, CGRectMake(x * 20.0, y * 20.0, 20.0, 20.0));
+         CGContextFill( context);
       }
 
    return( YES);
 }
-
-
 #define COLS  3
 #define ROWS  3
 
@@ -124,8 +118,6 @@ void   setupSceneInContentPlane( UIWindowPlane *plane)
       }
    }
 }
-
-
 int   main()
 {
    CGContext       *context;

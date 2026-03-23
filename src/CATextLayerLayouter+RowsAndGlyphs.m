@@ -237,7 +237,6 @@
    {
       [_textLayer prepareLayoutContext:context];
       [self updateRowsWithContext:context];
-      assert( _rowArrayValid);
    }
 }
 
@@ -316,7 +315,8 @@ static BOOL   CATextLayerLayouterNeedsUpdates( CATextLayerLayouter *self)
 
       MulleUILog( "a: %g d: %g h: %g", _metrics.ascender, _metrics.descender, _metrics.lineHeight);
 
-      assert( _metrics.lineHeight);
+      if( ! _metrics.lineHeight)
+         return( CGRectZero);
 
       nRows = _mulle_structarray_get_count( &_rowArray);
 
@@ -464,7 +464,8 @@ next:
    struct UIGlyphPosition          *glyphs;
    struct mulle_utf8data           data;
 
-   assert( ! CATextLayerLayouterNeedsUpdates( self));
+   if( CATextLayerLayouterNeedsUpdates( self))
+      return( NSNotFound);
 
    nRows = _mulle_structarray_get_count( &_rowArray);
    if( ! nRows)
@@ -520,7 +521,8 @@ next:
    struct UIGlyphPosition          *glyphs;
    struct UIGlyphPosition          dummy;
 
-   assert( ! CATextLayerLayouterNeedsUpdates( self));
+   if( CATextLayerLayouterNeedsUpdates( self))
+      return( CAGlyphSeatingNull);
 
    if( ! glyphPosition)
       glyphPosition = &dummy;

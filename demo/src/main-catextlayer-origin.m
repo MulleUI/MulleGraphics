@@ -7,8 +7,6 @@
 
 #include <string.h>
 
-
-
 #define VERBOSE_DEBUG 0
 
 #if VERBOSE_DEBUG
@@ -21,15 +19,11 @@
 // This is NOT the DemoView main layer!
 @interface DebugTextLayer : CATextLayer
 @end
-
-
 //
 // DemoView does the layer layout and shows the glyph rectangle
 //
 @interface DemoView : UIView
 @end
-
-
 @implementation DemoView
 
 - (instancetype) initWithFrame:(CGRect) frame
@@ -76,8 +70,6 @@
 
    return( self);
 }
-
-
 - (void) layoutAuxillaryLayer:(id <UILayer>) layer
                    layoutInfo:(struct UILayoutInfo *) info;
 {
@@ -123,8 +115,6 @@
    [super layoutAuxillaryLayer:layer
                     layoutInfo:info];
 }
-
-
 - (UIMouseMotionEvent *) handleMouseMotionEvent:(UIMouseMotionEvent *) event
 {
    CGFloat           baseline;
@@ -185,8 +175,6 @@
 }
 
 @end
-
-
 void   setupScene( UIWindow *window)
 {
    DemoView   *view;
@@ -196,15 +184,11 @@ void   setupScene( UIWindow *window)
    view    = [DemoView viewWithFrame:frame];
    [view setAutoresizingMask:UIViewAutoresizingScaleToFill];
    // [view setMouseMotionEventCallback:handleMouseMotionEvent];
-
-
    [[window contentView] addSubview:view];
    // do this after adding view to window, need to be first responder to get
    // mouse tracking events
    [view becomeFirstResponder];
 }
-
-
 int   main( int argc, char *argv[])
 {
    UIApplication   *app;
@@ -233,8 +217,6 @@ int   main( int argc, char *argv[])
 
    return( [app runApp]);
 }
-
-
 // DebugTextLayer 
 @implementation DebugTextLayer
 
@@ -245,13 +227,11 @@ int   main( int argc, char *argv[])
 
    mulle_fprintf( stderr, "%s\n", __FUNCTION__);
 
-   old = nvgTrace( CGContextGetNVGContext( context), stderr);
+   old = CGContextTrace( context, stderr);
    [super renderInContext:context];
-   nvgTrace( CGContextGetNVGContext( context), old);
+   CGContextTrace( context, old);
    mulle_fprintf( stderr, "\n");
 }
-
-
 //
 // will not be called if backgroundColor is transparent
 //
@@ -261,8 +241,6 @@ int   main( int argc, char *argv[])
 
    [super drawBackgroundInContext:context];
 }
-
-
 //
 // will not be called if border is 0.0 or transparent
 //
@@ -272,8 +250,6 @@ int   main( int argc, char *argv[])
 
    [super drawBorderInContext:context];
 }
-
-
 - (BOOL) willDrawInContext:(CGContext *) context
 {
    BOOL   flag;
@@ -282,15 +258,11 @@ int   main( int argc, char *argv[])
    flag = [super willDrawInContext:context];
    return( flag);
 }
-
-
 - (void) didDrawInContext:(CGContext *) context
 {
    mulle_fprintf( stderr, "%s\n", __FUNCTION__);
    [super didDrawInContext:context];
 }
-
-
 /// b -[DemoTextLayer drawInContext:]
 - (BOOL) drawInContext:(CGContext *) context
 {
@@ -301,8 +273,6 @@ int   main( int argc, char *argv[])
    return( flag);
 }
 #endif
-
-
 - (id) copy
 {
    id    copy;
@@ -312,8 +282,6 @@ int   main( int argc, char *argv[])
 }
 
 @end
-
-
 //                           ,╓≤æKª╨╙╙▓█D"╙╙╙*╨¥W▄╓,
 //                      ╓▄ª╙└╧▓        █           ⁿ▓▓ª╦w
 //                  ╓#╜^*█⌐   `╕       █           ╓▌    `╙%w

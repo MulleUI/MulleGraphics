@@ -61,7 +61,6 @@ src/CACPUImageLayer.h
 src/CAGradientLayer.h
 src/CAImageLayer+Cursor.h
 src/CAImageLayer.h
-src/CAOpenGLLayer.h
 src/CAShadowLayer.h
 src/CAShapeLayer.h
 src/CATextLayerLayouter+CGGraphicsLayerLayouter.h

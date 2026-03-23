@@ -30,3 +30,12 @@
 #import "_MulleGraphics-import-private.h"
 
 /* You can add some more import statements here */
+
+#ifdef __has_include
+# if __has_include( <MulleCG/CGContext+Drawing.h>)
+#  import <MulleCG/CGContext+Drawing.h>
+#  import <MulleCG/CGContext+DrawingConveniences.h>
+#  import <MulleCG/CGPaintable.h>
+#  import <MulleCG/CGPaint+DrawingConveniences.h>
+# endif
+#endif

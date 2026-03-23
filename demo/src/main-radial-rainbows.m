@@ -13,16 +13,16 @@
 #define BRIGHTNESS_DIP      1.1         // undefine to turn off
 
 
-static void   circleWithHolePath( NVGcontext *vg,
+static void   circleWithHolePath( CGContext *context,
                                   CGPoint center,
                                   CGFloat innerRadius,   // hole
                                   CGFloat outerRadius)
 {
-   nvgBeginPath( vg);
-   nvgPathWinding( vg, NVG_SOLID);
-   nvgCircle( vg, center.x, center.y, outerRadius);
-   nvgPathWinding( vg, NVG_HOLE);
-   nvgCircle( vg, center.x, center.y, innerRadius);
+   CGContextBeginPath( context);
+   CGContextPathWinding( context, CGPathFillStyleSolid);
+   CGContextCircle( context, CACircleMakeWithCenterAndRadius( center, outerRadius));
+   CGContextPathWinding( context, CGPathFillStyleHole);
+   CGContextCircle( context, CACircleMakeWithCenterAndRadius( center, innerRadius));
 }
 
 
@@ -128,29 +128,19 @@ static inline CGColor   ColorStopGetColor( struct ColorStop *c)
 }
 
 
-static void   fillCircleWithHoleAndColorStops( NVGcontext *vg,
+static void   fillCircleWithHoleAndColorStops( CGContext *context,
                                                CGPoint center,
                                                struct ColorStop *inner,
                                                struct ColorStop *outer)
 {
-   NVGpaint   paint;
+   circleWithHolePath( context, center, outer->radius, inner->radius);
 
-   circleWithHolePath( vg, center, outer->radius, inner->radius);
-
-//   paint = nvgBoxGradient( vg, center.x - outer->radius, center.y - outer->radius,
-//                               outer->radius * 2, outer->radius * 2,
-//                               outer->radius, inner->radius,
-//                               ColorStopGetColor( inner), ColorStopGetColor( outer));
-
-//   paint = nvgLinearGradient( vg, center.x - outer->radius, center.y - outer->radius,
-//                                  center.x + outer->radius, center.y + outer->radius,
-//                                  ColorStopGetColor( inner), ColorStopGetColor( outer));
-//
-   paint = nvgRadialGradient( vg, center.x, center.y,
-                                  inner->radius, outer->radius,
-                                  ColorStopGetColor( inner), ColorStopGetColor( outer));
-   nvgFillPaint( vg, paint);
-   nvgFill( vg);
+   CGContextSetFillRadialGradient( context,
+                                   CACircleMakeWithCenterAndRadius( center, outer->radius),
+                                   ColorStopGetColor( outer),
+                                   inner->radius,
+                                   ColorStopGetColor( inner));
+   CGContextFill( context);
 }
 
 
@@ -159,17 +149,17 @@ static void   fillCircleWithHoleAndColorStops( NVGcontext *vg,
           context:(CGContext *) context
 {
    struct mulle_structarrayreverseenumerator   rover;
-   NVGcontext                                  *vg;
+   
    struct ColorStop                            *inner;
    struct ColorStop                            *outer;
    struct ColorStop                            hack;
    CGPoint                                     center;
    NSUInteger                                  i, n;
 
-   vg     = CGContextGetNVGContext( context);
+   
    center = CGRectGetCenter( rect);
 
-   nvgShapeAntiAlias( vg, RIDGE != 0.0);
+   CGContextShapeAntiAlias( context, RIDGE != 0.0);
 
    n     = mulle_structarray_get_count( &_stops);
    i     = 0;
@@ -188,16 +178,16 @@ static void   fillCircleWithHoleAndColorStops( NVGcontext *vg,
             if( RIDGE == 0.0)
             {
                if( i == 2 || i == n - 1)
-                  nvgShapeAntiAlias( vg, 1);
+                  CGContextShapeAntiAlias( context, 1);
                else
-                  nvgShapeAntiAlias( vg, 0);
+                  CGContextShapeAntiAlias( context, 0);
             }
 
             hack = *outer;
             if( i != 2)
                hack.radius += 1.0 - RIDGE;
 
-            fillCircleWithHoleAndColorStops( vg, center, inner, &hack);
+            fillCircleWithHoleAndColorStops( context, center, inner, &hack);
          }
       }
       outer = inner;

@@ -10,12 +10,8 @@ static BOOL   drawStuff( CGGraphicsLayer *layer, CGContext *_context)
    CGContext          *context = _context;
    CGRect             rect;
    CGRect             patternRect;
-   struct NVGpaint    imgPaint;
-   struct NVGcontext  *vg;
    CGSize             imageSize;
    CGImage            *image;
-
-   vg    = CGContextGetNVGContext( context);
    image = [context resourceForKey:MulleUIResourceStorageKey( tardbeaver)];
    if( ! image)
    {

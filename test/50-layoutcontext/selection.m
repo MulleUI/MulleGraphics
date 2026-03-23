@@ -88,7 +88,6 @@ static void  test_selection_rect( void)
    CATextLayer          *layer;
    CATextLayerLayouter  *layouter;
    CGLayoutContext      *context;
-   CGRect               selRect;
    NSRange              sel;
    NSUInteger           i;
    NSUInteger           nRows;
@@ -117,8 +116,9 @@ static void  test_selection_rect( void)
    
    for( i = 0; i < nRows; i++)
    {
-      selRect = [layouter selectionRectInRow:i textRange:sel];
-      printf( "Row %tu selection rect: %s\n", i, CGRectUTF8String( selRect));
+      CGFloat  x, width;
+      [layouter selectionInRow:i textRange:sel selectionX:&x selectionWidth:&width];
+      printf( "Row %tu selection rect: x=%.2f width=%.2f\n", i, x, width);
    }
 }
 

@@ -1,11 +1,7 @@
 #import "import-private.h"
 
 #include <math.h>
-
-
 float snoise3(float x, float y, float z);
-
-
 static float getNoise( float x, float y, float z)
 {
    NSUInteger  octaves = 4;
@@ -21,8 +17,6 @@ static float getNoise( float x, float y, float z)
    }
    return( sum);
 }
-
-
 struct whirls_options
 {
    CGHexColor   backgroundColor;
@@ -38,8 +32,6 @@ struct whirls_options
    .base             = 1000.0,
    .zInc             = 0.001
 };
-
-
 @interface Whirl : NSObject
 
 @property( assign) CGPoint  origin;
@@ -47,11 +39,7 @@ struct whirls_options
 @property( assign) CGColor  color;
 
 @end
-
-
 @implementation Whirl
-
-
 - (instancetype) initWithCanvas:(CGRect) canvas
                         hueBase:(CGFloat) base
 {
@@ -71,16 +59,12 @@ struct whirls_options
 
    return( self);
 }
-
-
 - (BOOL) drawInContext:(CGContext *) context
 {
-   // No need for NVGcontext anymore
+   // Using CGContext directly
    CGContextStrokeLineWithColor( context, self->_lastOrigin, self->_origin, 1.0f, self->_color);
    return( YES);
 }
-
-
 - (void) updateWithZOffset:(CGFloat) zoff
 {
    CGFloat   radians;
@@ -97,8 +81,6 @@ struct whirls_options
       self->_color.a += 0.003;
 }
 
-
-
 - (void) updateWithCanvas:(CGRect ) canvas
                   hueBase:(CGFloat) hueBase
 {
@@ -111,8 +93,6 @@ struct whirls_options
 }
 
 @end
-
-
 @interface WhirlLayer : CGGraphicsLayer
 {
    // for TAO this is bad as on our autolocking CGGraphicsLayer we have
@@ -148,24 +128,18 @@ struct whirls_options
 
    return( self);
 }
-
-
 - (void) dealloc
 {
    [self->_whirls release];
    [super dealloc];
 }
-
-
 - (BOOL) drawInContext:(CGContext *) context
 {
    CGColor      fillColor;
    CGRect       canvas;
    NSUInteger   i;
-   NVGcontext   *vg;
    Whirl       *whirl;
 
-   vg     = CGContextGetNVGContext( context);
    canvas = [self canvas];
 
    for( whirl in _whirls)
@@ -186,8 +160,6 @@ struct whirls_options
 {
    [super mulleGainAccessWithUniquingSet:uniquing];
 }
-
-
 - (void) mulleRelinquishAccessWithUniquingSet:(struct mulle_pointerset *) uniquing
 {
    [super mulleRelinquishAccessWithUniquingSet:uniquing];
@@ -195,8 +167,6 @@ struct whirls_options
 #endif
 
 @end
-
-
 
 int   main( int argc, char *argv[])
 {
@@ -237,14 +207,8 @@ int   main( int argc, char *argv[])
 
       [app addWindow:window];
    }
-
-
    return( [app runApp]);
 }
-
-
-
-
 //
 //                           ,╓≤æKª╨╙╙▓█D"╙╙╙*╨¥W▄╓,
 //                      ╓▄ª╙└╧▓        █           ⁿ▓▓ª╦w
@@ -281,8 +245,6 @@ int   main( int argc, char *argv[])
 //                     ╙▀W╥,╓╣   ╙█║        ╫M  █    ,╓▄╝╙`
 //                          ╙╙▀%▄▄▄▌,≤▄_▄≡,▐▓▓▄▄#ª▀"`
 
-
-
 #if 0
 /*
 **
@@ -298,8 +260,6 @@ window.requestAnimationFrame = (function(){
                 window.setTimeout(callback, 1000 / 60);
             };
 })();
-
-
 // Configs
 
 var Configs = {
@@ -309,8 +269,6 @@ var Configs = {
     base: 1000,
     zInc: 0.001
 };
-
-
 // Vars
 
 var canvas,
@@ -324,8 +282,6 @@ var canvas,
     simplexNoise,
     zoff = 0,
     gui;
-
-
 // Initialize
 
 function init() {
@@ -350,8 +306,6 @@ function init() {
 
     update();
 }
-
-
 // Event listeners
 
 function onWindowResize(e) {
@@ -375,8 +329,6 @@ function onCanvasClick(e) {
 
     simplexNoise = new SimplexNoise();
 }
-
-
 // Functions
 
 function getNoise(x, y, z) {
@@ -402,8 +354,6 @@ function initParticle(p) {
     p.color.l = 0.5;
     p.color.a = 0;
 }
-
-
 // Update
 
 function update() {
@@ -439,8 +389,6 @@ function update() {
 
     requestAnimationFrame(update);
 }
-
-
 /**
  * HSLA
  */
@@ -465,13 +413,9 @@ function Particle(x, y, color) {
     this.lastX = this.x;
     this.lastY = this.y;
 }
-
-
 // Run
 
 #endif
-
-
 /* SimplexNoise1234, Simplex noise with true analytic
  * derivative in 1D to 4D.
  *
@@ -801,8 +745,6 @@ float snoise3(float x, float y, float z) {
     // The result is scaled to stay just inside [-1,1]
     return 72.0f * (n0 + n1 + n2 + n3);
   }
-
-
 // 4D simplex noise
 float snoise4(float x, float y, float z, float w) {
   

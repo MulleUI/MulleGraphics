@@ -49,6 +49,7 @@
 
 - (NSUInteger) characterOffsetAtPoint:(CGPoint) point
 {
+   MULLE_C_UNUSED( point);
    // TODO: HACK!!!
    return( _image ? 1 : 0);
 }
@@ -56,6 +57,7 @@
 
 - (MulleCursorPosition) cursorPositionForPoint:(CGPoint) mouseLocation
 {
+   MULLE_C_UNUSED( mouseLocation);
    // TODO: HACK!!!
    return( CGPixelPointMake( _image ? 1 : 0, 0));
 }
