@@ -233,6 +233,7 @@
 
 - (void) updateRowsWithContextIfNeeded:(id <UILayoutContext>) context
 {
+   CATextLayerLayouterNeedsUpdates( self);
    if( ! _rowArrayValid)
    {
       [_textLayer prepareLayoutContext:context];
@@ -471,9 +472,8 @@ next:
    if( ! nRows)
       return( NSNotFound);
 
-   // figure out the row that was hit, a row is _metrics.lineHeight and
-   // drawn at frame.origin.y + i *_metrics.lineHeight
-   y = (NSInteger) round( point.y / _metrics.lineHeight);
+   // Top of row 0 is at -ascender (origin/baseline already subtracted)
+   y = (NSInteger) floor( (point.y + _metrics.ascender) / _metrics.lineHeight);
    if( y < 0)
       y = 0;
    else
@@ -533,9 +533,8 @@ next:
    if( ! nRows)
       return( seating);
 
-   // figure out the row that was hit, a row is _metrics.lineHeight and
-   // drawn at frame.origin.y + i *_metrics.lineHeight
-   y = (NSInteger) round( point.y / _metrics.lineHeight);
+   // Top of row 0 is at -ascender (origin/baseline already subtracted)
+   y = (NSInteger) floor( (point.y + _metrics.ascender) / _metrics.lineHeight);
    if( y < 0)
       y = 0;
    else

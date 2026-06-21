@@ -7,6 +7,7 @@
 
 #import "CATextLayerLayouter+Selection.h"
 #import "CATextLayer.h"
+#include <ctype.h>
 
 
 @implementation CATextLayerLayouter( Cursor)
@@ -267,11 +268,10 @@ scrolling:
 
    origin = [_textLayer origin];
    nRows  = _mulle_structarray_get_count( &_rowArray);
-   // figure out the row that was hit, a row is _metrics.lineHeight and
-   // drawn at frame.origin.y + origin.y  + i *_metrics.lineHeight
-   y = (NSInteger) round( (point.y -origin.y) / _metrics.lineHeight);
+   // The top of row 0 is at origin.y - ascender. Each row spans lineHeight.
+   y = (NSInteger) floor( (point.y - (origin.y - _metrics.ascender)) / _metrics.lineHeight);
    if( y < 0) 
-      return( MulleCursorPositionMake( 0, 0));
+      y = 0;
    if( y >= nRows)
       return( MulleCursorPositionMax);
 
@@ -281,6 +281,7 @@ scrolling:
 
    // TODO: binary search anyone ?
    search = point.x - origin.x;
+
    for( x = 0; x < nGlyphs; x++)
    {
       if( search >= glyphs[ x].x && search < glyphs[ x + 1].x)
@@ -292,7 +293,12 @@ scrolling:
       }
    }
 
-   return( MulleCursorPositionNull);
+   // before first glyph: position at start of line
+   if( nGlyphs && search < glyphs[ 0].x)
+      return( MulleCursorPositionMake( 0, y));
+
+   // past last glyph: position at end of line
+   return( MulleCursorPositionMake( nGlyphs, y));
 }
 
 
@@ -364,15 +370,26 @@ scrolling:
    struct mulle_allocator   *allocator;
    struct mulle_utf8data    data;
 
+   CATextLayerLayouterLog( CATextLayerLayouterDebugCursor,
+      "char='%c' (0x%x) text=\"%s\" selection={%tu,%tu}",
+      (c >= 32 && c < 127) ? c : '?', c,
+      [_textLayer textUTF8String], _selection.location, _selection.length);
+
    [self deleteSelectionIfNeeded];
 
    cursorPosition = [self cursorPosition];
    pos            = [self characterOffsetForCursorPosition:cursorPosition];
+
+   CATextLayerLayouterLog( CATextLayerLayouterDebugVerbose,
+      "cursorPos=(%td,%td) charOffset=%tu",
+      cursorPosition.x, cursorPosition.y, pos);
+
    if( pos == NSNotFound)
       return;
 
    data = [_textLayer textUTF8Data];
-   assert( pos < data.length);
+   if( pos > data.length)
+      pos = data.length;
 
    allocator = MulleObjCInstanceGetAllocator( self);
    s         = [_textLayer textUTF8String];
@@ -390,7 +407,13 @@ scrolling:
 
    // naive!! need to consider line breaks
    cursorPosition.x++;
+   if( MulleCursorPositionIsNull( cursorPosition))
+      cursorPosition = MulleCursorPositionMake( pos + 1, 0);
    [self setCursorPosition:cursorPosition];
+
+   CATextLayerLayouterLog( CATextLayerLayouterDebugCursor,
+      "result text=\"%s\" cursor=(%td,%td)",
+      [_textLayer textUTF8String], cursorPosition.x, cursorPosition.y);
 }
 
 - (void) enterOrReturn
@@ -407,6 +430,10 @@ scrolling:
    NSUInteger            pos2;
    char                  *s;
 
+   CATextLayerLayouterLog( CATextLayerLayouterDebugCursor,
+      "text=\"%s\" selection={%tu,%tu}",
+      [_textLayer textUTF8String], _selection.location, _selection.length);
+
    if( [self deleteSelectionIfNeeded])
       return;
 
@@ -416,13 +443,26 @@ scrolling:
 
    pos2           = [self characterOffsetForCursorPosition:cursorPosition];
    --cursorPosition.x; // need to move line up if hitting 0
+   if( cursorPosition.x < 0)
+      return;
    pos1           = [self characterOffsetForCursorPosition:cursorPosition];
    if( pos1 == NSNotFound)
       return;
    s              = [_textLayer textUTF8String];
+   if( pos2 > strlen( s))
+      return;
+
+   CATextLayerLayouterLog( CATextLayerLayouterDebugVerbose,
+      "pos1=%tu pos2=%tu cursor=(%td,%td) s=\"%s\"",
+      pos1, pos2, cursorPosition.x, cursorPosition.y, s);
+
    s = MulleObjC_asprintf( "%.*s%s", (int) pos1, s, &s[ pos2]);
    [_textLayer setTextUTF8String:s];
    [self setCursorPosition:cursorPosition];
+
+   CATextLayerLayouterLog( CATextLayerLayouterDebugCursor,
+      "result text=\"%s\" cursor=(%td,%td)",
+      [_textLayer textUTF8String], cursorPosition.x, cursorPosition.y);
 }
 
 
@@ -461,6 +501,14 @@ scrolling:
 {
    MulleCursorPosition   cursorPosition;
 
+   if( _selection.length)
+   {
+      cursorPosition = [self cursorPositionForCharacterOffset:_selection.location];
+      [self setSelection:NSRangeMake( 0, 0)];
+      [self setCursorPosition:cursorPosition];
+      return;
+   }
+
    cursorPosition = [self cursorPosition];
    if( cursorPosition.x == NSNotFound)
       return;
@@ -478,6 +526,14 @@ scrolling:
    MulleCursorPosition   cursorPosition;
    MulleCursorPosition   maxPosition;
 
+   if( _selection.length)
+   {
+      cursorPosition = [self cursorPositionForCharacterOffset:_selection.location + _selection.length];
+      [self setSelection:NSRangeMake( 0, 0)];
+      [self setCursorPosition:cursorPosition];
+      return;
+   }
+
    cursorPosition = [self cursorPosition];
    if( cursorPosition.x == NSNotFound)
       return;
@@ -488,6 +544,405 @@ scrolling:
 
    ++cursorPosition.x; 
    [self setCursorPosition:cursorPosition];
+}
+
+
+// Returns UTF8 byte offset of start of previous word (before cursor)
+static NSUInteger   utf8OffsetPrevWordStart( char *s, NSUInteger pos)
+{
+   if( ! pos)
+      return( 0);
+   // skip trailing whitespace
+   NSUInteger i = pos;
+   while( i > 0 && isspace( (unsigned char) s[ i - 1]))
+      --i;
+   // skip word chars
+   while( i > 0 && ! isspace( (unsigned char) s[ i - 1]))
+      --i;
+   return( i);
+}
+
+// Returns UTF8 byte offset of end of next word (after cursor)
+static NSUInteger   utf8OffsetNextWordEnd( char *s, NSUInteger pos, NSUInteger len)
+{
+   NSUInteger i = pos;
+   // skip leading whitespace
+   while( i < len && isspace( (unsigned char) s[ i]))
+      ++i;
+   // skip word chars
+   while( i < len && ! isspace( (unsigned char) s[ i]))
+      ++i;
+   return( i);
+}
+
+
+- (void) selectWordAtCursor
+{
+   MulleCursorPosition    cursorPosition;
+   NSUInteger             pos;
+   NSUInteger             wordStart;
+   NSUInteger             wordEnd;
+   struct mulle_utf8data  data;
+   char                   *s;
+
+   cursorPosition = [self cursorPosition];
+   pos            = [self characterOffsetForCursorPosition:cursorPosition];
+   if( pos == NSNotFound)
+      return;
+
+   data = [_textLayer textUTF8Data];
+   s    = (char *) data.characters;
+   if( ! data.length)
+      return;
+
+   // find word boundaries around cursor
+   wordStart = pos;
+   while( wordStart > 0 && ! isspace( (unsigned char) s[ wordStart - 1]))
+      --wordStart;
+   wordEnd = pos;
+   while( wordEnd < data.length && ! isspace( (unsigned char) s[ wordEnd]))
+      ++wordEnd;
+
+   if( wordEnd > wordStart)
+   {
+      _startSelection = wordStart;
+      [self setSelection:NSRangeMake( wordStart, wordEnd - wordStart)];
+      [self setCursorPosition:[self cursorPositionForCharacterOffset:wordEnd]];
+   }
+}
+
+
+- (void) cursorWordLeft
+{
+   MulleCursorPosition   cursorPosition;
+   NSUInteger            pos;
+   NSUInteger            newPos;
+   char                  *s;
+
+   [self setSelection:NSRangeMake( 0, 0)];
+   cursorPosition = [self cursorPosition];
+   pos            = [self characterOffsetForCursorPosition:cursorPosition];
+   if( pos == NSNotFound)
+      return;
+   s              = [_textLayer textUTF8String];
+   newPos         = utf8OffsetPrevWordStart( s, pos);
+   [self setCursorPosition:[self cursorPositionForCharacterOffset:newPos]];
+}
+
+
+- (void) cursorWordRight
+{
+   MulleCursorPosition   cursorPosition;
+   NSUInteger            pos;
+   NSUInteger            newPos;
+   struct mulle_utf8data data;
+   char                  *s;
+
+   [self setSelection:NSRangeMake( 0, 0)];
+   cursorPosition = [self cursorPosition];
+   pos            = [self characterOffsetForCursorPosition:cursorPosition];
+   if( pos == NSNotFound)
+      return;
+   data           = [_textLayer textUTF8Data];
+   s              = (char *) data.characters;
+   newPos         = utf8OffsetNextWordEnd( s, pos, data.length);
+   [self setCursorPosition:[self cursorPositionForCharacterOffset:newPos]];
+}
+
+
+- (void) cursorHome
+{
+   MulleCursorPosition   cursorPosition;
+
+   [self setSelection:NSRangeMake( 0, 0)];
+   cursorPosition   = [self cursorPosition];
+   cursorPosition.x = 0;
+   [self setCursorPosition:cursorPosition];
+}
+
+
+- (void) cursorEnd
+{
+   MulleCursorPosition            cursorPosition;
+   struct CATextLayerLayouterRow  *row;
+   NSUInteger                     nRows;
+
+   [self setSelection:NSRangeMake( 0, 0)];
+   cursorPosition = [self cursorPosition];
+   nRows          = _mulle_structarray_get_count( &_rowArray);
+   if( ! nRows || cursorPosition.y >= nRows)
+      return;
+   row              = _mulle_structarray_get( &_rowArray, cursorPosition.y);
+   cursorPosition.x = row->glyphRange.length;
+   [self setCursorPosition:cursorPosition];
+}
+
+
+- (void) cursorDocHome
+{
+   [self setCursorPosition:MulleCursorPositionMake( 0, 0)];
+}
+
+
+- (void) cursorDocEnd
+{
+   [self setCursorPosition:[self maxCursorPosition]];
+}
+
+
+- (void) deleteWordBefore
+{
+   MulleCursorPosition   cursorPosition;
+   NSUInteger            pos;
+   NSUInteger            wordStart;
+   char                  *s;
+   struct mulle_utf8data data;
+
+   if( [self deleteSelectionIfNeeded])
+      return;
+
+   cursorPosition = [self cursorPosition];
+   pos            = [self characterOffsetForCursorPosition:cursorPosition];
+   if( pos == NSNotFound || ! pos)
+      return;
+   s              = [_textLayer textUTF8String];
+   wordStart      = utf8OffsetPrevWordStart( s, pos);
+   data           = [_textLayer textUTF8Data];
+   s = MulleObjC_asprintf( "%.*s%s", (int) wordStart, s, s + pos);
+   [_textLayer setTextUTF8String:s];
+   [self setCursorPosition:[self cursorPositionForCharacterOffset:wordStart]];
+}
+
+
+- (void) deleteWordAfter
+{
+   MulleCursorPosition   cursorPosition;
+   NSUInteger            pos;
+   NSUInteger            wordEnd;
+   struct mulle_utf8data data;
+   char                  *s;
+
+   if( [self deleteSelectionIfNeeded])
+      return;
+
+   cursorPosition = [self cursorPosition];
+   pos            = [self characterOffsetForCursorPosition:cursorPosition];
+   if( pos == NSNotFound)
+      return;
+   data           = [_textLayer textUTF8Data];
+   s              = (char *) data.characters;
+   wordEnd        = utf8OffsetNextWordEnd( s, pos, data.length);
+   if( wordEnd == pos)
+      return;
+   s = MulleObjC_asprintf( "%.*s%s", (int) pos, s, s + wordEnd);
+   [_textLayer setTextUTF8String:s];
+   [self setCursorPosition:cursorPosition];
+}
+
+
+// Selection extension: move cursor and expand selection
+- (void) extendSelectionLeft
+{
+   MulleCursorPosition   cursorPosition;
+   NSUInteger            pos;
+   NSUInteger            anchor;
+
+   cursorPosition = [self cursorPosition];
+   pos            = [self characterOffsetForCursorPosition:cursorPosition];
+   if( pos == NSNotFound || ! pos)
+      return;
+
+   if( ! _selection.length)
+      _startSelection = pos;
+   anchor = _startSelection;
+
+   --pos;
+   if( pos < anchor)
+      [self setSelection:NSRangeMake( pos, anchor - pos)];
+   else if( pos > anchor)
+      [self setSelection:NSRangeMake( anchor, pos - anchor)];
+   else
+      [self setSelection:NSRangeMake( 0, 0)];
+
+   --cursorPosition.x;
+   if( cursorPosition.x >= 0)
+      [self setCursorPosition:cursorPosition];
+}
+
+
+- (void) extendSelectionRight
+{
+   MulleCursorPosition   cursorPosition;
+   MulleCursorPosition   maxPosition;
+   NSUInteger            pos;
+   NSUInteger            anchor;
+
+   cursorPosition = [self cursorPosition];
+   maxPosition    = [self maxCursorPosition];
+   if( cursorPosition.x >= maxPosition.x)
+      return;
+
+   pos = [self characterOffsetForCursorPosition:cursorPosition];
+   if( pos == NSNotFound)
+      return;
+
+   if( ! _selection.length)
+      _startSelection = pos;
+   anchor = _startSelection;
+
+   ++pos;
+   if( pos > anchor)
+      [self setSelection:NSRangeMake( anchor, pos - anchor)];
+   else if( pos < anchor)
+      [self setSelection:NSRangeMake( pos, anchor - pos)];
+   else
+      [self setSelection:NSRangeMake( 0, 0)];
+
+   ++cursorPosition.x;
+   [self setCursorPosition:cursorPosition];
+}
+
+
+- (void) extendSelectionWordLeft
+{
+   MulleCursorPosition   cursorPosition;
+   NSUInteger            pos;
+   NSUInteger            newPos;
+   NSUInteger            anchor;
+   char                  *s;
+
+   cursorPosition = [self cursorPosition];
+   pos            = [self characterOffsetForCursorPosition:cursorPosition];
+   if( pos == NSNotFound)
+      return;
+   s      = [_textLayer textUTF8String];
+   newPos = utf8OffsetPrevWordStart( s, pos);
+   anchor = _selection.length ? _selection.location + _selection.length : pos;
+   if( newPos < anchor)
+      [self setSelection:NSRangeMake( newPos, anchor - newPos)];
+   else
+      [self setSelection:NSRangeMake( anchor, newPos - anchor)];
+   [self setCursorPosition:[self cursorPositionForCharacterOffset:newPos]];
+}
+
+
+- (void) extendSelectionWordRight
+{
+   MulleCursorPosition   cursorPosition;
+   NSUInteger            pos;
+   NSUInteger            newPos;
+   NSUInteger            anchor;
+   struct mulle_utf8data data;
+   char                  *s;
+
+   cursorPosition = [self cursorPosition];
+   pos            = [self characterOffsetForCursorPosition:cursorPosition];
+   if( pos == NSNotFound)
+      return;
+   data   = [_textLayer textUTF8Data];
+   s      = (char *) data.characters;
+   newPos = utf8OffsetNextWordEnd( s, pos, data.length);
+   anchor = _selection.length ? _selection.location : pos;
+   if( newPos > anchor)
+      [self setSelection:NSRangeMake( anchor, newPos - anchor)];
+   else
+      [self setSelection:NSRangeMake( newPos, anchor - newPos)];
+   [self setCursorPosition:[self cursorPositionForCharacterOffset:newPos]];
+}
+
+
+- (void) extendSelectionHome
+{
+   MulleCursorPosition   cursorPosition;
+   NSUInteger            pos;
+   NSUInteger            anchor;
+
+   cursorPosition = [self cursorPosition];
+   pos            = [self characterOffsetForCursorPosition:cursorPosition];
+   if( pos == NSNotFound)
+      return;
+
+   if( ! _selection.length)
+      _startSelection = pos;
+   anchor = _startSelection;
+
+   cursorPosition.x = 0;
+   if( anchor > 0)
+      [self setSelection:NSRangeMake( 0, anchor)];
+   else
+      [self setSelection:NSRangeMake( 0, 0)];
+   [self setCursorPosition:cursorPosition];
+}
+
+
+- (void) extendSelectionEnd
+{
+   MulleCursorPosition            cursorPosition;
+   NSUInteger                     pos;
+   NSUInteger                     lineEnd;
+   NSUInteger                     anchor;
+   struct CATextLayerLayouterRow  *row;
+   NSUInteger                     nRows;
+   MulleCursorPosition            endPos;
+
+   cursorPosition = [self cursorPosition];
+   pos            = [self characterOffsetForCursorPosition:cursorPosition];
+   if( pos == NSNotFound)
+      return;
+   nRows = _mulle_structarray_get_count( &_rowArray);
+   if( ! nRows || cursorPosition.y >= nRows)
+      return;
+   row              = _mulle_structarray_get( &_rowArray, cursorPosition.y);
+   endPos           = MulleCursorPositionMake( row->glyphRange.length, cursorPosition.y);
+   lineEnd          = [self characterOffsetForCursorPosition:endPos];
+   if( lineEnd == NSNotFound)
+      return;
+
+   if( ! _selection.length)
+      _startSelection = pos;
+   anchor = _startSelection;
+
+   if( lineEnd > anchor)
+      [self setSelection:NSRangeMake( anchor, lineEnd - anchor)];
+   else
+      [self setSelection:NSRangeMake( 0, 0)];
+   [self setCursorPosition:endPos];
+}
+
+
+- (void) extendSelectionDocHome
+{
+   NSUInteger            pos;
+   MulleCursorPosition   cursorPosition;
+
+   cursorPosition = [self cursorPosition];
+   pos            = [self characterOffsetForCursorPosition:cursorPosition];
+   if( pos == NSNotFound || ! pos)
+      return;
+   [self setSelection:NSRangeMake( 0, pos)];
+   [self setCursorPosition:MulleCursorPositionMake( 0, 0)];
+}
+
+
+- (void) extendSelectionDocEnd
+{
+   NSUInteger            pos;
+   NSUInteger            endPos;
+   MulleCursorPosition   cursorPosition;
+   MulleCursorPosition   maxPos;
+   struct mulle_utf8data data;
+
+   cursorPosition = [self cursorPosition];
+   pos            = [self characterOffsetForCursorPosition:cursorPosition];
+   if( pos == NSNotFound)
+      return;
+   data   = [_textLayer textUTF8Data];
+   endPos = data.length;
+   if( endPos <= pos)
+      return;
+   [self setSelection:NSRangeMake( pos, endPos - pos)];
+   maxPos = [self maxCursorPosition];
+   [self setCursorPosition:maxPos];
 }
 
 

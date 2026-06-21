@@ -319,7 +319,7 @@ static inline float fabstrunc(float f){
 @end
 
 
-@interface PlasmaView( Forwarding)
+@interface PlasmaView( Forwarding) <MulleObjectForwarding>
 
 @property( assign) int   plasmasize;
 @property( assign) int   zoom;
@@ -330,7 +330,11 @@ static inline float fabstrunc(float f){
 @end
 
 
-@implementation UIView (AnimateFrame)
+@implementation PlasmaView( Forwarding)
+@end
+
+
+@implementation UIView ( AnimateFrame)
 @end
 
 

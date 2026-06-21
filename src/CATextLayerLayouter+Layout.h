@@ -51,8 +51,11 @@
 
 @end
 
-
-@interface CATextLayer( CATextLayerLayouter_Layout_Forward)
+//
+// as the CATextLayerLayouter is getting methods forwarded by the CATextLayer
+// we declare it on the CATextLayer as well
+//
+@interface CATextLayer( CATextLayerLayouter_LayoutForward) < MulleObjCForwarding>
 
 - (CGPoint) textOriginInRect:(CGRect) rect
                      context:(id <UILayoutContext>) context;

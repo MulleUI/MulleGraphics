@@ -44,12 +44,12 @@ export PROJECT_ASSET_DIR="asset"
 #
 #
 #
-export MULLE_CG_NANO_VG_NODETYPE="local"
+export MULLE_CG_NANOVG_NODETYPE="local"
 
 
 #
 #
 #
-export MULLE_CG_NANO_VG_URL="/home/src/srcO/MulleUI/MulleCGNanoVG"
+export MULLE_CG_NANOVG_URL="/home/src/srcO/MulleUI/MulleCGNanovg"
 
 

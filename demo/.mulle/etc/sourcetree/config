@@ -1,6 +1,6 @@
+MulleUIOS;${MULLE_UIOS_NODETYPE:-tar};no-singlephase;7C2CA39C-5E35-4245-A438-44C2F84E5EF2;${MULLE_UIOS_URL:-https://github.com/MulleUI/MulleUIOS/archive/${MULLE_TAG}.tar.gz};${MULLE_UIOS_BRANCH};${MULLE_UIOS_TAG:-latest};;
 MulleGraphics;${MULLE_GRAPHICS_NODETYPE:-git};no-singlephase;96956698-555F-42F8-A7E6-252B8EC21531;${MULLE_GRAPHICS_URL:-https://github.com/MulleUI/MulleGraphics.git};${MULLE_GRAPHICS_BRANCH};${MULLE_GRAPHICS_TAG};;
 MulleFoundation;${MULLE_FOUNDATION_NODETYPE:-git};no-singlephase;AC2B5582-8BF6-42B5-BAAB-934BDB8B7B51;${MULLE_FOUNDATION_URL:-https://github.com/MulleFoundation/MulleFoundation.git};${MULLE_FOUNDATION_BRANCH};${MULLE_FOUNDATION_TAG};;
-MulleUI;${MULLE_UI_NODETYPE:-git};no-singlephase;5C4FDD8C-FB18-431B-9875-9F3D878B25FC;${MULLE_UI_URL:-https://github.com/MulleUI/MulleUI.git};${MULLE_UI_BRANCH};${MULLE_UI_TAG};;
 Xi;none;no-all-load,no-build,no-cmake-inherit,no-delete,no-dependency,no-fs,no-header,no-import,no-platform-darwin,no-share,no-update;9A7D25D7-D5E0-4C1D-B8DB-0E8F2530264A;;;;;
 MulleGraphicsImage;${MULLE_GRAPHICS_IMAGE_NODETYPE:-tar};no-singlephase;986A0F1A-630C-4484-A168-301287677F0E;${MULLE_GRAPHICS_IMAGE_URL:-https://github.com/MulleUI/MulleGraphicsImage/archive/${MULLE_TAG}.tar.gz};${MULLE_GRAPHICS_IMAGE_BRANCH};${MULLE_GRAPHICS_IMAGE_TAG:-latest};;
 MulleUIPerf;${MULLE_UI_PERF_NODETYPE:-tar};no-singlephase;16295179-6216-4E0D-8313-A92671B4EE42;${MULLE_UI_PERF_URL:-https://github.com/MulleUI/MulleUIPerf/archive/${MULLE_TAG}.tar.gz};${MULLE_UI_PERF_BRANCH};${MULLE_UI_PERF_TAG:-latest};;

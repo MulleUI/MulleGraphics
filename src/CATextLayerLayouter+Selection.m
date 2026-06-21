@@ -67,6 +67,11 @@
 - (void) startSelectionAtPoint:(CGPoint) point
 {
    NSUInteger   i;
+   CGPoint      origin;
+
+   origin = [_textLayer origin];
+   point.x -= origin.x;
+   point.y -= origin.y;
 
    i = [self characterOffsetOfGlyphAtPoint:point];
    if( i == NSNotFound)
@@ -80,6 +85,11 @@
 - (void) adjustSelectionToPoint:(CGPoint) point
 {
    NSUInteger   i;
+   CGPoint      origin;
+
+   origin = [_textLayer origin];
+   point.x -= origin.x;
+   point.y -= origin.y;
 
    i = [self characterOffsetOfGlyphAtPoint:point];
    if( i == NSNotFound)
@@ -105,6 +115,9 @@
    NSRange   range;
 
    range = [self textRange];
+   CATextLayerLayouterLog( CATextLayerLayouterDebugSelection,
+      "textRange={%tu,%tu} text=\"%s\"",
+      range.location, range.length, [_textLayer textUTF8String]);
    [self setSelection:range];
    [self setCursorPosition:MulleCursorPositionMax];
 }
@@ -112,27 +125,47 @@
 
 - (void) deselectAll
 {
+   CATextLayerLayouterLog( CATextLayerLayouterDebugSelection, "");
    [self setSelection:NSRangeMake( 0, 0)];
 }
 
 
 - (void) deleteSelection
 {
-   CGPixelPoint   cursorPosition;
    struct mulle_utf8data   data;
 
+   CATextLayerLayouterLog( CATextLayerLayouterDebugSelection,
+      "selection={%tu,%tu} text=\"%s\"",
+      _selection.location, _selection.length, [_textLayer textUTF8String]);
+
    data = [_textLayer textUTF8Data];
+   if( ! data.characters || ! data.length)
+   {
+      CATextLayerLayouterLog( CATextLayerLayouterDebugVerbose, "empty data, bail");
+      [self setSelection:NSRangeMake( 0, 0)];
+      return;
+   }
+   if( _selection.location + _selection.length > data.length)
+   {
+      CATextLayerLayouterLog( CATextLayerLayouterDebugVerbose,
+         "selection out of range: loc+len=%tu > data.length=%tu",
+         _selection.location + _selection.length, data.length);
+      [self setSelection:NSRangeMake( 0, 0)];
+      return;
+   }
+
    mulle_buffer_do_inflexible_filled( buffer, data.characters, data.length)
    {
-      // how to keep the cursor position stable ? move cursor to 
-      // _selection.location then remove text
       mulle_buffer_remove_in_range( buffer, _selection);
       data.length = mulle_buffer_get_length( buffer);
       data.characters[ data.length] = 0;
       [_textLayer setTextUTF8Data:data];
 
-      cursorPosition = [self cursorPositionForCharacterOffset:_selection.location];   
-      [self setCursorPosition:cursorPosition];
+      CATextLayerLayouterLog( CATextLayerLayouterDebugSelection,
+         "after delete: text=\"%s\" cursor=(%td,0)",
+         [_textLayer textUTF8String], _selection.location);
+
+      [_textLayer setCursorPosition:MulleCursorPositionMake( _selection.location, 0)];
       [self setSelection:NSRangeMake( 0, 0)];
    }
 }

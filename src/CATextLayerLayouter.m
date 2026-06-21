@@ -19,10 +19,25 @@
 
 @implementation CATextLayerLayouter
 
+static NSUInteger   CATextLayerLayouterClassDebuggingFlags;
+
++ (void) initialize
+{
+   char   *s;
+
+   if( MulleObjCClassGetID( self) != @selector( CATextLayerLayouter))
+      return;
+   s = getenv( "CATextLayerLayouterDebuggingFlags");
+   if( s)
+      CATextLayerLayouterClassDebuggingFlags = strtol( s, NULL, 0);
+}
+
 
 - (instancetype) init
 {
    [super init];
+
+   _debuggingFlags = CATextLayerLayouterClassDebuggingFlags;
 
    _textRange = NSRangeMake( NSNotFound, 0);
 
@@ -117,6 +132,16 @@
       _textLayer = textLayer;
       [self invalidate];
    }
+}
+
+
+- (void) setSelection:(NSRange) range
+{
+   CATextLayerLayouterLog( CATextLayerLayouterDebugSelection,
+      "selection {%tu,%tu} -> {%tu,%tu}",
+      _selection.location, _selection.length,
+      range.location, range.length);
+   _selection = range;
 }
 
 

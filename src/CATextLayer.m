@@ -1,5 +1,7 @@
 #import "CATextLayer.h"
 
+// #define CATEXTLAYER_SHOW_BASELINE
+
 #import "import-private.h"
 
 #import "CGGraphicsLayer+MulleGraphics.h"
@@ -202,6 +204,7 @@
       _textPropertiesGenerationCount++;
    }
 }
+
 
 
 - (CGRect) insetCanvas
@@ -629,14 +632,6 @@ uintptr_t   mulle_utf8_utf32_offset_at_characters( char *data,
    if( ! nRows)
       return( YES);
 
-
-   // set font, size, alignment...
-   _renderedFontMetrics = [self prepareLayoutContext:context];
-   metrics              = CGContextTextMetrics( context);
-
-   origin = _origin;
-   canvas = [self insetCanvas];
-
    // if textPaint is not set, use color derived from :_backgroundPaint
    textPaint = _textPaint ? _textPaint : [self suggestedTextPaint];
    assert( textPaint);
@@ -660,11 +655,33 @@ uintptr_t   mulle_utf8_utf32_offset_at_characters( char *data,
 
    CGContextClearType( context, useClearType);
 
+   // set font, size, alignment...
+   _renderedFontMetrics = [self prepareLayoutContext:context];
+   metrics              = CGContextTextMetrics( context);
+
    origin = _origin;
-   mulle_fprintf( stderr, "CATextLayer drawInContext: origin=(%.1f, %.1f)\n", origin.x, origin.y);
+   canvas = [self insetCanvas];
 
    // Set initial position to origin
    CGContextTranslate( context, origin);
+
+#ifdef CATEXTLAYER_SHOW_BASELINE
+   // draw a thin green line at the baseline position (y=0 after translate)
+   {
+      CGRect   baselineRect;
+      CGFloat  left;
+
+      left = -origin.x;
+      baselineRect = CGRectMake( left, -0.5, canvas.size.width, 1.0);
+      CGContextFillRectWithColor( context, baselineRect, CGColorMakeWithRGBA( 0, 0.8, 0, 0.7));
+      // blue rect for ascender (above baseline)
+      baselineRect = CGRectMake( left, -metrics.ascender, canvas.size.width, metrics.ascender);
+      CGContextFillRectWithColor( context, baselineRect, CGColorMakeWithRGBA( 0, 0, 1.0, 0.4));
+      // red rect for descender (below baseline)
+      baselineRect = CGRectMake( left, 0, canvas.size.width, metrics.descender);
+      CGContextFillRectWithColor( context, baselineRect, CGColorMakeWithRGBA( 1.0, 0, 0, 0.4));
+   }
+#endif
 
    for( i = 0; i < nRows; i++)
    {

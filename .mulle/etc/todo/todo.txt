@@ -1,0 +1,3 @@
+# Todo List
+Fix green border in catextlayer-align demo
+Consider isolating nanovg in another subproject, make MulleGraphics solely depend on CGContext function calls

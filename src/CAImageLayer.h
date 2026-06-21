@@ -32,7 +32,7 @@ MulleCursorInterface;
 @end
 
 
-@interface CAImageLayer( Future)
+@interface CAImageLayer( Future) < MulleObjCFuture>
 
 - (void) drawSelectionRect:(CGRect) canvas
                  inContext:(CGContext *) context;

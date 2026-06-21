@@ -39,6 +39,9 @@ struct CATextLayerLayouterRow
 @protected
    NSUInteger                          _startSelection;
 
+// DEBUG
+   NSUInteger                          _debuggingFlags;
+
 //
 // ROWS AND GLYPHS
 @protected   
@@ -54,8 +57,8 @@ struct CATextLayerLayouterRow
    struct mulle_structarray            _glyphArray; // contains glyphs
    BOOL                                _glyphArrayValid;
 
-   // * The UIGlyphPosition is relative to the baseline in the Y direction
-   // * If you have a string "a\na" the UIGlyphPosition for both 'a' in terms
+   // * The struct UIGlyphPosition is relative to the baseline in the Y direction
+   // * If you have a string "a\na" the struct UIGlyphPosition for both 'a' in terms
    //   of minx,maxx,miny,maxy will be identical.
    // * If your textAlignment is center, x will move from negative to positive
 
@@ -112,6 +115,24 @@ struct CATextLayerLayouterRow
 - (void) invalidate;
 
 @end
+
+
+enum
+{
+   CATextLayerLayouterDebugCursor    = 0x01,
+   CATextLayerLayouterDebugSelection = 0x02,
+   CATextLayerLayouterDebugVerbose   = 0x04
+};
+
+
+#define CATextLayerLayouterLog( flag, format, ...)                     \
+do                                                                     \
+{                                                                      \
+   if( self->_debuggingFlags & (flag))                                 \
+      mulle_fprintf( stderr, "%s: " format "\n",                       \
+                     __PRETTY_FUNCTION__, ## __VA_ARGS__);              \
+}                                                                      \
+while( 0)
 
 
 @interface CATextLayer( CATextLayerLayouter_Forward)

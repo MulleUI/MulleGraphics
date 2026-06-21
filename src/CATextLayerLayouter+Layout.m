@@ -193,8 +193,16 @@ static NSUInteger  count_newlines( mulle_utf8_t *s)
          break;
 
       case UITextAlignmentMiddle :
-         origin.y = (rect.size.height - boundsHeight) / 2.0 + metrics->ascender;
+      {
+         CGFloat   effectiveAscender;
+
+         // reduce ascender by lineGap (internal leading) for tighter centering
+         effectiveAscender = metrics->ascender;
+         if( metrics->lineGap > 0)
+            effectiveAscender -= metrics->lineGap;
+         origin.y = roundf( (rect.size.height + effectiveAscender) / 2.0);
          break;
+      }
 
       case UITextAlignmentBaseline :
          // Center the baseline reference point
@@ -234,7 +242,7 @@ static NSUInteger  count_newlines( mulle_utf8_t *s)
       MulleUILog( "%s origin: %s", NS_ENUM_PRINT( UITextVerticalAlignment, [_textLayer textVerticalAlignment]),
                                    CGPointUTF8String( origin));
 
-      origin.x += rect.origin.x;
+      // origin.x already includes rect.origin.x via CGRectGetMin/Mid/MaxX
       origin.y += rect.origin.y;
 
       // If cursor is visible, keep it always visible

@@ -67,6 +67,7 @@ typedef BOOL   CGGraphicsLayerDrawCallback_t( CGGraphicsLayer *layer,
 @property CGGraphicsLayerDrawCallback_t    *drawCallback;
 
 // set to stderr or stdout turn off with NULL (default)
+// NULL will not disrupt a CGContext trace though
 @property( assign) FILE                    *drawCallTracer;
 @property( dynamic, assign) CGFloat        cornerRadius;
 

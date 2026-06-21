@@ -27,6 +27,7 @@ struct CATextLayerRow
 
    CGFloat                     selectionX;
    CGFloat                     selectionWidth;
+   NSRange                     selectionRange;  // byte range of selected text (within textData)
    CATextLayerSelectionStyle   selectionStyle;
 
    CGFloat                     cursorX;

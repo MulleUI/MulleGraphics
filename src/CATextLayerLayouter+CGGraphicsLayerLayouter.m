@@ -169,14 +169,18 @@
 
       // Calculate selection X and width
       if( layerRow.selectionStyle != CATextLayerSelectionStyleNone)
+      {
          [self selectionInRow:i
                     textRange:layerRow.textRange
                    selectionX:&layerRow.selectionX
               selectionWidth:&layerRow.selectionWidth];
+         layerRow.selectionRange = NSIntersectionRange( layerRow.textRange, _selection);
+      }
       else
       {
          layerRow.selectionX     = 0;
          layerRow.selectionWidth = 0;
+         layerRow.selectionRange = NSRangeMake( 0, 0);
       }
 
       // Determine if cursor is in this row
@@ -200,7 +204,6 @@
    origin      = [self textOriginInRect:insetCanvas
                                 context:info->context];
 
-   mulle_fprintf( stderr, "Layouter setting origin=(%.1f, %.1f)\n", origin.x, origin.y);
    [textLayer setOrigin:origin];
 }
 

@@ -20,7 +20,7 @@
  - CGTextMetrics from CGContextTextMetrics are the canonical font metrics:
      ascender  > 0 above baseline
      descender < 0 below baseline (we display its absolute value for convenience)
- - Visual bounds are computed from actual glyph geometry (UIGlyphPosition minx/miny/maxx/maxy) transformed into layer coordinates, with small insets (CATextLayerVisualBoundsInsets) to account for overdraw.
+ - Visual bounds are computed from actual glyph geometry (struct UIGlyphPosition minx/miny/maxx/maxy) transformed into layer coordinates, with small insets (CATextLayerVisualBoundsInsets) to account for overdraw.
  - Hence, metric descender is a theoretical limit; visual descender reflects real pixel coverage and may extend a few pixels further.
 
  How text is actually rendered (pipeline)

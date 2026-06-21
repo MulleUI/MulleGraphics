@@ -1,0 +1,5 @@
+rows with long text: 1
+rows after text change: 0
+rows after valid add: 1
+text: "Red"
+passed

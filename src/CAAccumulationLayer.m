@@ -70,21 +70,28 @@
 
 - (void) mulleGainAccessWithUniquingSet:(struct mulle_pointerset *) uniquing
 {
+   NSInteger   i;
+
    assert( mulle_pointerset_get( uniquing, self) == self);
 
    [super mulleGainAccessWithUniquingSet:uniquing];
 
-   [self->_framebuffer[ 0] mulleGainAccessWithUniquingSet:uniquing];
-   [self->_framebuffer[ 1] mulleGainAccessWithUniquingSet:uniquing];
+   for( i = 0; i <= 1; ++i)
+      if( mulle_pointerset_insert( uniquing, self->_framebuffer[ i]))
+         [self->_framebuffer[ i] mulleGainAccessWithUniquingSet:uniquing];
 }
 
 
 - (void) mulleRelinquishAccessWithUniquingSet:(struct mulle_pointerset *) uniquing
 {
+   NSInteger   i;
+
    assert( mulle_pointerset_get( uniquing, self) == self);
 
-   [self->_framebuffer[ 1] mulleRelinquishAccessWithUniquingSet:uniquing];
-   [self->_framebuffer[ 0] mulleRelinquishAccessWithUniquingSet:uniquing];
+   for( i = 1; i >= 0; --i)
+      if( mulle_pointerset_insert( uniquing, self->_framebuffer[ i]))
+         [self->_framebuffer[ i] mulleRelinquishAccessWithUniquingSet:uniquing];
+
    [super mulleRelinquishAccessWithUniquingSet:uniquing];
 }
 
