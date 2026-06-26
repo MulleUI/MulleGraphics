@@ -250,6 +250,8 @@ int   main( int argc, char *argv[])
 
    [super drawBorderInContext:context];
 }
+
+
 - (BOOL) willDrawInContext:(CGContext *) context
 {
    BOOL   flag;
@@ -258,11 +260,15 @@ int   main( int argc, char *argv[])
    flag = [super willDrawInContext:context];
    return( flag);
 }
+
+
 - (void) didDrawInContext:(CGContext *) context
 {
    mulle_fprintf( stderr, "%s\n", __FUNCTION__);
    [super didDrawInContext:context];
 }
+
+
 /// b -[DemoTextLayer drawInContext:]
 - (BOOL) drawInContext:(CGContext *) context
 {

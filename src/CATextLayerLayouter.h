@@ -130,7 +130,7 @@ do                                                                     \
 {                                                                      \
    if( self->_debuggingFlags & (flag))                                 \
       mulle_fprintf( stderr, "%s: " format "\n",                       \
-                     __PRETTY_FUNCTION__, ## __VA_ARGS__);              \
+                     __PRETTY_FUNCTION__, ## __VA_ARGS__);             \
 }                                                                      \
 while( 0)
 

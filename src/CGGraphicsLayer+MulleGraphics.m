@@ -15,6 +15,9 @@
    MulleEdgeInsets   insets;
    CGRect            rect;
 
+
+   CGContextTraceComment( context, "// \"%s\" fill background", [self nameUTF8String]);
+
    rect = _frame;
 
    //
@@ -94,6 +97,8 @@
    CGPoint   br;
    CGRect    rect;
 
+   CGContextTraceComment( context, "// \"%s\" draw border", [self nameUTF8String]);
+
    //
    // the strokeWidth isn't scaled in nvg, so we do this now ourselves
    //
@@ -145,6 +150,8 @@
             transform:(CGAffineTransform *) xform
                 alpha:(CGFloat) alpha
 {
+   CGContextTraceComment( context, "// %s setup", [self nameUTF8String]);
+
    //
    // reset from previous CGGraphicsLayer having done renderInContext:
    //
@@ -210,6 +217,8 @@ void  CGGraphicsLayerSetupDrawTransform( CGGraphicsLayer *self,
    if( bounds.size.width == 0.0 || bounds.size.height == 0.0)
       return( NO);
 
+   CGContextTraceComment( context, "// %s will draw", [self nameUTF8String]);
+
    CGGraphicsLayerSetupDrawTransform( self, context, bounds);
 #ifdef USE_SCISSOR
    if( _masksToBounds)
@@ -221,6 +230,8 @@ void  CGGraphicsLayerSetupDrawTransform( CGGraphicsLayer *self,
 
 - (BOOL) drawInContext:(CGContext *) context
 {
+   CGContextTraceComment( context, "// %s draw", [self nameUTF8String]);
+
    return( CGGraphicsLayerExecuteDrawCallback( self, context));
 }
 

@@ -126,8 +126,7 @@ static NSUInteger  count_newlines( mulle_utf8_t *s)
    BOOL                   useVisualBounds;
    struct CGTextMetrics   *metrics;
 
-   mulle_fprintf( stderr, "textOriginInRect: rect=(%.1f, %.1f, %.1f, %.1f)\n",
-                  rect.origin.x, rect.origin.y, rect.size.width, rect.size.height);
+   CATextLayerLayouterLog( CATextLayerLayouterDebugVerbose, "textOriginInRect: rect=%s", CGRectUTF8String( rect));
 
    state = [context pushGraphicsState];
    {
@@ -239,7 +238,7 @@ static NSUInteger  count_newlines( mulle_utf8_t *s)
                                    break;
       }
 
-      MulleUILog( "%s origin: %s", NS_ENUM_PRINT( UITextVerticalAlignment, [_textLayer textVerticalAlignment]),
+      CATextLayerLayouterLog( CATextLayerLayouterDebugVerbose, "%s origin: %s", NS_ENUM_PRINT( UITextVerticalAlignment, [_textLayer textVerticalAlignment]),
                                    CGPointUTF8String( origin));
 
       // origin.x already includes rect.origin.x via CGRectGetMin/Mid/MaxX
