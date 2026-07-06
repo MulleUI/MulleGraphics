@@ -160,7 +160,7 @@
 
    // set UIView clipping rect in "framebuffer" space
 #ifdef USE_SCISSOR
-   if( _clipRect.size.width != INFINITY)
+   if( ! isinf( _clipRect.size.width))
       CGContextScissor( context, _clipRect);
 #endif
 

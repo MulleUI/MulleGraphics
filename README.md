@@ -1,3 +1,8 @@
+# MulleGraphics
+
+#### 🌠 MulleGraphics provides CALayer subclasses
+
+
 # 🌠 MulleGraphics
 
 #### 🌠 MulleGraphics provides CALayer subclasses
@@ -34,52 +39,83 @@ Based on MulleObjC. The MulleFoundation (e.g. NSString, or NSArray) is not yet
 available.
 
 
+
+
+
+| Release Version                                       | Release Notes  | AI Documentation
+|-------------------------------------------------------|----------------|---------------
+| ![Mulle kybernetiK tag](https://img.shields.io/github/tag/MulleUI/MulleGraphics.svg) [![Build Status](https://github.com/MulleUI/MulleGraphics/workflows/CI/badge.svg)](//github.com/MulleUI/MulleGraphics/actions) | [RELEASENOTES](RELEASENOTES.md) | [DeepWiki for MulleGraphics](https://deepwiki.com/MulleUI/MulleGraphics)
+
+
+
+
+
+
 ### You are here
 
 ![Overview](overview.dot.svg)
+
+
+
 
 
 ## Add
 
 Use [mulle-sde](//github.com/mulle-sde) to add MulleGraphics to your project:
 
-``` console
-mulle-sde dependency add --c --github <|GITHUB_USER|> MulleGraphics
+``` sh
+mulle-sde add github:MulleUI/MulleGraphics
 ```
+
+To only add the sources of MulleGraphics with dependency
+sources use [clib](https://github.com/clibs/clib):
+
+
+``` sh
+clib install --out src/MulleUI MulleUI/MulleGraphics
+```
+
+Add `-isystem src/MulleUI` to your `CFLAGS` and compile all the sources that were downloaded with your project.
+
 
 ## Install
 
-### mulle-sde
+Use [mulle-sde](//github.com/mulle-sde) to build and install MulleGraphics and all dependencies:
 
-Use [mulle-sde](//github.com/mulle-sde) to build and install MulleGraphics
-and all its dependencies:
-
-```
+``` sh
 mulle-sde install --prefix /usr/local \
-   https://github.com/<|GITHUB_USER|>/MulleGraphics/archive/latest.tar.gz
+   https://github.com/MulleUI/MulleGraphics/archive/latest.tar.gz
 ```
 
-### Manual Installation
-
+### Legacy Installation
 
 Install the requirements:
 
-Requirements                                      | Description
---------------------------------------------------|-----------------------
-[some-requirement](//github.com/some/requirement) | Some requirement
+| Requirements                                 | Description
+|----------------------------------------------|-----------------------
+| [MulleCG](https://github.com/MulleUI/MulleCG)             | 💫 MulleCG Coregraphics for MulleUI
+| [MulleCA](https://github.com/MulleUI/MulleCA)             | 🍃 Animate properties in real time with mulle-objc
+| [mulle-objc-list](https://github.com/mulle-objc/mulle-objc-list)             | 📒 Lists mulle-objc runtime information contained in executables.
 
-Install into `/usr/local`:
+Download the latest [tar](https://github.com/MulleUI/MulleGraphics/archive/refs/tags/latest.tar.gz) or [zip](https://github.com/MulleUI/MulleGraphics/archive/refs/tags/latest.zip) archive and unpack it.
+
+Install **MulleGraphics** into `/usr/local` with [cmake](https://cmake.org):
 
 ``` sh
-cmake -B build \
-      -DCMAKE_INSTALL_PREFIX=/usr/local \
-      -DCMAKE_PREFIX_PATH=/usr/local \
+PREFIX_DIR="/usr/local"
+cmake -B build                               \
+      -DMULLE_SDK_PATH="${PREFIX_DIR}"       \
+      -DCMAKE_INSTALL_PREFIX="${PREFIX_DIR}" \
+      -DCMAKE_PREFIX_PATH="${PREFIX_DIR}"    \
       -DCMAKE_BUILD_TYPE=Release &&
 cmake --build build --config Release &&
 cmake --install build --config Release
 ```
 
-### Steal
 
-Read [STEAL.md](//github.com/mulle-c11/dox/STEAL.md) on how to steal the
-source code and incorporate it in your own projects.
+## Author
+
+[Nat!](https://mulle-kybernetik.com/weblog) for Mulle kybernetiK  
+
+
+

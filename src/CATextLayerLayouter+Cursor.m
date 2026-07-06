@@ -696,7 +696,6 @@ static NSUInteger   utf8OffsetNextWordEnd( char *s, NSUInteger pos, NSUInteger l
    NSUInteger            pos;
    NSUInteger            wordStart;
    char                  *s;
-   struct mulle_utf8data data;
 
    if( [self deleteSelectionIfNeeded])
       return;
@@ -707,7 +706,6 @@ static NSUInteger   utf8OffsetNextWordEnd( char *s, NSUInteger pos, NSUInteger l
       return;
    s              = [_textLayer textUTF8String];
    wordStart      = utf8OffsetPrevWordStart( s, pos);
-   data           = [_textLayer textUTF8Data];
    s = MulleObjC_asprintf( "%.*s%s", (int) wordStart, s, s + pos);
    [_textLayer setTextUTF8String:s];
    [self setCursorPosition:[self cursorPositionForCharacterOffset:wordStart]];

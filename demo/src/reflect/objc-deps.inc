@@ -5,7 +5,7 @@
  * DO NOT EDIT. YOUR CHANGES WILL BE LOST!
  *
  *
- * template: project-oneshot/all/PROJECT_SOURCE_DIR/reflect/objc-loader.inc
+ * template: project-oneshot/all/PROJECT_SOURCE_DIR/reflect/objc-deps.inc
  * vendor/extension: mulle-objc/objc
  *
  */

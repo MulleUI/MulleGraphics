@@ -43,7 +43,7 @@ int   main( int argc, char *argv[])
    Foo                *foo;
    CABasicAnimation   *animation;
    NSInteger          i;
-   CGGradient         *start;
+   CGPaint            *start;
    CGGradient         *end;
    static CGColor     colors[] = { CGColorDataRed, CGColorDataGreen, CGColorDataBlue };
 

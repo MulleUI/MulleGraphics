@@ -307,7 +307,9 @@ static void   assert_sane_font_name( char *s)
 
 - (struct mulle_utf8data) textUTF8Data
 {
-   return( _textData);
+   return( _textData.characters
+           ? _textData
+           : (struct mulle_utf8data) { .characters = "" });
 }
 
 
