@@ -1,0 +1,41 @@
+{
+   project =
+   {
+      description="🌠 MulleGraphics provides CALayer subclasses";
+      domain="github";
+      language="c";
+      dialect="objc";
+      name="MulleGraphics";
+      user="MulleUI";
+      repo="MulleGraphics";
+      homepage="https://github.com/MulleUI/MulleGraphics";
+      license="UNLICENSED";
+   };
+   dependencies =
+   (
+      {
+         description="💫 MulleCG Coregraphics for MulleUI";
+         domain="github";
+         name="MulleCG";
+         repo="MulleCG";
+         url="https://github.com/MulleUI/MulleCG";
+         user="MulleUI";
+      },
+      {
+         description="🍃 Animate properties in real time with mulle-objc";
+         domain="github";
+         name="MulleCA";
+         repo="MulleCA";
+         url="https://github.com/MulleUI/MulleCA";
+         user="MulleUI";
+      },
+      {
+         description="📒 Lists mulle-objc runtime information contained in executables.";
+         domain="github";
+         name="mulle-objc-list";
+         repo="mulle-objc-list";
+         url="https://github.com/mulle-objc/mulle-objc-list";
+         user="mulle-objc";
+      }
+   );
+}
