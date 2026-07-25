@@ -12,6 +12,7 @@ mulle-sde code symbol CGGraphicsLayer
 mulle-sde code symbol CATextLayer
 mulle-sde code symbol CAImageLayer
 mulle-sde api apropos CGPaint
+mulle-sde api apropos CABasicAnimation
 ```
 
 ## Main local references
@@ -34,6 +35,7 @@ mulle-sde api apropos CGPaint
 - `src/CABasicAnimation+CGColor.h`
 - `src/CABasicAnimation+CGGradient.h`
 - `src/CABasicAnimation+CGPaint.h`
+- `src/CAImageLayer+Cursor.h`
 - `demo/src/main-animate-circles.m`
 - `demo/README.md`
 - `test/20-paint/paint-copy.m`
@@ -47,7 +49,7 @@ mulle-sde api apropos CGPaint
 | Custom vector or retained drawing | `CGGraphicsLayer`, `src/CGGraphicsLayer+MulleGraphics.h`, `demo/src/main-animate-circles.m` | Draw in canvas space; background and border still render in frame space. |
 | Labels, buttons, short editable text | `CATextLayer`, `CATextLayerLayouter`, `CATextLayerLayouter+CGGraphicsLayerLayouter` | The layouter owns row generation and origin placement; raw text alone is not enough to draw. |
 | Images, bitmap slices, CPU textures | `CAImageLayer`, `CACPUImageLayer` | `layerWithImage:` seeds frame from image size; CPU layers use canvas as the logical pixel grid. |
-| Shapes, gradients, shadows | `CAShapeLayer`, `CAGradientLayer`, `CAShadowLayer` | Shape layers own their path by default; gradient and shadow layers are specialized background/content drawers. |
+| Shapes, gradients, shadows | `CAShapeLayer`, `CAGradientLayer`, `CAShadowLayer`, `test/10-first/cgpath-simple.m` | Shape layers own their path by default; gradient and shadow layers are specialized background/content drawers. |
 | Paint/color/gradient animation | `CAAnimation+CGPaint`, `CABasicAnimation+CGColor`, `CABasicAnimation+CGGradient`, `CABasicAnimation+CGPaint` | Runtime type matters: gradient-to-gradient uses gradient interpolation, mixed paint types fall back to blended paint. |
 | Trail or feedback effects | `CAAccumulationLayer` | Only the subclassed layer accumulates; you still implement normal layer drawing on top of the previous framebuffer. |
 

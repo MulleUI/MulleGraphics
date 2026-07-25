@@ -16,7 +16,10 @@
 - Baseline math is local and intentional: row y positions are baseline-relative, not top-left text boxes. `textVerticalAlignment` and `useVisualBounds` both change how origin gets computed.
 - `useVisualBounds` is stricter than font metrics mode. With `aliasPixelVisible == NO` the layouter shrinks visual bounds by one pixel on each side to exclude anti-aliasing pixels.
 - ClearType has hard prerequisites in `src/CATextLayer.m`: text paint, text background paint, and selection paint must all be monochrome, and the text background must be opaque.
-- Selection ranges are character ranges, but `CATextLayerLayouter.h` warns that the layouter does **not** prevent splitting graphemes or combined emoji for you.
+- `textPaint` uses a small font image colorized with a monochrome color. Gradients are not possible for text fills per `src/CATextLayer.h`.
+- Text properties marked `observable` (`fontPixelSize`, `textLineHeight`, `textLetterSpacing`, etc.) increment `textPropertiesGenerationCount` but it is read-only. The layouter checks this count to decide whether glyphs need recomputation.
+- Selection ranges are character ranges in UTF-32 offsets, but `CATextLayerLayouter.h` warns that the layouter does **not** prevent splitting graphemes or combined emoji for you.
+- `fontNameUTF8String` is declared `assign` but `src/CATextLayer.m` internally duplicates the C string via `MulleObjCObjectSetDuplicatedUTF8String`. The caller may free the original pointer after setting.
 
 ## `CAImageLayer`, `CACPUImageLayer`, and `CAShapeLayer`
 

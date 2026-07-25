@@ -70,3 +70,9 @@ export MULLE_CRAFT_CROSS_COMPILER_ROOT__WINDOWS="/opt/mulle-clang-project-window
 
 
 
+#
+#
+#
+export vibecoding="off"
+
+

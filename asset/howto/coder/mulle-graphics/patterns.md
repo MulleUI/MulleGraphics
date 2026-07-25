@@ -50,6 +50,8 @@ layouter = [CATextLayerLayouter instance];
 
 Local rule from `src/CATextLayerLayouter+CGGraphicsLayerLayouter.m`: `layoutLayer:info:` clears all existing `CATextLayerRow` entries, repopulates them from the layouter state, and then sets `[layer origin]`. If you bypass the layouter, you must provide both text and rows yourself.
 
+ClearType text requires monochrome paints for text, background, and selection, plus an opaque text background — per `src/CATextLayer.m`. The convenience setters `setTextColor:`, `setSelectionColor:`, and `setTextBackgroundColor:` build monochrome paints automatically.
+
 ## Image, bitmap, and path authoring
 
 - `CAImageLayer` is the stock image surface. `+layerWithImage:` starts with the image size as the frame.
@@ -100,6 +102,23 @@ shapeLayer = [CAShapeLayer layerWithFrame:CGRectMake( 0, 0, 100, 100)];
 ```
 
 `src/CACPUImageLayer.h` is explicit: keeping the CPU texture only preserves the buffer for incremental updates; it does not make edits visible until the layer draws again.
+
+## Shadow and accumulation layers
+
+- `CAShadowLayer` draws a shadow around a content hole. Place it behind the content layer.
+- `shadowInsets` define the hole; `shadowHole` adds an extra rectangular cutout (used by `UIPopUpButton` to punch through menu shadows).
+- `CAAccumulationLayer` double-buffers each frame. Subclass it normally, implement `-drawInContext:`, and the previous frame is composited behind with decay.
+- Call `swapFramebuffers` at the end of each frame to move current → previous.
+
+```objective-c
+CAShadowLayer   *shadowLayer;
+CGRect          shadowHole;
+
+shadowLayer = [CAShadowLayer layerWithFrame:CGRectMake( 0, 0, 200, 200)];
+[shadowLayer setShadowBlur:8.0];
+[shadowLayer setShadowColor:CGColorMakeRGBA( 0, 0, 0, 0.5)];
+[shadowLayer setShadowInsets:MulleEdgeInsetsMake( 10, 10, 10, 10)];
+```
 
 ## Paint and gradient animation
 
