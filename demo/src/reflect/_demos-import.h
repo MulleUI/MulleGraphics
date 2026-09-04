@@ -12,6 +12,21 @@
  */
 
 // To remove the following dependency (headers and library) completely:
+//   `mulle-sde dependency remove MulleFoundation`
+// (Use AC2B5582-8BF6-42B5-BAAB-934BDB8B7B51 instead of MulleFoundation, if there are duplicate entries)
+//
+// You can tweak the following #import with these commands:
+//    remove #import      : `mulle-sde dependency mark MulleFoundation no-header`
+//    rename              : `mulle-sde dependency|library set MulleFoundation include whatever.h`
+//    reorder             : `mulle-sde dependency move MulleFoundation <up|down>`
+//    toggle objc         : `mulle-sde dependency mark MulleFoundation [no-]import`
+//    toggle public       : `mulle-sde dependency mark MulleFoundation [no-]public`
+//    toggle optional     : `mulle-sde dependency mark MulleFoundation [no-]require`
+//    remove for platform : `mulle-sde dependency mark MulleFoundation no-platform-<uname>`
+//        (use `mulle-sourcetree-to-c --unames` to list known values)
+#import <MulleFoundation/MulleFoundation.h>   // MulleFoundation
+
+// To remove the following dependency (headers and library) completely:
 //   `mulle-sde dependency remove MulleUIOS`
 // (Use 7C2CA39C-5E35-4245-A438-44C2F84E5EF2 instead of MulleUIOS, if there are duplicate entries)
 //
@@ -40,21 +55,6 @@
 //    remove for platform : `mulle-sde dependency mark MulleGraphics no-platform-<uname>`
 //        (use `mulle-sourcetree-to-c --unames` to list known values)
 #import <MulleGraphics/MulleGraphics.h>   // MulleGraphics
-
-// To remove the following dependency (headers and library) completely:
-//   `mulle-sde dependency remove MulleFoundation`
-// (Use AC2B5582-8BF6-42B5-BAAB-934BDB8B7B51 instead of MulleFoundation, if there are duplicate entries)
-//
-// You can tweak the following #import with these commands:
-//    remove #import      : `mulle-sde dependency mark MulleFoundation no-header`
-//    rename              : `mulle-sde dependency|library set MulleFoundation include whatever.h`
-//    reorder             : `mulle-sde dependency move MulleFoundation <up|down>`
-//    toggle objc         : `mulle-sde dependency mark MulleFoundation [no-]import`
-//    toggle public       : `mulle-sde dependency mark MulleFoundation [no-]public`
-//    toggle optional     : `mulle-sde dependency mark MulleFoundation [no-]require`
-//    remove for platform : `mulle-sde dependency mark MulleFoundation no-platform-<uname>`
-//        (use `mulle-sourcetree-to-c --unames` to list known values)
-#import <MulleFoundation/MulleFoundation.h>   // MulleFoundation
 
 // To remove the following dependency (headers and library) completely:
 //   `mulle-sde dependency remove MulleGraphicsImage`

@@ -41,12 +41,10 @@ static BOOL   drawStuff( CGGraphicsLayer *aLayer, CGContext *_context)
    CGContext       *context = _context;
    CGImage         *image;
    CAImageLayer    *imageLayer = (CAImageLayer *) aLayer;
-   CGFrameInfo     *info;
    NSUInteger      modeIndex;
    char            *filename;
    NSUInteger      frameNumber;
 
-   info        = [context currentFrameInfo];
    frameNumber = [context numberOfFrames];
    image       = (CGImage *) [imageLayer image] ;
    modeIndex   = (frameNumber / 100) % N_CGContentModes;
@@ -73,7 +71,6 @@ static BOOL   drawStuff( CGGraphicsLayer *aLayer, CGContext *_context)
 static void   setupSceneInWindow( UIWindow *window)
 {
    CAImageLayer    *layer;
-   CGImage         *image;
    CGRect          frame;
    UIView          *view;
    UIWindowPlane   *contentPlane;

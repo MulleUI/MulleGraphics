@@ -63,10 +63,9 @@
 
 @implementation DebugTextLayer
 
-- (BOOL) drawInContext:(CGContext *) context
-{
+ - (BOOL) drawInContext:(CGContext *) context
+ {
    CGTextMetrics        metrics;
-   CATextLayerLayouter  *layouter;
    CGRect               canvas;
    CGRect               textRect;
 
@@ -121,7 +120,6 @@
                            CGTextOptionAlignVisually);
       textRect.origin.y += 20;
    }
-   layouter = MULLE_OBJC_CLASS_CAST( CATextLayerLayouter, _layouter);
    mulle_sprintf_do( buf, "visualBounds : %s", CGRectUTF8String( [self visualBoundsWithContext:context]))
    {
       CGContextTextInRect( context, buf,
@@ -132,7 +130,6 @@
       textRect.origin.y += 20;
    }
 
-   layouter = MULLE_OBJC_CLASS_CAST( CATextLayerLayouter, _layouter);
    mulle_sprintf_do( buf, "origin : %s", CGPointUTF8String( _origin))
    {
       CGContextTextInRect( context, buf,

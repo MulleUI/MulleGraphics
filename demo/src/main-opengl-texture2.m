@@ -142,10 +142,10 @@ static void   checkGLError( const char* str)
 
 int   main( int argc, char *argv[])
 {
-   UIApplication   *app;
-   UIWindow        *window;
-   CALayer         *layer;
-   NSUInteger      styleMask;
+   UIApplication           *app;
+   UIWindow                *window;
+   OpenGLTexturedQuadLayer *layer;
+   NSUInteger              styleMask;
 
    app = [UIApplication sharedInstance];
    {

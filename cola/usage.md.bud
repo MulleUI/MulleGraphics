@@ -1,0 +1,48 @@
+## Usage
+
+The easiest way to draw your own content is a `CGGraphicsLayer` with a draw
+callback. The callback gets the layer and the `CGContext` you can draw into.
+Return `NO` to preempt the layer's own `-drawInContext:` so only your drawing
+shows; return `YES` to have your drawing appear underneath the layer's own
+content:
+
+``` objc
+#import <MulleGraphics/MulleGraphics.h>
+#import <MulleUIView/MulleUIView.h>   // UIView
+
+static BOOL   drawStuff( CGGraphicsLayer *layer, CGContext *context)
+{
+   CGRect   rect;
+
+   rect = CGRectInset( [layer canvas], 16, 16);
+   CGContextStrokeRectWithColor( context, rect, 8.0, CGColorMakeGreen());
+   return( NO);
+}
+
+
+static void   setupSceneInWindow( UIWindow *window)
+{
+   CGGraphicsLayer  *layer;
+   UIView           *view;
+
+   layer = [CGGraphicsLayer layerWithFrame:CGRectMake( 0.0, 0.0, 200.0, 200.0)];
+   [layer setDrawCallback:drawStuff];
+   [layer setBorderColor:CGColorMakeBlue()];
+   [layer setBorderWidth:2.0];
+
+   view = [UIView viewWithLayer:layer];
+   [[window contentView] addSubview:view];
+}
+```
+
+If you need to keep state between frames, subclass `CGGraphicsLayer` and
+override `-drawInContext:` instead of using a callback.
+
+## Build the demo
+
+The `demo/` folder is a [mulle-sde](//github.com/mulle-sde) project:
+
+``` sh
+cd demo
+mulle-sde craft
+```

@@ -99,10 +99,8 @@ static void   changeLayerString( UIView *view)
 static UIView *   setupSceneInWindow( UIWindow *window)
 {
    CATextLayer     *layer;
-   CGRect          frame;
    UIView          *view;
    UIView          *contentView;
-   CGSize          size;
 
    contentView = [window contentView];
    [contentView setBackgroundColor:CGColorMakeGray()];
@@ -143,7 +141,6 @@ int   main( int argc, char *argv[])
    UIView          *view;
    NSTimer         *timer;
    NSUInteger      styleMask;
-   double          delay;
 
    app = [UIApplication sharedInstance];
    {

@@ -1,5 +1,5 @@
 //
-//  CACPUImageLayer.m
+//  CACPUImageLayer.h
 //  MulleGraphics
 //
 //  Copyright (c) 2021 Nat! - Mulle kybernetiK.

@@ -154,11 +154,12 @@ void  setupAnimation( UIWindow *window,
 
 void   setupSceneAndAnimation( UIWindow *window, CGContext *context)
 {
-   CGImage         *image2;
    CGImage         *image;
    CGRect          frame;
    ImageLayer      *layer;
-   UIEdgeInsets    insets;
+#ifndef DEBUG_NO_ANIMATION
+   CGImage         *image2;
+#endif
    UIView          *view;
    UIWindowPlane   *contentPlane;
 
@@ -257,7 +258,7 @@ int   main( int argc, char *argv[])
    perf = [MulleUIPerf instance];
    [window setFrameDelegate:perf];
 
-   return( UIApplicationRunWindow( window));
+   return( [app runWindow:window]);
 }
 
 

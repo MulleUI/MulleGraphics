@@ -97,8 +97,6 @@ static BOOL   drawStuff( CGGraphicsLayer *aLayer, CGContext *context)
 static void   setupSceneInView( UIView *contentPlane)
 {
    CGGraphicsLayer   *layer;
-   CGFloat           aspectFactor;
-   CGRect            bounds;
    CGRect            frame;
    UIView            *view;
 

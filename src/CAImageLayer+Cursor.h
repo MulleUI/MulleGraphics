@@ -1,5 +1,5 @@
 //
-//  CAImageLayer+Cursor.m
+//  CAImageLayer+Cursor.h
 //  MulleGraphics
 //
 //  Copyright (c) 2021 Nat! - Mulle kybernetiK.

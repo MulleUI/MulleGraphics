@@ -1,5 +1,5 @@
 //
-//  CABasicAnimation+CGGradient.m
+//  CABasicAnimation+CGGradient.h
 //  MulleGraphics
 //
 //  Copyright (c) 2023 Nat! - Mulle kybernetiK.

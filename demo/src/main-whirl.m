@@ -133,11 +133,9 @@ struct whirls_options
    [self->_whirls release];
    [super dealloc];
 }
-- (BOOL) drawInContext:(CGContext *) context
-{
-   CGColor      fillColor;
+ - (BOOL) drawInContext:(CGContext *) context
+ {
    CGRect       canvas;
-   NSUInteger   i;
    Whirl       *whirl;
 
    canvas = [self canvas];

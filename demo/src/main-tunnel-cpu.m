@@ -63,10 +63,9 @@ static char  tunnelstonetex_png_data[] =
 }
 
 
-- (id) initWithFrame:(CGRect) frame
-{
+ - (id) initWithFrame:(CGRect) frame
+ {
    CGRect                rect;
-   UIBitmapImage         *image;
    struct CGBitmapInfo   bitmapInfo;
 
    [super initWithFrame:frame];
@@ -97,13 +96,14 @@ static char  tunnelstonetex_png_data[] =
 {
    NSUInteger    x, y;
    NSUInteger    mapped_x, mapped_y;
+#if DRAW_TEXTURE
    NSUInteger    w, h;
+#endif
    uint32_t      *dst_pixels;
    uint32_t      *src_pixels;
    double        animation;
    NSInteger     shiftX;
    NSInteger     shiftY;
-   uint32_t      color;
 
    assert( CGBitmapInfoGetEncoding( bitmapInfo) == CGBitmapEncodingRGBABytes);
    assert( CGPixelSizeEqualToPixelSize( CGBitmapInfoGetSize( bitmapInfo), CGPixelSizeMake( W, H)));
@@ -164,7 +164,6 @@ int   main( int argc, char *argv[])
    UIApplication   *app;
    TunnelView      *tunnelView;
    UIView          *contentView;
-   CGContext       *context;
 
    /*
     * window and app

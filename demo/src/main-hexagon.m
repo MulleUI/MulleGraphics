@@ -199,11 +199,10 @@ static void   drawBoxWithDropShadow( CGContext *context,
    [self->_lines release];
    [super dealloc];
 }
-- (BOOL) drawInContext:(CGContext *) context
-{
+ - (BOOL) drawInContext:(CGContext *) context
+ {
    Line         *line;
    CGRect       canvas;
-   CGPoint      die;
    CGColor      fillColor;
 
     ++self->_tick;

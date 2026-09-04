@@ -22,25 +22,31 @@ if( NOT ${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
       list( APPEND OS_SPECIFIC_LIBRARIES "Xi")
    else()
       if( NOT XI_LIBRARY)
-         find_library( XI_LIBRARY NAMES
-            Xi
-         )
+         foreach( _TMP_XI_LIBRARY_TARGET Xi)
+            if( TARGET ${_TMP_XI_LIBRARY_TARGET})
+               set( XI_LIBRARY ${_TMP_XI_LIBRARY_TARGET})
+               break()
+            endif()
+         endforeach()
+         if( NOT XI_LIBRARY)
+            find_library( XI_LIBRARY NAMES
+               Xi
+            )
+         endif()
          message( STATUS "XI_LIBRARY is ${XI_LIBRARY}")
-         #
-         # The order looks ascending, but due to the way this file is read
-         # it ends up being descending, which is what we need.
-         #
-         if( XI_LIBRARY)
+      endif()
+      if( XI_LIBRARY)
             #
             # Add XI_LIBRARY to OS_SPECIFIC_LIBRARIES list.
             # Disable with: `mulle-sourcetree mark Xi no-cmake-add`
             #
-            list( APPEND OS_SPECIFIC_LIBRARIES ${XI_LIBRARY})
+            if( NOT ${XI_LIBRARY} IN_LIST OS_SPECIFIC_LIBRARIES)
+               list( APPEND OS_SPECIFIC_LIBRARIES ${XI_LIBRARY})
+            endif()
             # intentionally left blank
-         else()
-            # Disable with: `mulle-sourcetree mark Xi no-require-link`
-            message( SEND_ERROR "XI_LIBRARY was not found in Xi")
-         endif()
+      else()
+         # Disable with: `mulle-sourcetree mark Xi no-require-link`
+         message( SEND_ERROR "XI_LIBRARY was not found in Xi")
       endif()
    endif()
 endif()

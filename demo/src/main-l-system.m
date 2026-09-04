@@ -38,7 +38,7 @@ static struct
 static char   *lindenmayer( char *s)
 {
    size_t   i, s_len;
-   size_t   j, rules_len;
+   size_t   j;
    int      ismatch;
    char     *outputstring;
 
@@ -103,7 +103,6 @@ static char   *lindenmayer( char *s)
    CGFloat   radius;
    CGPoint   oldCenter;
    CGFloat   r, g, b, a;
-   CGColor   color;
 
    if( k == 'F')
    {

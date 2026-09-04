@@ -117,16 +117,12 @@ static inline uint8_t   effect( uint8_t left, uint8_t middle, uint8_t right, int
    uint32_t   value;
    int32_t    chance;
    int32_t    left_chance;
-   int32_t    right_chance;
-   int32_t    middle_chance;
    int32_t    decay_chance;
    int32_t    div;
 
    chance        = rand();
    decay_chance  = chance & 0xFFFF;
    left_chance   = (chance >> 16) & 0xF;
-   right_chance  = (chance >> 20) & 0xF;
-   middle_chance = (chance >> 24) & 0xFF;
 
    value = middle;
    div   = 1;
@@ -167,17 +163,14 @@ static inline uint8_t   effect( uint8_t left, uint8_t middle, uint8_t right, int
 }
 
 
-- (void) flow
-{
+ - (void) flow
+ {
    uint8_t      *src;
    uint8_t      *dst;
    uint8_t      *sentinel;
    NSUInteger   y;
-   NSInteger    n;
    NSInteger    h;
-   NSInteger    decay;
    int          decay_probability;
-   int          decay_rate;
    double       percent;
 
    [self seedWater];
@@ -249,10 +242,9 @@ static inline uint8_t   effect( uint8_t left, uint8_t middle, uint8_t right, int
 //
 @implementation Water( CGBitmap)
 
-- (void) renderToRGBA:(void *) bytes
+ - (void) renderToRGBA:(void *) bytes
            bitmapInfo:(struct CGBitmapInfo) info
-{
-   CGPixelPoint   point;
+ {
    uint8_t                *dst;
    uint8_t                *src;
    uint8_t                *dst_sentinel;
@@ -370,7 +362,6 @@ static inline uint8_t   effect( uint8_t left, uint8_t middle, uint8_t right, int
 static void   setupSceneInWindow( UIWindow *window)
 {
    WaterLayer      *layer;
-   CGRect          frame;
    UIView          *view;
    UIWindowPlane   *contentPlane;
 

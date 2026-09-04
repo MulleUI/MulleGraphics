@@ -68,7 +68,7 @@ static inline CGColor   ColorStopGetColor( struct ColorStop *c)
 //
 // abuse size = 0,0 and default contentMode 0 to get a default fill
 //
-@property( assign) CGSize   size;
+- (CGSize) size;
 
 - (void) drawRect:(CGRect) rect
           options:(CGDrawableOptions *) options
@@ -144,12 +144,10 @@ static void   fillCircleWithHoleAndColorStops( CGContext *context,
 }
 
 
-- (void) drawRect:(CGRect) rect
-          options:(CGDrawableOptions *) options
-          context:(CGContext *) context
-{
-   struct mulle_structarrayreverseenumerator   rover;
-   
+ - (void) drawRect:(CGRect) rect
+           options:(CGDrawableOptions *) options
+           context:(CGContext *) context
+ {
    struct ColorStop                            *inner;
    struct ColorStop                            *outer;
    struct ColorStop                            hack;
@@ -280,7 +278,6 @@ static void   setupCircle( RadialGradientCircle *circle, CGFloat r)
 static void   setupScene( UIWindow *window)
 {
    CGRect                      contentRect;
-   CGRect                      frame;
    UIView                      *view;
    CAImageLayer                *layer;
    RadialGradientCircle        *circle;

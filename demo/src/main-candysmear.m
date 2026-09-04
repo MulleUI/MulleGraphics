@@ -52,7 +52,6 @@
 {
    NSUInteger       i;
    CAPolarPoint     x;
-   CGFloat          hue;
 
    _radius          = r;
    _point           = p;
@@ -184,13 +183,12 @@
    if( _point.y > size.height + _radius)
       _point.y = -_radius;
 }
-- (void) updateShape
-{
+ - (void) updateShape
+ {
    NSUInteger   i;
    NSUInteger   next;
    NSUInteger   prev;
    CGFloat      offset;
-   CGPoint      p;
 
    for( i = 0; i < _numSegment; i++)
    {

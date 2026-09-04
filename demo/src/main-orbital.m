@@ -147,7 +147,7 @@
    Orb          *orb;
    CGRect       canvas;
    CGColor      fillColor;
-   NSUInteger   i, n;
+   NSUInteger   i;
 
     canvas    = [self canvas];
    fillColor = CGColorMakeWithRGBA( 0, 0, 0, _trail ? 0.1 : 1.0);

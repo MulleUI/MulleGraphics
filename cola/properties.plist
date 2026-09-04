@@ -6,6 +6,7 @@
       language="c";
       dialect="objc";
       name="MulleGraphics";
+      version="0.8.0";
       user="MulleUI";
       repo="MulleGraphics";
       homepage="https://github.com/MulleUI/MulleGraphics";
@@ -22,7 +23,7 @@
          user="MulleUI";
       },
       {
-         description="🍃 Animate properties in real time with mulle-objc";
+         description="🫧 Animate properties in real time with mulle-objc";
          domain="github";
          name="MulleCA";
          repo="MulleCA";

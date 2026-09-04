@@ -14,9 +14,6 @@ static BOOL   drawStuff( CGGraphicsLayer *layer, CGContext *_context)
    NSUInteger          y;
    NSUInteger          w;
    NSUInteger          h;
-   CGRect              bounds;
-   CGFloat             col;
-   CGFloat             col_inc;
    CGRect              canvas;
    canvas = [layer canvas];
    w = (NSUInteger) ceil( canvas.size.width / 20.0);
@@ -120,7 +117,6 @@ void   setupSceneInContentPlane( UIWindowPlane *plane)
 }
 int   main()
 {
-   CGContext       *context;
    UIWindow        *window;
    UIApplication   *app;
 

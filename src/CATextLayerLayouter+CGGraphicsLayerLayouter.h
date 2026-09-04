@@ -1,8 +1,8 @@
 //
-//  CATextLayerLayouter+CGGraphicsLayerLayouter.m
+//  CATextLayerLayouter+CGGraphicsLayerLayouter.h
 //  MulleGraphics
 //
-//  Copyright (c) <|YEAR|> Nat! - Mulle kybernetiK.
+//  Copyright (c) 2025 Nat! - Mulle kybernetiK.
 //  All rights reserved.
 //
 //

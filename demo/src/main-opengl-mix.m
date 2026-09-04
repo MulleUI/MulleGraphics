@@ -324,11 +324,7 @@ static BOOL   layoutRedView( UIView *view)
 
 static UIView   *setupTeapotView( UIWindow *window, CGColor color, int grid)
 {
-   CAAnimationGroup                 *group;
-   CAAnimator                       *animator;
    CABasicAnimation                 *animation;
-   CATransaction                    *ta;
-   CGRect                           frame;
    OpenGLTeapotLayer                *layer;
    OpenGLTeapotView                 *view;
    struct CABasicAnimationOptions   options;

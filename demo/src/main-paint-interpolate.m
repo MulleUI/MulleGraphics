@@ -45,7 +45,6 @@ static BOOL   drawStuff( CGGraphicsLayer *layer, CGContext *context)
    CABasicAnimation              *animation;
    CGPaint                       *paint[ 2];
    CGRect                        canvas;
-   CGRect                        rect;
    CGRect                        rects[ ROWS][ COLS];
    Foo                           *foo;
    NSUInteger                    i, j;
@@ -117,7 +116,7 @@ static BOOL   drawStuff( CGGraphicsLayer *layer, CGContext *context)
          //       (also tests more code)
          //
          animation = MULLE_OBJC_CLASS_CAST( CABasicAnimation,
-                                           [CGPaint createAnimationFrom:paint[ 0]
+                                           [CGPaint animationFrom:paint[ 0]
                                                                      to:paint[ 1]
                                                                property:property
                                                                 options:NULL]);

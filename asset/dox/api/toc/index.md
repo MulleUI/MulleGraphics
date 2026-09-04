@@ -568,7 +568,7 @@ Currently the texture is always RGBA — assert bitmapInfo encoding nevertheless
 @end
 
 @interface CGPaint( CAAnimation)
-+ (CAAnimation *) createAnimationFrom:(id) startObject
++ (CAAnimation *) animationFrom:(id) startObject
                                    to:(id) endObject
                              property:(struct _mulle_objc_property *) property
                               options:(struct CABasicAnimationOptions *) options;

@@ -5,8 +5,7 @@ int   main()
 {
    UIWindow        *window;
    UIApplication   *app;
-   CALayer         *layer;
-   UIView          *view;
+   CAOpenGLLayer   *layer;
    NSUInteger      styleMask;
 
    /*

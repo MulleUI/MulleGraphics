@@ -52,8 +52,6 @@ static BOOL   drawStuff( CGGraphicsLayer *layer, CGContext *_context)
    NSUInteger          w;
    NSUInteger          h;
    CGRect              bounds;
-   CGFloat             col;
-   CGFloat             col_inc;
    CGRect              canvas;
 #ifdef POSSIBLE_INTERSECT_BUG
    // visually this breaks the intersect we got from the view clipRect
@@ -103,7 +101,6 @@ void   setupSceneInView( UIView *contentView)
 }
 int   main( void)
 {
-   CGContext       *context;
    UIWindow        *window;
    UIApplication   *app;
 

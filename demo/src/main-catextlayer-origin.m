@@ -115,9 +115,8 @@
    [super layoutAuxillaryLayer:layer
                     layoutInfo:info];
 }
-- (UIMouseMotionEvent *) handleMouseMotionEvent:(UIMouseMotionEvent *) event
-{
-   CGFloat           baseline;
+ - (UIMouseMotionEvent *) handleMouseMotionEvent:(UIMouseMotionEvent *) event
+ {
    CGFloat           borderWidth_2;
    CGGraphicsLayer   *outlineLayer;
    CGPoint           location;
@@ -125,7 +124,6 @@
    CGRect            oldFrame;
    CGRect            outlineFrame;
    CGRect            rect;
-   char              *s;
    CATextLayer       *layer;
    NSUInteger        i;
 

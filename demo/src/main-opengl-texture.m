@@ -223,7 +223,6 @@ int   main()
    UIWindow            *window;
    UIApplication       *app;
    RotatingQuadLayer   *layer;
-   UIView              *view;
    NSUInteger          styleMask;
 
    /*

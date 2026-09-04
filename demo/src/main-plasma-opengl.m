@@ -15,9 +15,6 @@ int   main( void)
 
 #else
 
-# include <GL/gl.h>
-# include <GL/glu.h>
-
 // This demo shows how you can fairly easily convert OpenGL code into
 // a CAOpenGLLayer subclass.
 
@@ -49,11 +46,6 @@ int   main( void)
 
 // Useful random number macros
 // Don't forget to initialize with srand()
-static inline int rsRandi(int x){
-   return rand() % x;
-}
-
-
 static inline float rsRandf(float x){
    return x * ((float)(rand()) / (float)(RAND_MAX));
 }
@@ -110,9 +102,9 @@ static inline float fabstrunc(float f){
 
 
 // done once (per OpenGL context, layer)
-- (void) initPlasma
-{
-   int i, j;
+ - (void) initPlasma
+ {
+   int i;
 
    srand((unsigned)time(NULL));
 
@@ -319,13 +311,13 @@ static inline float fabstrunc(float f){
 @end
 
 
-@interface PlasmaView( Forwarding) <MulleObjectForwarding>
+@interface PlasmaView( Forwarding) <MulleObjCForwarding>
 
-@property( assign) int   plasmasize;
-@property( assign) int   zoom;
-@property( assign) int   focus;
-@property( assign) int   speed;
-@property( assign) int   resolution;
+@property( assign, forward) int   plasmasize;
+@property( assign, forward) int   zoom;
+@property( assign, forward) int   focus;
+@property( assign, forward) int   speed;
+@property( assign, forward) int   resolution;
 
 @end
 

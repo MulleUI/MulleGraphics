@@ -10,7 +10,6 @@ static UIWindowDisplayBits   changeShadow( UIWindow *window,
                                            UIWindowDisplayBits displayBits)
 {
    CAShadowLayer      *layer;
-   CGRect             frame;
    UIView             *view;
    UIView             *contentView;
    MulleEdgeInsets    insets;

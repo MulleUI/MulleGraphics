@@ -23,9 +23,8 @@
 // DebugTextLayer 
 @implementation DebugTextLayer
 
-- (BOOL) drawInContext:(CGContext *) context
-{
-   BOOL      flag;
+ - (BOOL) drawInContext:(CGContext *) context
+ {
    CGFloat   ascender;
    CGFloat   descender;
    CGRect    canvas;
@@ -132,11 +131,10 @@
 }
 
 
-- (void) layoutAuxillaryLayer:(id <UILayer>) layer
-                   layoutInfo:(struct UILayoutInfo *) info
-{
+ - (void) layoutAuxillaryLayer:(id <UILayer>) layer
+                    layoutInfo:(struct UILayoutInfo *) info
+ {
    CATextLayer           *textLayer;
-   CATextLayer           *infoLayer;
    CGRect                frame;
    NSInteger             tag;
    CGFloat               borderWidth_2;
@@ -162,12 +160,11 @@
       [layer setFrame:frame];
       break;
 
-   case -1 :
-      // ok so we know the info layer is layouted after textLayer, so we can 
-      // use that frame to calculate a position
+    case -1 :
+       // ok so we know the info layer is layouted after textLayer, so we can 
+       // use that frame to calculate a position
 
-      infoLayer  = MULLE_OBJC_CLASS_CAST( CATextLayer, layer);
-      textLayer  = MULLE_OBJC_CLASS_CAST( CATextLayer, [self layerWithTag:1]);
+       textLayer  = MULLE_OBJC_CLASS_CAST( CATextLayer, [self layerWithTag:1]);
 
       frame          = [textLayer frame];
       frame.origin.x = CGRectGetMidX( frame);

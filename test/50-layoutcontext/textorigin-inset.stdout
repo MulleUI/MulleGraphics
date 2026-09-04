@@ -1,0 +1,4 @@
+insetCanvas origin.x: 20.0
+left   origin.x: 20.0  expected: 20.0  PASS
+center origin.x: 100.0  expected: 100.0  PASS
+right  origin.x: 180.0  expected: 180.0  PASS

@@ -1,8 +1,8 @@
 //
-//  CAAccumulationLayer.m
+//  CAAccumulationLayer.h
 //  MulleGraphics
 //
-//  Copyright (c) 2024 Nat! - Mulle kybernetiK.
+//  Copyright (c) 2025 Nat! - Mulle kybernetiK.
 //  All rights reserved.
 //
 //

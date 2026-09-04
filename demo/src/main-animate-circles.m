@@ -136,7 +136,7 @@ int   main( int argc, char *argv[])
    perf = [MulleUIPerf instance];
    [window setFrameDelegate:perf];
 
-   return( UIApplicationRunWindow( window));
+   return( [app runWindow:window]);
 }
 
 

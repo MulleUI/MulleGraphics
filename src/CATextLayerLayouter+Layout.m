@@ -1,8 +1,8 @@
 //
-//  CATextLayer+Layout.m
+//  CATextLayerLayouter+Layout.m
 //  MulleGraphics
 //
-//  Copyright (c) <|YEAR|> Nat! - Mulle kybernetiK.
+//  Copyright (c) 2025 Nat! - Mulle kybernetiK.
 //  All rights reserved.
 //
 //
@@ -165,6 +165,7 @@ static NSUInteger  count_newlines( mulle_utf8_t *s)
       // For even rows: midpoint between two center rows
       if( nRows == 1)
       {
+         baselineY = metrics->ascender;
       }
       else
          if( nRows & 1)

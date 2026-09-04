@@ -63,7 +63,6 @@ static CGColor   colors[ 13] =
 static void   setupSceneInWindow( UIWindow *window)
 {
    CATextLayer     *layer;
-   CGRect          frame;
    UIWindowPlane   *contentView;
    CGPaint         *windowBackgroundPaint;
    CGPaint         *grayPaints[ 5];

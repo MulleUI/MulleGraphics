@@ -5,10 +5,11 @@
 
 static void   setupSceneInWindow( UIWindow *window)
 {
-   CATextLayer     *layer;
-   CGRect          frame;
-   UIView          *view;
-   UIWindowPlane   *contentPlane;
+   CATextLayer          *layer;
+   CATextLayerLayouter  *layouter;
+   CGRect               frame;
+   UIView               *view;
+   UIWindowPlane        *contentPlane;
 
    contentPlane = [window contentView];
    frame        = [contentPlane contentRect];
@@ -30,12 +31,13 @@ static void   setupSceneInWindow( UIWindow *window)
    [layer setLineBreakMode:NSLineBreakByWordWrapping];
    [layer setTextUTF8String:"This is line 1\nfollowed by line 2\nending in line 3"];
    
-   // Set selection from character 10 to 35 (across multiple lines)
-   // "This is li[ne 1\nfollowed by line 2\nending i]n line 3"
-   [[layer layouter] setSelection:NSMakeRange( 10, 25)];
-   
-   // Set cursor at line 1, position 8 (after "followed")
-   [[layer layouter] setCursorPosition:MulleCursorPositionMake( 8, 1)];
+    // Set selection from character 10 to 35 (across multiple lines)
+    // "This is li[ne 1\nfollowed by line 2\nending i]n line 3"
+    layouter = MULLE_OBJC_CLASS_CAST( CATextLayerLayouter, [layer layouter]);
+    [layouter setSelection:NSMakeRange( 10, 25)];
+    
+    // Set cursor at line 1, position 8 (after "followed")
+    [layouter setCursorPosition:MulleCursorPositionMake( 8, 1)];
    
    view  = [UIView viewWithLayer:layer];
    [contentPlane addSubview:view];
