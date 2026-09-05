@@ -75,6 +75,5 @@ src/CGGraphicsLayer.h
 src/MulleEdgeInsets+UTF8String.h
 src/MulleGraphics.h
 src/MulleObjCDeps+MulleGraphics.h
-src/reflect/_MulleGraphics-versioncheck.h
 )
 
