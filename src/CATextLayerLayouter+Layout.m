@@ -114,13 +114,10 @@ static NSUInteger  count_newlines( mulle_utf8_t *s)
 - (CGPoint) textOriginInRect:(CGRect) rect
                      context:(id <UILayoutContext>) context
 {
-   CGFloat                baselineY;
-   CGFloat                boundsHeight;
    CGFloat                rowsHeight;
    CGFloat                textLineHeight;
    CGPoint                origin;
    CGRect                 visualBounds;
-   NSUInteger             middleRow;
    NSUInteger             nRows;
    void                   *state;
    BOOL                   useVisualBounds;
@@ -145,43 +142,39 @@ static NSUInteger  count_newlines( mulle_utf8_t *s)
       {
          visualBounds = [self visualBoundsWithContext:context];
          //boundsTop    = visualBounds.origin.y;
-         boundsHeight = visualBounds.size.height;
 
          _visualMetrics.ascender   = _metrics.ascender - visualBounds.origin.y;
          _visualMetrics.descender  = _visualMetrics.lineHeight - _visualMetrics.ascender;
-         _visualMetrics.lineHeight = boundsHeight / nRows;
+         _visualMetrics.lineHeight = visualBounds.size.height / nRows;
          metrics                   = &_visualMetrics;
       }
       else
       {
          // Font metrics bounds
          // boundsTop    = 0.0;
-         boundsHeight = rowsHeight;
          metrics      = &_metrics;
       }
 
-      // Calculate baseline reference point
-      // For odd rows: baseline of middle row
-      // For even rows: midpoint between two center rows
-      if( nRows == 1)
-      {
-         baselineY = metrics->ascender;
-      }
-      else
-         if( nRows & 1)
-         {
-            // odd rows: baseline of middle row
-            middleRow  = nRows / 2;
-            baselineY  = (middleRow - 1) * textLineHeight + metrics->ascender;
-         }
-         else
-         {
-            // even rows: midpoint between two center baselines
-            middleRow  = nRows / 2;
-            baselineY  = (middleRow - 0.5) * textLineHeight;
-         }
-
-      // Calculate vertical origin based on alignment mode
+      // Calculate the vertical origin. origin.y is the baseline of the first
+      // row, measured from the top of the rect (the rect origin is added
+      // later). See UITextVerticalAlignment for the meaning of each mode.
+      //
+      // single row:       Top      -> ascender
+      //                   Bottom   -> height - descender
+      //                   Middle   -> height / 2
+      //                   Baseline -> ascender   (same as Top for one row)
+      //
+      // multiple rows, rowsHeight = lineHeight * nRows:
+      //                   Top      -> ascender
+      //                   Bottom   -> height - rowsHeight + ascender
+      //                   Middle   -> (height - rowsHeight) / 2 + ascender
+      //                   Baseline -> odd rows:
+      //                                  (height - rowsHeight + lineHeight) / 2
+      //                               even rows:
+      //                                  (height - rowsHeight) / 2 + ascender
+      //
+      // metrics is _visualMetrics when the text layer uses visual bounds,
+      // otherwise the plain font metrics.
       switch( [_textLayer textVerticalAlignment])
       {
       case UITextAlignmentTop :
@@ -189,24 +182,29 @@ static NSUInteger  count_newlines( mulle_utf8_t *s)
          break;
 
       case UITextAlignmentBottom :
-         origin.y = rect.size.height - boundsHeight + metrics->ascender;
+         if( nRows <= 1)
+            origin.y = rect.size.height - metrics->descender;
+         else
+            origin.y = rect.size.height - rowsHeight + metrics->ascender;
          break;
 
       case UITextAlignmentMiddle :
-      {
-         CGFloat   effectiveAscender;
-
-         // reduce ascender by lineGap (internal leading) for tighter centering
-         effectiveAscender = metrics->ascender;
-         if( metrics->lineGap > 0)
-            effectiveAscender -= metrics->lineGap;
-         origin.y = roundf( (rect.size.height + effectiveAscender) / 2.0);
+         if( nRows <= 1)
+            origin.y = rect.size.height / 2.0;
+         else
+            origin.y = (rect.size.height - rowsHeight) / 2.0 + metrics->ascender;
          break;
-      }
 
       case UITextAlignmentBaseline :
-         // Center the baseline reference point
-         origin.y = rect.size.height / 2.0 - baselineY;
+         if( nRows <= 1)
+            origin.y = metrics->ascender;
+         else
+         {
+            if( nRows & 1)
+               origin.y = (rect.size.height - rowsHeight + textLineHeight) / 2.0;
+            else
+               origin.y = (rect.size.height - rowsHeight) / 2.0 + metrics->ascender;
+         }
          break;
 
       case UITextAlignmentFill :

@@ -8,18 +8,18 @@
 
  Why this happens (metrics vs. pixels)
  - Font metrics (ascender, descender, lineHeight) come from FreeType via CGContextTextMetrics.
-   Example values for our demo at full canvas height:
-     ascender  ~= 580.8076
-     descender ~= -159.1924 (negative by definition below baseline)
-     lineh     ~= 740.0000  (≈ ascender + |descender|)
+   All values are positive distances from the baseline:
+     ascender   = distance from the baseline up to the ascender line
+     descender  = distance from the baseline down to the descender line
+     lineHeight = ascender + descender (+ optional lineGap)
  - Rendering uses an atlas of glyph bitmaps at integer pixel boundaries. Glyphs may include implicit padding/overshoot to avoid clipping and to improve rasterization (hinting, stem fitting, coverage).
  - Therefore, the actual inked pixels (visual bounds) can exceed theoretical metric lines (especially descenders with curved shapes like 'y', 'g', 'p'). This is expected and font-dependent, not a bug.
 
  Baseline, metrics and visual bounds
  - Baseline: y where text is positioned; 'v' touches baseline; 'y' descends below.
- - CGTextMetrics from CGContextTextMetrics are the canonical font metrics:
-     ascender  > 0 above baseline
-     descender < 0 below baseline (we display its absolute value for convenience)
+ - CGTextMetrics from CGContextTextMetrics are the canonical font metrics. Both
+   ascender and descender are positive distances from the baseline (ascender
+   points up, descender points down).
  - Visual bounds are computed from actual glyph geometry (struct UIGlyphPosition minx/miny/maxx/maxy) transformed into layer coordinates, with small insets (CATextLayerVisualBoundsInsets) to account for overdraw.
  - Hence, metric descender is a theoretical limit; visual descender reflects real pixel coverage and may extend a few pixels further.
 
@@ -34,17 +34,17 @@
  - Helper lines using CGTextMetrics show canonical font lines; visual pixels may exceed them by a few px.
  - For vertical centering that matches what the eye sees, center by visual bounds, not by metrics.
 
- Vertical alignment choices
- - Metrics-based (asc/desc/lineHeight): stable across text changes; can visually drift if glyphs lack extents.
- - Visual-based (visual bounds): matches perceived centering; depends on actual glyphs; preferred for short labels.
-
- Correct baseline for VisualMiddle
- - Let rect be the target area, visualBounds the ink bounds in layer coordinates.
- - The mathematically correct baseline (relative to rect) is:
-     origin.y = _metrics.ascender
-                + (rect.size.height - visualBounds.size.height) / 2.0
-                - visualBounds.origin.y;
-   The caller later adds rect.origin.y. This centers the ink and positions the baseline accordingly.
+ Vertical alignment
+ - The layer's UITextVerticalAlignment selects the vertical placement of the
+   text block. See UITextTypes.h in MulleUIBase for the exact per-mode formulas
+   (Top / Bottom / Middle / Baseline / Fill, single- and multi-row).
+ - For a single row, Baseline leaves the baseline at "ascender", so it coincides
+   with Top; only with more than one row does it vertically center the block.
+   Middle places the single-row baseline at height / 2.
+ - Metrics-based (asc/desc/lineHeight): stable across text changes; can visually
+   drift if glyphs lack extents.
+ - Visual-based (setUseVisualBounds:YES): matches perceived centering; depends
+   on the actual glyphs; preferred for short labels.
 
  Tracing tips
  - Enable draw call tracing: mulle-sde run --mulleui-trace-draw
@@ -75,6 +75,13 @@
    CGContextFillCircleWithColor( context, CACircleMakeWithCenterAndRadius( _origin, 8.0), CGColorMakeDarkGray()); // Converted from mvgFillCircleWithColor
 
    canvas   = [self insetCanvas];
+
+   // This debug overlay is only a rough aid:
+   //  * [super drawInContext:] has already restored the layer's default font,
+   //    so the metrics read below are the *default* font metrics and not the
+   //    metrics of the rendered text.
+   //  * the guide lines are drawn around the canvas midpoint, which is the
+   //    actual baseline only for UITextAlignmentMiddle.
    metrics  = [context textMetrics];
 
    CGContextStrokeLineHWithColor( context,
@@ -172,6 +179,8 @@
 }
 
 @end
+
+
 static void   setupSceneInWindow( UIWindow *window,
                                   UITextVerticalAlignment valignment,
                                   char *text)
@@ -198,6 +207,8 @@ static void   setupSceneInWindow( UIWindow *window,
    [view setClipsToBounds:NO];
    [contentPlane addSubview:view];
 }
+
+
 int   main( int argc, char *argv[])
 {
    UIWindow                  *window;

@@ -512,6 +512,21 @@ uintptr_t   mulle_utf8_utf32_offset_at_characters( char *data,
       nRows = 1;
 
    fontPixelSize = (canvas.size.height / (CGFloat) nRows) * factor;
+
+   // The height-derived size can make the text wider than the canvas (e.g.
+   // "|y|" at full height is ~1.6x wider than the layer). Shrink it so the
+   // visual bounds fit the layer, otherwise the text escapes it.
+   [context useFontWithNameUTF8String:_fontNameUTF8String];
+   [context setTextAlignment:_textAlignment];
+   [context setTextLetterSpacing:_textLetterSpacing];
+   [context setFontSize:fontPixelSize];
+
+   fontBounds.size.width = 0.0;
+   fontBounds = [context visualBoundsOfText:_textData.characters
+                                     length:_textData.length];
+   if( fontBounds.size.width > canvas.size.width)
+      fontPixelSize *= canvas.size.width / fontBounds.size.width;
+
    return( mvgRoundedFontSize( fontPixelSize));
 }
 
@@ -668,6 +683,9 @@ uintptr_t   mulle_utf8_utf32_offset_at_characters( char *data,
    if( ! nRows)
       return( YES);
 
+   origin = _origin;
+   canvas = [self insetCanvas];
+
    // if textPaint is not set, use color derived from :_backgroundPaint
    textPaint = _textPaint ? _textPaint : [self suggestedTextPaint];
    assert( textPaint);
@@ -689,93 +707,95 @@ uintptr_t   mulle_utf8_utf32_offset_at_characters( char *data,
                    [_selectionPaint isMonochrome];
    useClearType &= [textBackgroundPaint isOpaque];
 
-   CGContextClearType( context, useClearType);
 
-   // set font, size, alignment...
-   _renderedFontMetrics = [self prepareLayoutContext:context];
-   metrics              = CGContextTextMetrics( context);
+   CGContextSave( context);
+   {
+      CGContextClearType( context, useClearType);
 
-   origin = _origin;
-   canvas = [self insetCanvas];
+      // set font, size, alignment...
+      _renderedFontMetrics = [self prepareLayoutContext:context];
+      metrics              = CGContextTextMetrics( context);
 
-   // Set initial position to origin
-   CGContextTranslate( context, origin);
+      // Set initial position to origin
+      CGContextTranslate( context, origin);
 
 #ifdef CATEXTLAYER_SHOW_BASELINE
-   // draw a thin green line at the baseline position (y=0 after translate)
-   {
-      CGRect   baselineRect;
-      CGFloat  left;
+      // draw a thin green line at the baseline position (y=0 after translate)
+      {
+         CGRect   baselineRect;
+         CGFloat  left;
 
-      left = -origin.x;
-      baselineRect = CGRectMake( left, -0.5, canvas.size.width, 1.0);
-      CGContextFillRectWithColor( context, baselineRect, CGColorMakeWithRGBA( 0, 0.8, 0, 0.7));
-      // blue rect for ascender (above baseline)
-      baselineRect = CGRectMake( left, -metrics.ascender, canvas.size.width, metrics.ascender);
-      CGContextFillRectWithColor( context, baselineRect, CGColorMakeWithRGBA( 0, 0, 1.0, 0.4));
-      // red rect for descender (below baseline)
-      baselineRect = CGRectMake( left, 0, canvas.size.width, metrics.descender);
-      CGContextFillRectWithColor( context, baselineRect, CGColorMakeWithRGBA( 1.0, 0, 0, 0.4));
-   }
+         left = -origin.x;
+         baselineRect = CGRectMake( left, -0.5, canvas.size.width, 1.0);
+         CGContextFillRectWithColor( context, baselineRect, CGColorMakeWithRGBA( 0, 0.8, 0, 0.7));
+         // blue rect for ascender (above baseline)
+         baselineRect = CGRectMake( left, -metrics.ascender, canvas.size.width, metrics.ascender);
+         CGContextFillRectWithColor( context, baselineRect, CGColorMakeWithRGBA( 0, 0, 1.0, 0.4));
+         // red rect for descender (below baseline)
+         baselineRect = CGRectMake( left, 0, canvas.size.width, metrics.descender);
+         CGContextFillRectWithColor( context, baselineRect, CGColorMakeWithRGBA( 1.0, 0, 0, 0.4));
+      }
 #endif
 
-   for( i = 0; i < nRows; i++)
-   {
-      row = _mulle_structarray_get( &_rowArray, i);
-      if( _drawsTextBackground)
+      for( i = 0; i < nRows; i++)
       {
-         // compensate for center/left
-         rect = CGRectMake( -origin.x, -metrics.ascender, canvas.size.width, metrics.ascender + metrics.descender);
-         assert( textBackgroundPaint);
-         CGContextFillRectWithPaintable( context, rect, textBackgroundPaint);
-      }
-
-      /*
-       * Draw selection
-       */
-      if( _selectable)
-      {
-         switch( row->selectionStyle)
+         row = _mulle_structarray_get( &_rowArray, i);
+         if( _drawsTextBackground)
          {
-         case CATextLayerSelectionStyleRect :
-            rect = CGRectMake( row->selectionX, -metrics.ascender, row->selectionWidth, metrics.ascender + metrics.descender);
-            assert( _selectionPaint);
-            CGContextFillRectWithPaintable( context, rect, _selectionPaint);
-            break;
-
-         case CATextLayerSelectionStyleNone :
-            break;
+            // compensate for center/left
+            rect = CGRectMake( -origin.x, -metrics.ascender, canvas.size.width, metrics.ascender + metrics.descender);
+            assert( textBackgroundPaint);
+            CGContextFillRectWithPaintable( context, rect, textBackgroundPaint);
          }
-      }
 
-      CGContextTextColor( context, textColor);
-      CGContextTextBackgroundColor( context, textBackgroundColor);
-
-      s = mulle_utf8data_characters_in_range( self->_textData, row->textRange);
-      CGContextText( context, CGPointZero, s, row->textRange.length);
-
-      /*
-       * Draw Cursor
-       */
-      if( _editing)
-      {
-         switch( row->cursorStyle)
+         /*
+          * Draw selection
+          */
+         if( _selectable)
          {
-         case CATextLayerCursorStyleLine :
-            rect = CGRectMake( row->cursorX, -metrics.ascender, 2, metrics.ascender + metrics.descender);
-            assert( _cursorPaint);
-            CGContextFillRectWithPaintable( context, rect, _cursorPaint);
-            break;
+            switch( row->selectionStyle)
+            {
+            case CATextLayerSelectionStyleRect :
+               rect = CGRectMake( row->selectionX, -metrics.ascender, row->selectionWidth, metrics.ascender + metrics.descender);
+               assert( _selectionPaint);
+               CGContextFillRectWithPaintable( context, rect, _selectionPaint);
+               break;
 
-         case CATextLayerCursorStyleNone :
-            break;
+            case CATextLayerSelectionStyleNone :
+               break;
+            }
          }
-      }
 
-      // Move down to next line
-      CGContextTranslate( context, CGPointMake( 0, _renderedFontMetrics.textLineHeight));
+         CGContextTextColor( context, textColor);
+         CGContextTextBackgroundColor( context, textBackgroundColor);
+
+         s = mulle_utf8data_characters_in_range( self->_textData, row->textRange);
+         CGContextText( context, CGPointZero, s, row->textRange.length);
+
+         /*
+          * Draw Cursor
+          */
+         if( _editing)
+         {
+            switch( row->cursorStyle)
+            {
+            case CATextLayerCursorStyleLine :
+               rect = CGRectMake( row->cursorX, -metrics.ascender, 2, metrics.ascender + metrics.descender);
+               assert( _cursorPaint);
+               CGContextFillRectWithPaintable( context, rect, _cursorPaint);
+               break;
+
+            case CATextLayerCursorStyleNone :
+               break;
+            }
+         }
+
+         // Move down to next line
+         CGContextTranslate( context, CGPointMake( 0, _renderedFontMetrics.textLineHeight));
+      }
+      CGContextClearType( context, 0);
    }
-   CGContextClearType( context, 0);
+   CGContextRestore( context);
 
    return( YES);
 }

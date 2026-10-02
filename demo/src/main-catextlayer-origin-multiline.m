@@ -35,7 +35,9 @@
                                  CGRectGetRight( canvas),
                                  1.0,
                                  CGColorMakeWhite());
-   // compute metrics or get ascendet for baseline
+   // The ascender/descender guide lines below are drawn around the canvas
+   // midpoint, which is the actual baseline only for UITextAlignmentMiddle.
+   // This is just a rough debug aid, not a reference for the alignment math.
    ascender = [self fontAscender];
    CGContextStrokeLineWithColor( context, 
                                  CGPointMake( 0, 
@@ -300,15 +302,27 @@ static inline NSUInteger   getIndex( UITextVerticalAlignment valignment)
 @end
 
 
-void   setupScene( UIWindow *window)
+void   setupScene( UIWindow *window,
+                   UITextVerticalAlignment valignment,
+                   char *text)
 {
-   DemoView   *view;
-   CGRect     frame;
+   CATextLayer   *infoLayer;
+   CATextLayer   *textLayer;
+   DemoView      *view;
+   CGRect        frame;
 
    frame   = [[window contentView] contentRect];
    view    = [DemoView viewWithFrame:frame];
    [view setAutoresizingMask:UIViewAutoresizingScaleToFill];
    // [view setMouseMotionEventCallback:handleMouseMotionEvent];
+
+   textLayer = MULLE_OBJC_CLASS_CAST( CATextLayer, [view layerWithTag:1]);
+   [textLayer setTextVerticalAlignment:valignment];
+   if( text)
+      [textLayer setTextUTF8String:text];
+
+   infoLayer = MULLE_OBJC_CLASS_CAST( CATextLayer, [view layerWithTag:-1]);
+   [infoLayer setTextUTF8String:UITextVerticalAlignmentUTF8String( valignment)];
 
    [[window contentView] addSubview:view];
    // do this after adding view to window, need to be first responder to get
@@ -319,9 +333,33 @@ void   setupScene( UIWindow *window)
 
 int   main( int argc, char *argv[])
 {
-   UIApplication   *app;
-   UIWindow        *window;
-   NSUInteger      styleMask;
+   UIApplication             *app;
+   int                       i;
+   NSUInteger                styleMask;
+   char                      *text      = NULL;
+   UITextVerticalAlignment   valignment = UITextAlignmentBaseline;
+   unsigned long long        value;
+   UIWindow                  *window;
+
+   i = 1;
+   if( argc > i)
+   {
+      if( ! NS_ENUM_PARSE_STRICT( UITextVerticalAlignment, argv[ i], &value))
+      {
+         mulle_fprintf( stderr, "Unknown vertical alignment \"%s\", known are %s\n", argv[ i],
+"UITextAlignmentBaseline"
+", UITextAlignmentTop"
+", UITextAlignmentBottom"
+", UITextAlignmentMiddle"
+", UITextAlignmentFill");
+         return( 1);
+      }
+      valignment = (UITextVerticalAlignment) value;
+   }
+
+   i = 2;
+   if( argc > i)
+      text = argv[ i];
 
    app = [UIApplication sharedInstance];
 
@@ -338,7 +376,7 @@ int   main( int argc, char *argv[])
 
       assert( window);
       [window setBackgroundColor:CGColorMakeWithRGBA( 1.0, 1.0, 1.0, 1.0)];
-      setupScene( window);
+      setupScene( window, valignment, text);
 
       [app addWindow:window];
    }
