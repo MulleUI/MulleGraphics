@@ -41,7 +41,7 @@
  *
  *  version:  major, minor, patch
  */
-#define MULLE_GRAPHICS_VERSION  ((0UL << 20) | (8 << 8) | 0)
+#define MULLE_GRAPHICS_VERSION  ((0UL << 20) | (8 << 8) | 1)
 
 
 static inline unsigned int   MulleGraphics_get_version_major( void)

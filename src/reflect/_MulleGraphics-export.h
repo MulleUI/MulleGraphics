@@ -3,11 +3,11 @@
  *   `mulle-sde reflect` and any edits will be lost.
  *   Suppress generation of this file with:
  *
- *      mulle-sde environment set MULLE_MATCH_TO_C_OBJC_HEADERS_FILE DISABLE
+ *      mulle-sde environment --global set MULLE_MATCH_TO_C_OBJC_HEADERS_FILE DISABLE
  *
  *   To not let mulle-match-to-c generate any header files:
  *
- *      mulle-sde environment set MULLE_MATCH_TO_C_RUN DISABLE
+ *      mulle-sde environment --global set MULLE_MATCH_TO_C_RUN DISABLE
  */
 #ifndef _mulle_graphics__export_h__
 #define _mulle_graphics__export_h__
@@ -20,19 +20,19 @@
 #import "CABasicAnimation+CGPaint.h"
 #import "CACPUImageLayer.h"
 #import "CAGradientLayer.h"
-#import "CAImageLayer+Cursor.h"
 #import "CAImageLayer.h"
+#import "CAImageLayer+Cursor.h"
 #import "CAShadowLayer.h"
 #import "CAShapeLayer.h"
+#import "CATextLayer.h"
+#import "CATextLayerLayouter.h"
 #import "CATextLayerLayouter+CGGraphicsLayerLayouter.h"
 #import "CATextLayerLayouter+Cursor.h"
 #import "CATextLayerLayouter+Layout.h"
 #import "CATextLayerLayouter+RowsAndGlyphs.h"
 #import "CATextLayerLayouter+Selection.h"
-#import "CATextLayerLayouter.h"
-#import "CATextLayer.h"
-#import "CGGraphicsLayer+MulleGraphics.h"
 #import "CGGraphicsLayer.h"
+#import "CGGraphicsLayer+MulleGraphics.h"
 #import "MulleEdgeInsets+UTF8String.h"
 #import "MulleObjCDeps+MulleGraphics.h"
 
