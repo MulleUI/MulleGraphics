@@ -1,3 +1,13 @@
+### 0.8.1
+
+
+
+
+* add ``find_package()`` support so unrelated cmake projects can consume MulleGraphics
+* add ``add_subdirectory()`` support, staging public headers for embedded builds
+* propagate force-link (whole-archive) requirements of static initializer libraries to consumers
+* embed a UTF-8 active code page manifest in Windows executables
+
 ## 0.8.0
 
 

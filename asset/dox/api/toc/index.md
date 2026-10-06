@@ -630,7 +630,7 @@ char   *MulleEdgeInsetsUTF8String( MulleEdgeInsets insets);
 ### 3.12. `MulleGraphics.h` — Umbrella Header & Version
 
 ```c
-#define MULLE_GRAPHICS_VERSION  ((0UL << 20) | (8 << 8) | 0)
+#define MULLE_GRAPHICS_VERSION  ((0UL << 20) | (8 << 8) | 1)
 static inline unsigned int   MulleGraphics_get_version_major( void);
 static inline unsigned int   MulleGraphics_get_version_minor( void);
 static inline unsigned int   MulleGraphics_get_version_patch( void);
