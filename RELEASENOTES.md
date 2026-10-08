@@ -3,6 +3,7 @@
 
 
 
+
 * add ``find_package()`` support so unrelated cmake projects can consume MulleGraphics
 * add ``add_subdirectory()`` support, staging public headers for embedded builds
 * propagate force-link (whole-archive) requirements of static initializer libraries to consumers
